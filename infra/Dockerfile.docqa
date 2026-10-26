@@ -1,0 +1,7 @@
+# Disposable visual QA only. Application image does not require LibreOffice.
+FROM careerpilot-dev:local
+USER root
+RUN apt-get update && apt-get install -y --no-install-recommends libreoffice-writer poppler-utils \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip install --no-cache-dir pdf2image==1.17.0 pillow==13.0.0 pypdf==6.21.1
+USER careerpilot

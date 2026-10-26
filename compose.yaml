@@ -1,0 +1,81 @@
+name: careerpilot
+
+x-development: &development
+  image: careerpilot-dev:local
+  build:
+    context: .
+  init: true
+  working_dir: /workspace
+  environment:
+    CAREERPILOT_DATABASE_URL: sqlite:////var/lib/careerpilot/careerpilot.db
+  volumes:
+    - .:/workspace:ro
+    - careerpilot-data:/var/lib/careerpilot
+
+services:
+  migrate:
+    <<: *development
+    command: ["python", "-m", "careerpilot.bootstrap"]
+    restart: "no"
+
+  api:
+    <<: *development
+    environment:
+      CAREERPILOT_DATABASE_URL: sqlite:////var/lib/careerpilot/careerpilot.db
+      CAREERPILOT_GITHUB_CLIENT_ID: ${CAREERPILOT_GITHUB_CLIENT_ID:-}
+      CAREERPILOT_GITHUB_CLIENT_SECRET: ${CAREERPILOT_GITHUB_CLIENT_SECRET:-}
+      CAREERPILOT_GITHUB_CALLBACK_URL: ${CAREERPILOT_GITHUB_CALLBACK_URL:-}
+      CAREERPILOT_OAUTH_ENCRYPTION_KEY: ${CAREERPILOT_OAUTH_ENCRYPTION_KEY:-}
+    command:
+      - python
+      - -m
+      - uvicorn
+      - careerpilot.api:create_app
+      - --factory
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+      - --reload
+      - --reload-dir
+      - /workspace/src
+      - --no-access-log
+    ports:
+      - "127.0.0.1:${CAREERPILOT_PORT:-8000}:8000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready', timeout=3)"]
+      interval: 5s
+      timeout: 4s
+      start_period: 10s
+      retries: 12
+
+  worker:
+    <<: *development
+    command: ["python", "-m", "careerpilot.worker"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import pathlib,time; p=pathlib.Path('/tmp/careerpilot-worker-heartbeat'); assert p.exists() and time.time()-p.stat().st_mtime < 15"]
+      interval: 5s
+      timeout: 4s
+      start_period: 10s
+      retries: 12
+
+  # No development data volume or API dependency: tests use disposable databases.
+  checks:
+    image: careerpilot-dev:local
+    build:
+      context: .
+    init: true
+    working_dir: /workspace
+    profiles: ["tools"]
+    volumes:
+      - .:/workspace:ro
+    command: ["python", "scripts/check_dev.py"]
+
+volumes:
+  careerpilot-data:

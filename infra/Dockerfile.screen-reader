@@ -1,0 +1,11 @@
+# Optional real-reader check; keep desktop/speech packages out of the app image.
+FROM careerpilot-dev:local
+
+USER root
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        orca dbus-x11 at-spi2-core speech-dispatcher speech-dispatcher-espeak-ng \
+        espeak-ng xauth xdotool openbox libglib2.0-bin gsettings-desktop-schemas \
+    && rm -rf /var/lib/apt/lists/*
+USER careerpilot
+CMD ["dbus-run-session", "--", "python", "scripts/browser_screen_reader.py"]

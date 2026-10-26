@@ -1,0 +1,95 @@
+[
+  {
+    "project": "MyCareer",
+    "local_path": "D:\\Github_Project\\MyCareer",
+    "files": [
+      {
+        "path": "LICENSE",
+        "exists": true,
+        "sha256": "6b025519056384521f89fca9f4d2b47e5cc824b6112919cda925ec27e33c3e65"
+      },
+      {
+        "path": "pyproject.toml",
+        "exists": true,
+        "sha256": "912d9bb97763c2b558a4fef3dcbe3a87a72c5b19eeb50056482144b925614b7e"
+      },
+      {
+        "path": "uv.lock",
+        "exists": true,
+        "sha256": "e3bc992740f8d66aa35ca75690b90f948719c2a6e2234008ee97d938d74b353e"
+      },
+      {
+        "path": "src/career_agent/api/single_worker.py",
+        "exists": true,
+        "sha256": "c4504201aeef0401028da8776b549591e65adee26b6d46198f8b256af060e529"
+      },
+      {
+        "path": "src/career_agent/storage/api_keys.py",
+        "exists": true,
+        "sha256": "4a89d97a44dd8ef834af5dcaac54feb260c99ee1cdb80bfafa2d792a01f3f2fa"
+      },
+      {
+        "path": "src/career_agent/agent/capabilities/registry.py",
+        "exists": true,
+        "sha256": "04f41fa93dc33a4d68937b467f8fbeba0f5e1a5f982e63f679371d379d31f8e2"
+      }
+    ],
+    "root_license": "MIT",
+    "dependency_license_review": "pending",
+    "copied_code": false,
+    "decision": "No-Go for direct V0 runtime/code integration; independent interfaces retained",
+    "decision_evidence": "docs/ADR-003-v0-reuse-go-no-go.md"
+  },
+  {
+    "project": "Viora_AI",
+    "local_path": "D:\\Github_Project\\Viora_AI",
+    "files": [
+      {
+        "path": "LICENSE",
+        "exists": true,
+        "sha256": "4d3297445b0df5ad1c4d9d225d066f0767ff92542b5872026d9c4702579fbabd"
+      },
+      {
+        "path": "package.json",
+        "exists": true,
+        "sha256": "f7d9eeb9bd810bc56ff946c9240c2837ebccf9af4d2943c72b7f3df68deac859"
+      },
+      {
+        "path": "package-lock.json",
+        "exists": true,
+        "sha256": "96dbc798dcfc66729e6327936e974968d0ff8896e787393b018e4be312919e9a"
+      }
+    ],
+    "root_license": "MIT",
+    "dependency_license_review": "pending",
+    "copied_code": false,
+    "decision": "No-Go for direct V0 runtime/code integration; independent interfaces retained",
+    "decision_evidence": "docs/ADR-003-v0-reuse-go-no-go.md"
+  },
+  {
+    "project": "Jobyn",
+    "local_path": "D:\\Github_Project\\Jobyn",
+    "files": [
+      {
+        "path": "LICENSE",
+        "exists": true,
+        "sha256": "c85e4fc277d0345c37c6875bdfc598650ab50bb717468f175e616c53db0f8c5a"
+      },
+      {
+        "path": "frontend/package.json",
+        "exists": true,
+        "sha256": "0f54136491be1ee579e30eb53dc6745a317ce0f790ed2d829282f0ad3285e7d1"
+      },
+      {
+        "path": "backend/requirements.txt",
+        "exists": true,
+        "sha256": "da71eb484a64065616dbccd00b6a39d22de4a2f8052fcafe6a890df9eabae4a1"
+      }
+    ],
+    "root_license": "MIT",
+    "dependency_license_review": "pending",
+    "copied_code": false,
+    "decision": "No-Go for direct V0 runtime/code integration; independent interfaces retained",
+    "decision_evidence": "docs/ADR-003-v0-reuse-go-no-go.md"
+  }
+]

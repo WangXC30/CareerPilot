@@ -1,0 +1,11 @@
+{
+  "version": "dictionary.v1",
+  "source": "synthetic development seed; not a market-demand claim",
+  "careers": ["backend_engineer", "ai_application_engineer", "data_analyst"],
+  "skills": [
+    {"id":"python","aliases":["Python"],"requires":[]},
+    {"id":"sql","aliases":["SQL"],"requires":[]},
+    {"id":"pytorch","aliases":["PyTorch"],"requires":["python"]},
+    {"id":"javascript","aliases":["JS","JavaScript"],"requires":[]}
+  ]
+}

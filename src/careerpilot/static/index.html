@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CareerPilot · 我的成长空间</title>
+  <script src="/app/locales.js" defer></script>
+  <script src="/app/recruiting-locales.js" defer></script>
+  <script src="/app/project-locales.js" defer></script>
+  <script src="/app/community-locales.js" defer></script>
+  <script src="/app/remaining-locales.js" defer></script>
+  <script src="/app/model-comparison.js" defer></script>
+  <script src="/app/expert-comparison.js" defer></script>
+  <script src="/app/voice.js" defer></script>
+  <script src="/app/practice-tools.js" defer></script>
+  <script src="/app/v4-tools.js" defer></script>
+  <script src="/app/v4-growth.js" defer></script>
+  <script src="/app/direction-extras.js" defer></script>
+  <script src="/app/v4-learning.js" defer></script>
+  <script src="/app/collaboration.js" defer></script>
+  <script src="/app/projects.js" defer></script>
+  <script src="/app/project-workflow.js" defer></script>
+  <script src="/app/skill-graph.js" defer></script>
+  <script src="/app/study.js" defer></script>
+  <script src="/app/profile-history.js" defer></script>
+  <link rel="stylesheet" href="/app/style.css"><script src="/app/v1.js" defer></script><script src="/app/v2.js" defer></script><script src="/app/discovery.js" defer></script><script src="/app/interviews.js" defer></script><script src="/app/hiring.js" defer></script><script src="/app/sources.js" defer></script><script src="/app/progress.js" defer></script><script src="/app/operations.js" defer></script><script src="/app/growth.js" defer></script><script src="/app/app.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#content">跳到主要内容</a>
+  <aside id="sidebar">
+    <a class="brand" href="#dashboard"><span class="brand-icon" aria-hidden="true">C</span> CareerPilot</a>
+    <p class="nav-label" data-i18n="spaceLabel">我的成长空间</p>
+    <nav aria-label="主导航" data-i18n-aria="mainNav">
+      <a href="#dashboard" data-page="dashboard"><span aria-hidden="true">◈</span> <span>成长工作台</span></a>
+      <a href="#explore" data-page="explore"><span aria-hidden="true">⌁</span> <span>职业探索</span></a>
+      <a href="#market" data-page="market"><span aria-hidden="true">▦</span> <span>岗位市场</span></a>
+      <a href="#skills" data-page="skills"><span aria-hidden="true">◎</span> <span>能力地图</span></a>
+      <a href="#learning" data-page="learning"><span aria-hidden="true">▤</span> <span>学习中心</span></a>
+      <a href="#sources" data-page="sources"><span aria-hidden="true">▧</span> <span>资料与来源</span></a>
+      <a href="#progress" data-page="progress"><span aria-hidden="true">◷</span> <span>复盘与通知</span></a>
+      <a href="#local-tools" data-page="local-tools"><span aria-hidden="true">▧</span> <span>本地工具</span></a>
+      <a href="#directions" data-page="directions"><span aria-hidden="true">⌁</span> <span>方向与练习</span></a>
+      <a href="#collaboration" data-page="collaboration"><span aria-hidden="true">◇</span> <span>协作与分享</span></a>
+      <a href="#portfolio" data-page="portfolio"><span aria-hidden="true">◇</span> <span>作品集</span></a>
+      <a href="#recruiting" data-page="recruiting"><span aria-hidden="true">↗</span> <span>求职中心</span></a>
+    </nav>
+    <div class="nav-bottom"><a href="#settings">设置与隐私</a><a href="#admin">运营管理</a>
+      <p data-i18n="tagline">把每一步努力，变成看得见的成长。</p><small data-i18n="devPreview">CareerPilot · 开发预览</small></div>
+  </aside>
+  <div class="workspace">
+    <header><button id="menu" class="icon-button" aria-label="展开导航" aria-expanded="false" aria-controls="sidebar">☰</button>
+      <span class="breadcrumb"><span data-i18n="mySpace">我的空间</span> <span aria-hidden="true">/</span> <strong id="breadcrumb">成长工作台</strong></span>
+      <button id="connect" class="secondary">连接我的账号</button></header>
+    <main id="content" tabindex="-1">
+      <div class="page-heading"><div><p class="eyebrow" lang="en">MAKE PROGRESS, WITH PURPOSE</p>
+        <h1 id="title" tabindex="-1">让目标，成为下一步行动。</h1><p id="subtitle">从了解自己开始，建立有证据的职业成长路径。</p></div>
+        <span class="status-pill" data-i18n="statusPill">V4 本地实验</span></div>
+      <div class="toolbar"><span id="context">成长工作台</span><label><span data-i18n="stateLabel">查看页面状态</span>
+        <select id="preview-state"><option value="default" data-i18n="stateDefault">当前页面</option><option value="empty" data-i18n="stateEmpty">暂无内容</option><option value="loading" data-i18n="stateLoading">加载中</option><option value="error" data-i18n="stateError">加载失败</option></select>
+      </label></div>
+      <label><span lang="zh-CN">界面语言</span> / <span lang="en-US">Interface language</span><select id="ui-locale"><option value="zh-CN" lang="zh-CN">简体中文</option><option value="en-US" lang="en-US">English</option></select></label><p id="locale-scope"></p>
+      <div id="notice" aria-live="polite"></div><section id="view" aria-label="页面内容" data-i18n-aria="pageContent"></section>
+      <p class="footnote" data-i18n="footnote">预览中的示例卡片用于展示页面结构。个人进度以账号内实际记录为准。</p>
+      <p><a class="local-use-link" href="local-use.html" target="_blank" rel="noopener noreferrer" data-i18n="localUseNotice">本地使用与数据说明（新窗口）</a></p>
+    </main>
+  </div>
+  <dialog id="account-dialog" aria-labelledby="account-dialog-title"><h2 id="account-dialog-title" tabindex="-1" autofocus data-i18n="loginTitle">登录或注册</h2><form id="login-form"><label><span data-i18n="emailLabel">邮箱</span><input name="email" type="email" required maxlength="254" autocomplete="username"></label><label><span data-i18n="passwordLabel">密码</span><input name="password" type="password" minlength="12" maxlength="128" required autocomplete="current-password"></label><label><span data-i18n="displayNameLabel">昵称（注册时填写）</span><input name="display_name" maxlength="100" autocomplete="nickname"></label><label><input name="privacy" type="checkbox"> <span data-i18n="privacyLabel">我同意将提交的资料保存在我的私人空间；外部处理另行授权。</span></label><p data-i18n="emailNote">邮箱用于账号标识，当前不发送验证邮件。</p><p><a class="local-use-link" href="local-use.html" target="_blank" rel="noopener noreferrer" data-i18n="localUseNotice">本地使用与数据说明（新窗口）</a></p><p id="login-error" role="alert"></p><div class="actions"><button type="submit" name="mode" value="login" data-i18n="loginButton">邮箱登录</button><button type="submit" name="mode" value="register" class="secondary" data-i18n="registerButton">注册账号</button></div></form><hr><form id="account-form"><h3 data-i18n="devTitle">连接本地开发账号</h3>
+    <p data-i18n="devHelp">输入本地开发账号的访问令牌。令牌仅保留在本次页面内存中，刷新即清除。</p>
+    <label for="token" data-i18n="tokenLabel">访问令牌</label><input id="token" type="password" autocomplete="off" required>
+    <p id="account-error" role="alert"></p><div class="actions"><button type="button" data-close="account-dialog" class="secondary" data-i18n="cancel">取消</button><button type="submit" data-i18n="connectButton">连接</button></div>
+  </form></dialog>
+  <dialog id="approval-dialog" aria-labelledby="approval-dialog-title"><h2 id="approval-dialog-title" data-i18n="approvalTitle">确认调整计划</h2><p data-i18n="approvalIntro">界面交互预览：每周预算保持 10 小时，将两项学习任务移至周末。</p>
+    <div class="approval-diff"><p data-i18n="approvalDiff1">周三 · 基础练习 → 周六</p><p data-i18n="approvalDiff2">周四 · 项目复盘 → 周日</p></div>
+    <p data-i18n="approvalNote">此处仅预览确认流程，尚未生成或修改真实学习计划。</p><div class="actions"><button class="secondary" data-close="approval-dialog" data-i18n="keepPlan">保留原计划</button><button id="confirm-preview" data-i18n="confirmPreview">确认预览</button></div>
+  </dialog>
+</body></html>

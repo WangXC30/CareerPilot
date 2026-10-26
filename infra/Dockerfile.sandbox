@@ -1,0 +1,6 @@
+FROM python:3.14-slim@sha256:fbecd461fc72d21b2143c6eaba25143738079154a6d0ea3da3aec724f50eed4a
+
+# Deliberately contains no application code, credentials, dependencies or host mounts.
+USER 65534:65534
+WORKDIR /tmp
+ENTRYPOINT ["python", "-I", "-B", "-c"]

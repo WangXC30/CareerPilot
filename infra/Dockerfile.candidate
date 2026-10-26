@@ -1,0 +1,11 @@
+# Local release-candidate packaging, not a formal production security approval.
+FROM careerpilot-dev:local
+USER root
+# The existing toolchain supports business PDF/OCR/audio operations. A separately
+# audited minimal runtime and image signing remain formal release prerequisites.
+RUN rm -rf /workspace/tests /workspace/scripts /workspace/docs /workspace/evaluation
+COPY src/ /workspace/src/
+COPY migrations/ /workspace/migrations/
+COPY alembic.ini /workspace/alembic.ini
+USER careerpilot
+CMD ["python", "-m", "uvicorn", "careerpilot.api:create_app", "--factory", "--host", "0.0.0.0", "--port", "8000", "--no-access-log"]

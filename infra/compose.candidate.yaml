@@ -1,0 +1,132 @@
+# Standalone local candidate only. Never merge with the business-data Compose stack.
+x-app: &app
+  image: ${CANDIDATE_IMAGE:-careerpilot-candidate:local}
+  init: true
+  user: "10001:10001"
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges:true"]
+  tmpfs: ["/tmp:uid=10001,gid=10001,mode=0700"]
+  environment: &env
+    CAREERPILOT_DEPLOYMENT_MODE: candidate
+    CAREERPILOT_DATABASE_URL_FILE: /run/secrets/database_url
+    XDG_CACHE_HOME: /tmp/cache
+  secrets: [database_url]
+  mem_limit: 768m
+  cpus: 1.0
+  restart: unless-stopped
+  stop_grace_period: 15s
+
+x-api-health: &api-health
+  test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready',timeout=3)"]
+  interval: 2s
+  timeout: 4s
+  retries: 3
+  start_period: 10s
+
+x-worker-health: &worker-health
+  test: [CMD, python, -c, "import pathlib,time; p=pathlib.Path('/tmp/careerpilot-worker-heartbeat'); assert p.exists() and time.time()-p.stat().st_mtime<15"]
+  interval: 2s
+  timeout: 3s
+  retries: 2
+  start_period: 5s
+
+x-postgres: &postgres
+  image: postgres:17-alpine
+  environment:
+    POSTGRES_DB: careerpilot_test
+    POSTGRES_USER: careerpilot_admin
+    POSTGRES_PASSWORD_FILE: /run/secrets/admin_password
+  secrets: [admin_password, app_password]
+  configs:
+    - source: postgres_init
+      target: /docker-entrypoint-initdb.d/10-candidate.sh
+  healthcheck:
+    test: [CMD-SHELL, "pg_isready -U careerpilot_admin -d careerpilot_test"]
+    interval: 2s
+    timeout: 3s
+    retries: 20
+  mem_limit: 512m
+
+services:
+  postgres:
+    <<: *postgres
+    volumes: [candidate_db:/var/lib/postgresql/data]
+  migrate:
+    <<: *app
+    restart: "no"
+    command: [python, -m, careerpilot.bootstrap]
+    depends_on:
+      postgres: {condition: service_healthy}
+  api-a:
+    <<: *app
+    healthcheck: *api-health
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+  api-b:
+    <<: *app
+    healthcheck: *api-health
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+  worker-a:
+    <<: *app
+    command: [python, -m, careerpilot.worker]
+    healthcheck: *worker-health
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+  worker-b:
+    <<: *app
+    command: [python, -m, careerpilot.worker]
+    healthcheck: *worker-health
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+  frontdoor:
+    image: haproxy:3.0-alpine
+    user: "10001:10001"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    configs:
+      - source: haproxy
+        target: /usr/local/etc/haproxy/haproxy.cfg
+    ports: ["127.0.0.1:${CANDIDATE_HTTP_PORT:?temporary loopback port required}:8080"]
+    depends_on:
+      api-a: {condition: service_healthy}
+      api-b: {condition: service_healthy}
+    mem_limit: 128m
+    networks: [default, edge]
+  postgres-restore:
+    <<: *postgres
+    profiles: [restore]
+    volumes: [restore_db:/var/lib/postgresql/data]
+  restored-api:
+    <<: *app
+    profiles: [restore]
+    environment:
+      <<: *env
+      CAREERPILOT_DATABASE_URL_FILE: /run/secrets/restored_database_url
+    secrets: [restored_database_url]
+    ports: ["127.0.0.1:${CANDIDATE_RESTORE_PORT:?temporary restore port required}:8000"]
+    healthcheck: *api-health
+    networks: [default, edge]
+    depends_on:
+      postgres-restore: {condition: service_healthy}
+
+networks:
+  default: {internal: true}
+  # Docker does not publish host ports on an internal-only network. Only these
+  # two ingress services attach here; application workers and the DB stay internal.
+  edge: {}
+volumes:
+  candidate_db:
+    labels: {careerpilot.disposable: "true"}
+  restore_db:
+    labels: {careerpilot.disposable: "true"}
+secrets:
+  admin_password: {file: "${CANDIDATE_SECRETS_DIR:?temporary secret directory required}/admin_password"}
+  app_password: {file: "${CANDIDATE_SECRETS_DIR:?temporary secret directory required}/app_password"}
+  database_url: {file: "${CANDIDATE_SECRETS_DIR:?temporary secret directory required}/database_url"}
+  restored_database_url: {file: "${CANDIDATE_SECRETS_DIR:?temporary secret directory required}/restored_database_url"}
+configs:
+  postgres_init: {file: ./infra/candidate-postgres.sh}
+  haproxy: {file: ./infra/haproxy.candidate.cfg}

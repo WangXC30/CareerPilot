@@ -1,0 +1,10 @@
+# Reference inputs stay read-only; scratch output is cleaned on exit.
+services:
+  reference-audit:
+    image: careerpilot-dev:local
+    user: "0"
+    working_dir: /workspace
+    volumes:
+      - ..:/workspace:ro
+      - ${MYCAREER_PATH:-D:/Github_Project/MyCareer}:/reference:ro
+    command: ["python", "scripts/audit_reference.py"]
