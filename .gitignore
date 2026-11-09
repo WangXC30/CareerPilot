@@ -14,6 +14,7 @@ build/
 node_modules/
 frontend/dist/
 src/careerpilot/web_dist/
+/skills/
 
 # Verification artifacts must be temporary and deleted after use.
 /test-results/
