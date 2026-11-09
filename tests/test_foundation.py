@@ -1,5 +1,6 @@
 import hashlib
 import time
+from pathlib import Path
 
 import pytest
 from alembic import command
@@ -153,5 +154,9 @@ def test_restart_persistence_and_pagination(system):
         assert restarted.get("/api/v1/career-goals?limit=101", headers=alice).status_code == 422
 
 
+@pytest.mark.skipif(
+    not all(Path(name).is_file() for name in ("PRD.md", "TASKS.md")),
+    reason="Internal planning documents are not distributed",
+)
 def test_requirement_traceability():
     assert build()["counts"] == {"FR-": 110, "NFR-": 18, "E2E-": 18}

@@ -30,7 +30,6 @@ def main():
             ["-m", "mypy", f"--cache-dir={Path(scratch) / 'mypy'}"],
             ["scripts/scan_secrets.py"],
             ["scripts/export_web_contract.py", "--check"],
-            ["scripts/check_traceability.py", "--check"],
             [
                 "-m",
                 "pytest",
@@ -59,6 +58,8 @@ def main():
             ["scripts/browser_web.py", "--followup-only"],
             ["scripts/browser_business_editor.py"],
         ]
+        if all(Path(name).is_file() for name in ("PRD.md", "TASKS.md")):
+            commands.insert(6, ["scripts/check_traceability.py", "--check"])
         for command in commands:
             print(f"Running: python {' '.join(command)}", flush=True)
             subprocess.run([sys.executable, *command], check=True)

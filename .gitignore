@@ -15,6 +15,14 @@ node_modules/
 frontend/dist/
 src/careerpilot/web_dist/
 /skills/
+/AGENTS.md
+/PLAN*.md
+/PRD.md
+/TASKS.md
+/ARCHITECTURE.md
+/docs/*.md
+!/docs/PROFILE-WRITING-GUIDE.md
+!/docs/TECHNICAL-RAG.md
 
 # Verification artifacts must be temporary and deleted after use.
 /test-results/
