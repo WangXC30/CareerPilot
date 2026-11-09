@@ -127,12 +127,9 @@ def calendar_events(db, principal):
     return sorted(result, key=lambda e: (e["date"], e["id"]))
 
 
-def save_calendar_event(db, principal, body, trace, key=None, expected=0):
-    growth.lock_owner(db, principal)
-    row = growth.owned(db, principal, key, "calendar_event") if key else None
-    if row and growth.data(row)["status"] != "active":
-        raise DomainError("NOT_FOUND", "事件已移除", 404)
+def calendar_candidate(body):
     growth.scan_upload(body["title"].encode(), "calendar-title.txt")
+    growth.scan_upload(body.get("preparation_note", "").encode(), "calendar-preparation.txt")
     start = None
     try:
         zone = ZoneInfo(body["timezone"])
@@ -146,14 +143,29 @@ def save_calendar_event(db, principal, body, trace, key=None, expected=0):
         if candidate.utcoffset() != local.replace(tzinfo=zone, fold=1).utcoffset():
             raise DomainError("AMBIGUOUS_LOCAL_TIME", "此时间出现两次，请换算为 UTC 后填写", 422)
         start = candidate.astimezone(timezone.utc).isoformat()
+    return {**body, "starts_at": start, "status": "active", "basis": "owner_provided"}
+
+
+def save_calendar_event(db, principal, body, trace, key=None, expected=0, record_id=None):
+    growth.lock_owner(db, principal)
+    row = growth.owned(db, principal, key, "calendar_event") if key else None
+    if row and growth.data(row)["status"] != "active":
+        raise DomainError("NOT_FOUND", "事件已移除", 404)
+    if row:
+        existing = growth.data(row)
+        body = {
+            **{k: v for k, v in existing.items() if k not in {"id", "version", "created_at"}},
+            **body,
+        }
     return growth.save(
         db,
         principal,
         "calendar_event",
-        {**body, "starts_at": start, "status": "active", "basis": "owner_provided"},
+        calendar_candidate(body),
         trace,
         row,
         expected,
+        record_id=record_id,
     )
 
 

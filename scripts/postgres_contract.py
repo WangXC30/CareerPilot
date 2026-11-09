@@ -18,6 +18,7 @@ from sqlalchemy.orm import Session
 from study_contract import create_study, verify_study
 from v4_contract import create_v4, verify_v4
 
+from careerpilot import assessment
 from careerpilot.api import create_app
 from careerpilot.cli import provision
 from careerpilot.growth_models import GrowthRecord, GrowthRevision
@@ -85,7 +86,7 @@ def main():
         with Session(engine) as db, db.begin():
             db.delete(db.get(GrowthRecord, record_id))
         seed(engine)
-        with TestClient(create_app(url)) as client:
+        with TestClient(create_app(url, local_only=False)) as client:
             headers = {"Authorization": "Bearer " + alice_token}
             profile = client.put(
                 "/api/v1/profile",
@@ -121,10 +122,14 @@ def main():
             assert published.status_code == 200, published.status_code
             exam = client.post("/api/v1/assessments", headers=headers, json={"skill_id": "python"})
             assert exam.status_code == 201, exam.status_code
+            questions = exam.json()["questions"]
+            first_index = int(questions[0]["id"].rsplit(".", 1)[1])
+            correct = assessment.V4_BANK["python"][first_index][2]
+            wrong = (correct + 1) % len(questions[0]["choices"])
             scored = client.post(
                 f"/api/v1/assessments/{exam.json()['id']}/submit",
                 headers={**headers, "If-Match": '"1"'},
-                json={"answers": [0, 0, 0]},
+                json={"answers": [wrong] + [0] * (len(questions) - 1)},
             )
             assert scored.status_code == 200, scored.status_code
             assert scored.json()["status"] == "failed" and scored.json()["replan_preview"]
@@ -295,7 +300,7 @@ def main():
             "V3 PostgreSQL project milestones/assets/STAR, pending evaluation "
             "and plan acceptance passed (simulated verdict)"
         )
-        print("V4 PostgreSQL workspace/direction isolation and schema 0005 roundtrip passed")
+        print("V4 PostgreSQL workspace/direction isolation and schema 0006 roundtrip passed")
     finally:
         engine.dispose()
 

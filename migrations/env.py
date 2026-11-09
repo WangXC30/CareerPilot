@@ -1,6 +1,11 @@
 from alembic import context
 
-from careerpilot import growth_models, platform_models, v1_models  # noqa: F401 - register metadata
+from careerpilot import (  # noqa: F401 - register metadata
+    growth_models,
+    platform_models,
+    v1_models,
+    workflow_models,  # noqa: F401 - register metadata
+)
 from careerpilot.persistence import Base, database_url, make_engine
 
 config = context.config

@@ -12,6 +12,7 @@ import httpx
 import uvicorn
 from alembic import command
 from alembic.config import Config
+from browser_identity import connect_browser
 from playwright.sync_api import expect, sync_playwright
 
 from careerpilot.api import create_app
@@ -38,7 +39,9 @@ def run(output=None):
             listener.bind(("127.0.0.1", 0))
             port = listener.getsockname()[1]
         server = uvicorn.Server(
-            uvicorn.Config(create_app(url), host="127.0.0.1", port=port, log_level="error")
+            uvicorn.Config(
+                create_app(url, local_only=False), host="127.0.0.1", port=port, log_level="error"
+            )
         )
         thread = threading.Thread(target=server.run, daemon=True)
         thread.start()
@@ -59,9 +62,7 @@ def run(output=None):
                     page.goto(f"http://127.0.0.1:{port}/app/#sources")
 
                     def login():
-                        page.get_by_role("button", name="连接我的账号", exact=True).click()
-                        page.locator("#token").fill(token)
-                        page.locator("#account-form button[type=submit]").click()
+                        connect_browser(page, token)
                         expect(page.locator("#sources-search")).to_be_visible()
 
                     login()

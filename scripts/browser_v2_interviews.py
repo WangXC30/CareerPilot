@@ -12,6 +12,7 @@ import httpx
 import uvicorn
 from alembic import command
 from alembic.config import Config
+from browser_identity import connect_browser
 from playwright.sync_api import expect, sync_playwright
 
 from careerpilot.api import create_app
@@ -40,7 +41,11 @@ def run(output=None):
             port = sock.getsockname()[1]
         server = uvicorn.Server(
             uvicorn.Config(
-                create_app(url), host="127.0.0.1", port=port, log_level="error", access_log=False
+                create_app(url, local_only=False),
+                host="127.0.0.1",
+                port=port,
+                log_level="error",
+                access_log=False,
             )
         )
         thread = threading.Thread(target=server.run, daemon=True)
@@ -142,11 +147,8 @@ def run(output=None):
                     page.goto(f"http://127.0.0.1:{port}/app/#recruiting")
 
                     def login():
-                        page.get_by_role("button", name="连接我的账号", exact=True).click()
-                        page.locator("#token").fill(token)
-                        page.locator("#account-form").get_by_role(
-                            "button", name="连接", exact=True
-                        ).click()
+                        connect_browser(page, token)
+                        pass
                         expect(page.locator("#interview-workspace")).to_contain_text(
                             "文字面试与复盘"
                         )
@@ -235,8 +237,10 @@ def run(output=None):
                         )
                         page.screenshot(path=output / "practice-desktop.png", animations="disabled")
                     page.set_viewport_size({"width": 375, "height": 860})
+                    sidebar_width = page.locator("#sidebar").evaluate("n=>n.offsetWidth")
                     expect(page.locator("#sidebar")).to_have_css(
-                        "transform", "matrix(1, 0, 0, 1, -240, 0)"
+                        "transform",
+                        f"matrix(1, 0, 0, 1, -{sidebar_width}, 0)",
                     )
                     page.locator("#interview-evaluation").evaluate(
                         "el=>el.scrollIntoView({block:'start'})"

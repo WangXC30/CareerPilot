@@ -11,6 +11,9 @@ backups/
 artifacts/
 dist/
 build/
+node_modules/
+frontend/dist/
+src/careerpilot/web_dist/
 
 # Verification artifacts must be temporary and deleted after use.
 /test-results/

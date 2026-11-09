@@ -35,7 +35,11 @@ def cycle(engine, last_source_cleanup):
     schedule_due(engine)
     schedule_reminders(engine)
     schedule_notifications(engine)
+    from careerpilot.workflows import process_cleanup
+
+    process_cleanup(engine)
     run_once(engine)
+    process_cleanup(engine)
     return last_source_cleanup
 
 

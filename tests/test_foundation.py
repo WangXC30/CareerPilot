@@ -38,7 +38,9 @@ def test_health_and_openapi(system):
 
 
 def test_unmigrated_database_not_ready(tmp_path):
-    with TestClient(create_app(f"sqlite:///{(tmp_path / 'empty.db').as_posix()}")) as client:
+    with TestClient(
+        create_app(f"sqlite:///{(tmp_path / 'empty.db').as_posix()}", local_only=False)
+    ) as client:
         assert client.get("/health/ready").status_code == 503
         assert client.get("/health/live").status_code == 200
 
@@ -141,7 +143,7 @@ def test_migration_roundtrip_and_metadata(system):
 def test_restart_persistence_and_pagination(system):
     client, engine, alice, _, config, _ = system
     ids = {create(client, alice, key=f"key-{i}").json()["id"] for i in range(3)}
-    with TestClient(create_app(config.attributes["database_url"])) as restarted:
+    with TestClient(create_app(config.attributes["database_url"], local_only=False)) as restarted:
         first = restarted.get("/api/v1/career-goals?limit=2", headers=alice).json()
         second = restarted.get(
             f"/api/v1/career-goals?limit=2&cursor={first[-1]['id']}", headers=alice

@@ -9,6 +9,7 @@ from pathlib import Path
 import uvicorn
 from alembic import command
 from alembic.config import Config
+from browser_identity import connect_browser
 from fastapi.testclient import TestClient
 from playwright.sync_api import expect, sync_playwright
 
@@ -25,9 +26,7 @@ def checked(response, status=200):
 
 def connect(page, base, token):
     page.goto(base + "#directions")
-    page.locator("#connect").click()
-    page.locator("#token").fill(token)
-    page.locator("#account-form button[type=submit]").click()
+    connect_browser(page, token)
     expect(page.locator("#practice-review-list")).to_be_visible()
 
 
@@ -43,7 +42,7 @@ def main():
         bob_id, bob_token = provision(engine, "Synthetic invited reviewer")
         alice = {"Authorization": "Bearer " + alice_token}
         bob = {"Authorization": "Bearer " + bob_token}
-        with TestClient(create_app(url)) as client:
+        with TestClient(create_app(url, local_only=False)) as client:
             space = checked(
                 client.post(
                     "/api/v1/workspaces",
@@ -71,7 +70,9 @@ def main():
             sock.bind(("127.0.0.1", 0))
             port = sock.getsockname()[1]
         server = uvicorn.Server(
-            uvicorn.Config(create_app(url), host="127.0.0.1", port=port, log_level="error")
+            uvicorn.Config(
+                create_app(url, local_only=False), host="127.0.0.1", port=port, log_level="error"
+            )
         )
         thread = threading.Thread(target=server.run, daemon=True)
         thread.start()

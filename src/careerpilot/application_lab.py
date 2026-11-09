@@ -25,8 +25,12 @@ def preview(db, principal, application_id):
     if application["status"] in applications.TERMINAL:
         raise DomainError("APPLICATION_CLOSED", "申请已结束，请核对真实求职记录", 409)
     applications.active_job(db, principal, application)
+    if not application.get("resume_version_id"):
+        raise DomainError(
+            "RESUME_REVIEW_REQUIRED", "外部简历无法用于本地申请演练，请先创建简历版本", 409
+        )
     version = resumes.owned_version(db, principal, application["resume_version_id"])
-    resumes.valid_facts(db, principal, [f["id"] for f in version["facts"]])
+    resumes.valid_version_facts(db, principal, version)
     return {
         "application_id": row.id,
         "application_version": row.version,
@@ -191,7 +195,21 @@ def recover_uncertain(engine):
 
 def compare_offers(db, principal, body, trace):
     growth.lock_owner(db, principal)
+    return growth.save(db, principal, "offer_comparison", offer_payload(body), trace)
+
+
+def offer_payload(body):
     weights = body["weights"]
+    if (
+        not weights
+        or any(value < 0 or value > 100 for value in weights.values())
+        or any(
+            value is not None and not 0 <= value <= 5
+            for offer in body["offers"]
+            for value in offer["ratings"].values()
+        )
+    ):
+        raise DomainError("INVALID_RATING", "权重为 0–100，评分为 0–5 或未知", 422)
     if sum(weights.values()) != 100:
         raise DomainError("INVALID_WEIGHTS", "比较权重总和须为 100", 422)
     rows = []
@@ -214,18 +232,12 @@ def compare_offers(db, principal, body, trace):
                 "unknown_dimensions": missing,
             }
         )
-    return growth.save(
-        db,
-        principal,
-        "offer_comparison",
-        {
-            "weights": weights,
-            "offers": rows,
-            "notice": "评分由本人提供，区间保留未知项；不构成薪酬预测或自动接受 Offer。",
-            "decision": None,
-        },
-        trace,
-    )
+    return {
+        "weights": weights,
+        "offers": rows,
+        "notice": "评分由本人提供，区间保留未知项；不构成薪酬预测或自动接受 Offer。",
+        "decision": None,
+    }
 
 
 def decide_offer(db, principal, key, offer_index, note, expected, trace):
@@ -243,6 +255,7 @@ def decide_offer(db, principal, key, offer_index, note, expected, trace):
             "weights": value["weights"],
             "offers": value["offers"],
             "notice": value["notice"],
+            "user_archived": value.get("user_archived", False),
             "decision": {
                 "offer_index": offer_index,
                 "name": value["offers"][offer_index]["name"] if offer_index is not None else None,

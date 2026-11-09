@@ -15,7 +15,6 @@ from alembic.config import Config
 from playwright.sync_api import expect, sync_playwright
 
 from careerpilot.api import create_app
-from careerpilot.cli import provision
 from careerpilot.persistence import make_engine
 from careerpilot.seed import seed
 
@@ -32,7 +31,6 @@ def run(output: Path | None = None):
         config.attributes["database_url"] = url
         command.upgrade(config, "head")
         engine = make_engine(url)
-        _, token = provision(engine, "Synthetic UI operator", role="operator")
         seed(engine)
         engine.dispose()
         with socket.socket() as sock:
@@ -65,9 +63,12 @@ def run(output: Path | None = None):
                 errors = []
                 page.on("pageerror", lambda error: errors.append(str(error)))
                 page.goto(base + "/app/")
-                expect(
-                    page.get_by_role("heading", name="让目标，成为下一步行动。", exact=True)
-                ).to_be_visible()
+                expect(page.get_by_role("heading", name="成长工作台", exact=True)).to_be_visible()
+                expect(page.locator("#primary-nav > a")).to_have_count(5)
+                expect(page.locator("#extra-nav")).not_to_have_attribute("open", "")
+                expect(page.locator("#assistant-form")).to_be_visible()
+                expect(page.locator("#connect, #account-dialog, #login-form")).to_have_count(0)
+                expect(page.locator('a[href="#admin"]')).to_have_count(0)
                 if output:
                     output.mkdir(parents=True, exist_ok=True)
                     page.screenshot(
@@ -82,12 +83,21 @@ def run(output: Path | None = None):
                     ("learning", "学习中心"),
                     ("portfolio", "作品集"),
                     ("recruiting", "求职中心"),
-                    ("settings", "设置与隐私"),
-                    ("admin", "运营管理"),
+                    ("settings", "我的资料与设置"),
                 ]:
                     page.goto(base + "/app/#" + route)
                     expect(page.locator("h1")).to_have_text(title)
+                    parent = {
+                        "market": "explore",
+                        "skills": "explore",
+                        "portfolio": "learning",
+                    }.get(route, route)
+                    expect(page.locator("#primary-nav a.active")).to_have_attribute(
+                        "data-page", parent
+                    )
+                    expect(page.locator("#extra-nav")).not_to_have_attribute("open", "")
                 page.goto(base + "/app/#learning")
+                page.locator("#page-options summary").click()
                 for state in ["loading", "empty", "error"]:
                     page.locator("#preview-state").select_option(state)
                     if state == "loading":
@@ -97,17 +107,9 @@ def run(output: Path | None = None):
                     else:
                         expect(page.get_by_role("heading", name="暂时无法加载")).to_be_visible()
                 page.locator("#preview-state").select_option("default")
-                page.get_by_role("button", name="连接我的账号").click()
-                page.locator("#token").fill(token)
-                page.get_by_role("button", name="连接", exact=True).click()
-                expect(page.locator("#account-dialog")).not_to_be_visible()
                 assert page.evaluate("localStorage.length") == 0
                 page.goto(base + "/app/#explore")
                 page.reload()  # A fragment navigation alone does not reload the document.
-                page.get_by_role("button", name="连接我的账号").click()
-                page.locator("#token").fill(token)
-                page.get_by_role("button", name="连接", exact=True).click()
-                expect(page.locator("#account-dialog")).not_to_be_visible()
                 page.locator("#goal-title").fill("浏览器验证目标")
                 page.get_by_role("button", name="保存目标草稿").click()
                 expect(page.locator("#goals")).to_contain_text("浏览器验证目标")
@@ -186,22 +188,17 @@ def run(output: Path | None = None):
                 page.evaluate("location.hash='settings'")
                 expect(page.locator("#profile-form")).to_be_visible()
                 assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
-                page.set_viewport_size({"width": 1440, "height": 1000})
-                page.evaluate("location.hash='admin'")
-                expect(page.locator("#source-health-table")).to_contain_text("user_import")
-                if output:
-                    page.screenshot(
-                        path=str(output / "operations-desktop.png"),
-                        full_page=True,
-                        animations="disabled",
-                    )
                 page.set_viewport_size({"width": 375, "height": 812})
                 page.evaluate("location.hash='dashboard'")
-                expect(page.locator("h1")).to_have_text("让目标，成为下一步行动。")
+                expect(page.locator("h1")).to_have_text("成长工作台")
                 assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
                 page.get_by_role("button", name="展开导航").click()
                 expect(page.locator("#sidebar")).to_have_class("open")
-                page.get_by_role("link", name="能力地图", exact=False).first.click()
+                page.get_by_role("link", name="目标与岗位", exact=True).click()
+                expect(page.locator("#primary-nav a.active")).to_have_attribute(
+                    "data-page", "explore"
+                )
+                page.locator("#section-nav").get_by_role("link", name="能力地图").click()
                 expect(page.locator("h1")).to_have_text("能力地图")
                 expect(page.locator("#sidebar")).not_to_have_class("open")
                 if output:
@@ -214,15 +211,17 @@ def run(output: Path | None = None):
                 browser.close()
             return {
                 "browser": "Chromium",
-                "routes": 9,
+                "routes": 8,
                 "states": ["empty", "loading", "error"],
-                "approval_dialog": True,
+                "primary_navigation": 5,
+                "grouped_navigation": True,
+                "local_workspace_without_login": True,
                 "real_goal_write": True,
                 "v1_profile_preview_save_restore": True,
                 "v1_material_confirm_and_memory_edit": True,
                 "v1_jd_import_evidence_and_history": True,
                 "v1_goal_preview_cancel_accept": True,
-                "operations_data": True,
+                "operations_ui_absent": True,
                 "mobile_width": 375,
                 "console_errors": 0,
             }

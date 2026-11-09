@@ -1,18 +1,16 @@
-"""Authenticated platform and growth API; local identity provisioning remains explicit."""
+"""Single local workspace API; historical identity contracts are opt-in fixtures."""
 
 import hashlib
 import logging
 import time
 from contextlib import asynccontextmanager
-from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Literal
 from uuid import uuid4
 
 from fastapi import Depends, FastAPI, Header, Query, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select, text
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
@@ -47,7 +45,11 @@ class GoalOutput(GoalInput):
     created_at: str
 
 
-def create_app(url: str | None = None) -> FastAPI:
+class LocalResetInput(BaseModel):
+    confirmation: Literal["CLEAR LOCAL DATA"]
+
+
+def create_app(url: str | None = None, *, local_only: bool = True) -> FastAPI:
     engine = make_engine(url or database_url())
 
     @asynccontextmanager
@@ -148,7 +150,7 @@ def create_app(url: str | None = None) -> FastAPI:
     Db = Annotated[Session, Depends(session_dependency)]
     bearer = HTTPBearer(auto_error=False)
 
-    def identity(
+    def contract_identity(
         request: Request,
         db: Db,
         credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer)],
@@ -165,7 +167,60 @@ def create_app(url: str | None = None) -> FastAPI:
         request.state.principal = principal
         return principal
 
+    def local_identity(request: Request):
+        from careerpilot.local_workspace import principal
+
+        owner = principal(engine)
+        expected_owner = request.headers.get("x-workspace-id")
+        if (
+            expected_owner
+            and expected_owner != owner.user_id
+            and request.url.path != "/api/v1/local-workspace"
+        ):
+            raise DomainError("LOCAL_WORKSPACE_CHANGED", "本地工作区已重置，请刷新后继续。", 409)
+        request.state.principal = owner
+        return owner
+
+    # Token/role contracts are retained only for explicit historical regression fixtures.
+    # Normal startup always uses the local workspace and never resolves role grants.
+    identity = local_identity if local_only else contract_identity
     Identity = Annotated[Principal, Depends(identity)]
+
+    if local_only:
+
+        @app.middleware("http")
+        async def local_boundary(request: Request, call_next):
+            if request.url.path.startswith("/api/"):
+                from urllib.parse import urlsplit
+
+                origin = request.headers.get("origin")
+                permitted = request.url.hostname in {"localhost", "127.0.0.1", "::1", "testserver"}
+                if origin:
+                    parsed = urlsplit(origin)
+                    permitted = (
+                        permitted
+                        and parsed.scheme in {"http", "https"}
+                        and (parsed.netloc == request.headers.get("host"))
+                    )
+                if request.headers.get("sec-fetch-site") == "cross-site":
+                    permitted = False
+                if not permitted:
+                    return JSONResponse(status_code=403, content={"code": "LOCAL_ACCESS_ONLY"})
+            return await call_next(request)
+
+    @app.get("/api/v1/local-workspace")
+    def workspace(principal: Identity):
+        return {"user_id": principal.user_id, "storage": "local", "requires_login": not local_only}
+
+    if local_only:
+
+        @app.post("/api/v1/local-workspace/reset", status_code=202)
+        def reset_workspace(body: LocalResetInput, request: Request, db: Db, principal: Identity):
+            from careerpilot import accounts
+
+            result = accounts.request_deletion(db, principal, request.state.trace_id)
+            db.commit()
+            return result
 
     @app.get("/health/live")
     def live():
@@ -186,11 +241,13 @@ def create_app(url: str | None = None) -> FastAPI:
 
     @app.get("/api/v1/me")
     def me(principal: Identity):
-        return {
+        result = {
             "user_id": principal.user_id,
             "tenant_id": principal.tenant_id,
-            "role": principal.role,
         }
+        if not local_only:
+            result["role"] = principal.role
+        return result
 
     @app.post("/api/v1/auth/logout", status_code=204)
     def logout(
@@ -287,9 +344,35 @@ def create_app(url: str | None = None) -> FastAPI:
     from careerpilot.local_tools_api import register_local_tools
 
     register_local_tools(app, session_dependency, identity)
-    static_root = Path(__file__).parent / "static"
-    if static_root.is_dir():
-        app.mount("/app", StaticFiles(directory=static_root, html=True), name="workspace")
+    if local_only:
+        blocked = (
+            "/api/v1/auth/",
+            "/api/v1/admin/",
+            "/api/v1/account/sessions",
+            "/api/v1/catalogue/skill/{skill_id}/dependencies",
+        )
+        app.router.routes[:] = [
+            route
+            for route in app.router.routes
+            if not getattr(route, "path", "").startswith(blocked)
+        ]
+    from careerpilot.web import mount_web
+    from careerpilot.workflow_api import register_workflows
+
+    register_workflows(app, engine, session_dependency, identity)
+    from careerpilot.profile_editor import register_profile_editor
+
+    register_profile_editor(app, session_dependency, identity)
+    from careerpilot.information_api import register_information
+
+    register_information(app, session_dependency, identity)
+    from careerpilot.planning_editor import register_planning_editor
+
+    register_planning_editor(app, session_dependency, identity)
+    from careerpilot.business_editor import register_business_editor
+
+    register_business_editor(app, session_dependency, identity)
+    mount_web(app)
 
     @app.get("/", include_in_schema=False)
     def home():

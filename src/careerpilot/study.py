@@ -19,7 +19,7 @@ def mode_preview(db, principal, plan_id, mode, expected, key, trace):
             raise DomainError("VERSION_CONFLICT", "计划已变化，请刷新", 412)
         if current["status"] != "active":
             raise DomainError("ACTIVE_PLAN_REQUIRED", "请先发布学习计划", 409)
-        profile = learning.profile_context(db, principal)
+        profile = learning.profile_context(db, principal, current)
         budget = max(1, profile["weekly_minutes"] * MODES[mode] // 100)
         candidate = {
             k: copy.deepcopy(v)
@@ -141,7 +141,12 @@ def review_queue(db, principal, now=None, timezone=None):
         assessed = datetime.fromisoformat(latest["created_at"]).astimezone(zone).date()
         due = assessed + timedelta(days=interval)
         attempt = growth.data(growth.owned(db, principal, latest["source_id"], "assessment"))
-        wrong = [f for f in (attempt.get("result") or {}).get("feedback", []) if not f["correct"]]
+        questions = {q["id"]: q for q in attempt.get("questions", [])}
+        wrong = [
+            {**f, "question": questions.get(f["question_id"], {})}
+            for f in (attempt.get("result") or {}).get("feedback", [])
+            if not f["correct"]
+        ]
         result.append(
             {
                 "skill_id": key,

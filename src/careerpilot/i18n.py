@@ -52,6 +52,10 @@ def assistant_result(result: dict, locale: str) -> dict:
     status = result["status"]
     output = result.get("result") or {}
     if status == "success":
+        if output.get("kind") == "assistant_chat":
+            return result
+        if output.get("kind") == "assistant_help":
+            return {**result, "summary": output["summary_en"]}
         tool = next((step.get("tool") for step in result["steps"] if step.get("tool")), "")
         summaries = {
             "growth.progress": "Read current skill evidence and study plan.",
@@ -79,6 +83,28 @@ def assistant_result(result: dict, locale: str) -> dict:
 # Generic, accurate English explanations keyed by stable error code. Codes reused for
 # several situations use a wording that stays true for every Chinese variant.
 ERROR_MESSAGES_EN: dict[str, str] = {
+    "CHAT_HIRING_INVALID": "Review the career fields, sources and selected facts.",
+    "CHAT_DELETING": "This conversation is being removed. Start a new conversation instead.",
+    "MODEL_EMPTY_RESPONSE": "The model returned no content after a bounded retry. Try again later.",
+    "CHAT_BUSY": "Wait for the previous reply, or confirm or cancel its pending operation.",
+    "CHAT_LIMIT": "This conversation has reached 500 turns. Start a new conversation.",
+    "CHAT_NOT_CONFIGURED": "Configure the DeepSeek API credential locally before using chat.",
+    "CHAT_TOOL_LIMIT": "This turn reached its tool limit. Continue with a smaller request.",
+    "CHAT_RETRY_STALE": "Later messages exist. Send a new request instead of retrying this turn.",
+    "CHAT_PROFILE_INVALID": (
+        "Complete or correct the personal information fields; do not guess missing details. "
+        "You can save the known information as a profile note."
+    ),
+    "CHAT_PROFILE_UNCHANGED": "This profile information is already saved. No changes are needed.",
+    "CHAT_DATE_INVALID": "Enter a valid start date in YYYY-MM-DD format.",
+    "TASK_CANCELLED": "This run was cancelled or its workspace is being cleared.",
+    "GRAPH_VERSION_MISMATCH": "This run uses an incompatible workflow version. Start a new run.",
+    "LOCAL_WORKSPACE_AMBIGUOUS": (
+        "Multiple historical datasets were found. Select the personal workspace to keep before "
+        "continuing; no data has been merged or overwritten."
+    ),
+    "LOCAL_WORKSPACE_RESETTING": "Local data cleanup is in progress. Please try again shortly.",
+    "LOCAL_WORKSPACE_CHANGED": "The local workspace was reset. Reload before continuing.",
     "MODEL_PREVIEW_INVALID": (
         "Invalid dataset or frozen observations. Check versions and complete steps."
     ),
@@ -90,6 +116,7 @@ ERROR_MESSAGES_EN: dict[str, str] = {
     "AMBIGUOUS_LOCAL_TIME": "This local time occurs twice. Enter the time in UTC instead.",
     "AMBIGUOUS_SKILL_ALIAS": "A skill alias cannot duplicate another skill.",
     "ANSWERS_REQUIRED": "Answer every question.",
+    "ANSWER_INVALID": "Choose one of the options provided for this question.",
     "ANSWER_REQUIRED": "Enter a written answer.",
     "APPEAL_REQUIRED": "Finish the practice and save your own review request first.",
     "APPLICATION_CLOSED": "This application is closed. Check your actual application record.",
@@ -286,6 +313,18 @@ ERROR_MESSAGES_EN: dict[str, str] = {
     "STALE_FACT": "The statement source changed or was withdrawn. Confirm again.",
     "STALE_PLAN": "Inputs to this plan changed. Generate the plan again.",
     "STALE_PREVIEW": "The underlying data changed. Preview again.",
+    "PROTECTED_TASK": "Locked or in-progress tasks cannot be rescheduled directly.",
+    "CHAT_FOLLOWUP_INVALID": "Check the application, exact date, time and time zone.",
+    "INTERVIEW_EXISTS": (
+        "An interview at this time already exists. Update the existing appointment."
+    ),
+    "STALE_DRAFT": "The official profile changed. Compare and review the existing draft first.",
+    "JOB_TEXT_NOT_PROVIDED": (
+        "Paste the original job description and source; do not use generated text."
+    ),
+    "JOB_TEXT_INCOMPLETE": (
+        "The extracted job text is incomplete. Preview the full text from this message again."
+    ),
     "STALE_PROJECT": "The project, deliverables or statements changed. Preview again.",
     "STALE_REVIEW": "The interview review changed or was withdrawn. Preview again.",
     "STALE_WORKFLOW_CONTEXT": "Inputs changed. Keep the old result and start a new review.",
@@ -307,6 +346,8 @@ ERROR_MESSAGES_EN: dict[str, str] = {
     "USE_REPLAN": "Protected tasks exist. Use the replanning preview.",
     "VALIDATION_ERROR": "Invalid request fields or headers.",
     "VERSION_CONFLICT": "This record was updated. Refresh and try again.",
+    "INFORMATION_REFERENCED": "Handle the dependent records in the deletion preview first.",
+    "FACT_REVOKED": "This fact was revoked. Confirm a new fact instead.",
     "WRONG_ANSWER_REQUIRED": "Choose a question you answered incorrectly in your practice.",
 }
 

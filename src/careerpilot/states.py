@@ -33,6 +33,13 @@ TRANSITIONS = {
         "prepared": {"awaiting_user_submission", "withdrawn"},
         "awaiting_user_submission": {"submitted", "withdrawn"},
         "submitted": {"assessment", "interviewing", "rejected", "withdrawn", "no_response"},
+        "reported_submitted": {
+            "assessment",
+            "interviewing",
+            "rejected",
+            "withdrawn",
+            "no_response",
+        },
         "assessment": {"interviewing", "rejected", "withdrawn"},
         "interviewing": {"offer", "rejected", "withdrawn"},
         "offer": set(),

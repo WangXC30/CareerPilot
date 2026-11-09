@@ -372,7 +372,7 @@ def plan_preview(db, principal, project_id, plan_id, expected, key, trace):
             raise DomainError("ACTIVE_PLAN_REQUIRED", "请先发布学习计划", 409)
         if any(t.get("project_id") == project_id for t in current["tasks"]):
             raise DomainError("PROJECT_ALREADY_PLANNED", "项目已在此计划中，不能重复添加", 409)
-        profile = learning.profile_context(db, principal)
+        profile = learning.profile_context(db, principal, current)
         profile["weekly_minutes"] = learning.plan_budget(current, profile["weekly_minutes"])
         graph = catalogue.skill_map(db)
         candidate = copy.deepcopy(current)

@@ -135,7 +135,6 @@ def save_profile(db, principal, payload, version, trace):
         trace,
         profile(db, principal),
         version,
-        record_id=principal.user_id,
     )
 
 
@@ -219,7 +218,7 @@ def confirm_material(db, principal, material_id, claims, version, trace):
                 {
                     **claim,
                     "source_id": material_id,
-                    "source_version": 1,
+                    "source_version": version,
                     "source_quote": payload["content"][claim["start"] : claim["end"]],
                     "trust": "user_confirmed",
                     "skill_status": "unverified",
@@ -235,6 +234,8 @@ def update_memory(db, principal, record_id, text, category, version, trace, dele
     lock_owner(db, principal)
     row = owned(db, principal, record_id, "memory")
     payload = json.loads(row.payload_json)
+    if payload.get("structured_experience"):
+        raise DomainError("VALIDATION_ERROR", "请在结构化经历表单中修改此记录", 422)
     payload.update(text=text, category=category, deleted=deleted, skill_status="unverified")
     return save(db, principal, "memory", payload, trace, row, version)
 
@@ -356,10 +357,8 @@ def extract_job(text, skill_patterns=None):
 
 def import_job(db, principal, text, url, trace):
     authorize_import(db, principal)
-    scan_upload(text.encode(), "job.txt")
-    if not text.strip():
-        raise DomainError("EMPTY_JD", "JD 不能为空", 422)
-    url = source_url(url)
+    payload = job_payload(text, url)
+    url = payload["sources"][0]["source_url"]
     # Exact bytes only: line breaks change evidence and must remain distinct versions.
     digest = hashlib.sha256(text.encode()).hexdigest()
     source = {"source_url": url, "retrieved_at": utc_now(), "access_mode": "user_import"}
@@ -381,20 +380,7 @@ def import_job(db, principal, text, url, trace):
             target = row
         elif SequenceMatcher(None, payload["content"][:5000], text[:5000]).ratio() >= 0.85:
             candidates.append({"id": row.id, "reason": "similar_text_requires_review"})
-    payload = {
-        "content": text,
-        "content_hash": digest,
-        "sources": [source],
-        "status": "unverified",
-        **extract_job(text),
-    }
-    deadline = payload["fields"]["deadline"]["value"]
-    if deadline:
-        try:
-            if date.fromisoformat(deadline) < datetime.now(timezone.utc).date():
-                payload["status"] = "possibly_expired"
-        except ValueError:
-            payload["fields"]["deadline"] = {"value": None, "state": "unknown", "evidence": None}
+    payload = job_payload(text, url)
     if target:
         previous = json.loads(target.payload_json)
         payload["sources"] = previous["sources"] + [source]
@@ -410,6 +396,29 @@ def import_job(db, principal, text, url, trace):
         target.version if target else 0,
     )
     return {**result, "deduplicated": False, "possible_duplicates": candidates}
+
+
+def job_payload(text, url):
+    scan_upload(text.encode(), "job.txt")
+    if not text.strip():
+        raise DomainError("EMPTY_JD", "JD 不能为空", 422)
+    payload = {
+        "content": text,
+        "content_hash": hashlib.sha256(text.encode()).hexdigest(),
+        "sources": [
+            {"source_url": source_url(url), "retrieved_at": utc_now(), "access_mode": "user_import"}
+        ],
+        "status": "unverified",
+        **extract_job(text),
+    }
+    deadline = payload["fields"]["deadline"]["value"]
+    if deadline:
+        try:
+            if date.fromisoformat(deadline) < datetime.now(timezone.utc).date():
+                payload["status"] = "possibly_expired"
+        except ValueError:
+            payload["fields"]["deadline"] = {"value": None, "state": "unknown", "evidence": None}
+    return payload
 
 
 def goal_snapshot(db, principal):

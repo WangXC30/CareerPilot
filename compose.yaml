@@ -9,7 +9,6 @@ x-development: &development
   environment:
     CAREERPILOT_DATABASE_URL: sqlite:////var/lib/careerpilot/careerpilot.db
   volumes:
-    - .:/workspace:ro
     - careerpilot-data:/var/lib/careerpilot
 
 services:
@@ -36,9 +35,6 @@ services:
       - 0.0.0.0
       - --port
       - "8000"
-      - --reload
-      - --reload-dir
-      - /workspace/src
       - --no-access-log
     ports:
       - "127.0.0.1:${CAREERPILOT_PORT:-8000}:8000"
@@ -54,6 +50,16 @@ services:
 
   worker:
     <<: *development
+    volumes:
+      - careerpilot-data:/var/lib/careerpilot
+      - ./data/rag_models:/opt/careerpilot-rag/models:ro
+      - ./data/rag_index:/opt/careerpilot-rag/index:ro
+    environment:
+      CAREERPILOT_DATABASE_URL: sqlite:////var/lib/careerpilot/careerpilot.db
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      CAREERPILOT_RAG_MODEL: /opt/careerpilot-rag/models/multilingual-e5-small
+      CAREERPILOT_RAG_RERANKER: /opt/careerpilot-rag/models/bge-reranker-v2-m3
+      CAREERPILOT_RAG_INDEX: /opt/careerpilot-rag/index/technical.sqlite3
     command: ["python", "-m", "careerpilot.worker"]
     depends_on:
       migrate:
@@ -77,5 +83,21 @@ services:
       - .:/workspace:ro
     command: ["python", "scripts/check_dev.py"]
 
+  frontend-dev:
+    image: node:24-slim
+    profiles: ["dev"]
+    init: true
+    working_dir: /web
+    volumes:
+      - ./frontend:/web:ro
+      - frontend-dependencies:/web/node_modules
+    command: ["sh", "-c", "npm ci --ignore-scripts --no-audit --no-fund && npm run dev"]
+    ports:
+      - "127.0.0.1:5173:5173"
+    depends_on:
+      api:
+        condition: service_healthy
+
 volumes:
   careerpilot-data:
+  frontend-dependencies:

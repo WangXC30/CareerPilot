@@ -165,6 +165,12 @@ def test_versions_append_restore_tailor_and_fixed_application(system):
         == v["id"]
     )
     assert client.get(f"/api/v1/resumes/{root_id}/versions", headers=bob).status_code == 404
+    options = ok(client.get("/api/v1/resume-version-options", headers=alice))
+    assert options == [
+        {"id": item["id"], "resume_id": root_id, "sequence": item["sequence"]}
+        for item in (restored, edited, v)
+    ]
+    assert ok(client.get("/api/v1/resume-version-options", headers=bob)) == []
     assert client.get(f"/api/v1/resume-versions/{v['id']}/ats", headers=bob).status_code == 404
     assert (
         client.post(f"/api/v1/resume-versions/{v['id']}/export/docx", headers=bob).status_code
@@ -777,3 +783,140 @@ def test_deadline_reminder_quiet_window_and_deferral_delivery(system):
     assert hiring_reminders.schedule_due(engine, r["due_at"]) == 0
     assert hiring_reminders.schedule_due(engine, r["next_run_at"]) == 1
     assert hiring_reminders.schedule_due(engine, r["next_run_at"] + 1) == 0
+
+
+def test_tailor_preview_preserves_facts_and_checks_versions(system):
+    client, _, alice, bob, *_ = system
+    j = job(client, alice)
+    original = resume(client, alice, job_id=j["id"])
+    root = original["resume_id"]
+    path = f"/api/v1/resumes/{root}/tailor"
+    preview = ok(client.get(f"{path}-preview", params={"job_id": j["id"]}, headers=alice))
+    assert sorted(f["id"] for f in preview["facts"]) == sorted(f["id"] for f in original["facts"])
+    assert client.get(f"{path}-preview", params={"job_id": j["id"]}, headers=bob).status_code == 404
+    body = {"job_id": j["id"], "job_version": j["version"], "confirmed": True}
+    headers = version(alice, preview["resume_version"])
+    stale = client.post(path, headers=headers, json={**body, "job_version": j["version"] + 1})
+    assert stale.status_code == 412
+    result = ok(client.post(path, headers=headers, json=body), 201)
+    assert [f["id"] for f in result["facts"]] == [f["id"] for f in preview["facts"]]
+    assert client.post(path, headers=headers, json=body).status_code == 412
+
+
+def test_external_submission_and_linked_interview(system):
+    client, _, alice, bob, *_ = system
+    j = job(client, alice)
+    body = {
+        "job_id": j["id"],
+        "resume_description": "招聘平台简历",
+        "note": "已通过平台投递",
+        "confirmed": True,
+    }
+    headers = {**alice, "Idempotency-Key": "external-submission"}
+    app = ok(client.post("/api/v1/applications/external", headers=headers, json=body), 201)
+    assert app["resume_version_id"] is None and app["receipt"] is None
+    assert app["status"] == "reported_submitted" and app["verification"] == "pending_verification"
+    assert app["self_report"]["note"] == body["note"]
+    simulation = client.post(
+        "/api/v1/application-lab/preview",
+        headers=alice,
+        json={"application_id": app["id"], "confirmed": True},
+    )
+    assert simulation.status_code == 409
+    assert (
+        ok(client.post("/api/v1/applications/external", headers=headers, json=body), 201)["id"]
+        == app["id"]
+    )
+    assert (
+        client.post(
+            "/api/v1/applications/external", headers=headers, json={**body, "note": "不同"}
+        ).status_code
+        == 409
+    )
+    assert (
+        client.post(
+            "/api/v1/applications/external",
+            headers={**alice, "Idempotency-Key": "other"},
+            json=body,
+        ).status_code
+        == 409
+    )
+    args = {
+        "version": app["version"],
+        "date": "2030-12-06",
+        "time": "14:30",
+        "timezone": "Asia/Shanghai",
+        "preparation_note": "准备项目",
+    }
+    path = f"/api/v1/applications/{app['id']}/interview"
+    assert client.post(path + "-preview", headers=bob, json=args).status_code == 404
+    preview = ok(client.post(path + "-preview", headers=alice, json=args))
+    assert preview["preview"]["job"]["id"] == j["id"]
+    confirm = {**args, "preview_hash": preview["context_hash"], "confirmed": True}
+    assert (
+        client.post(
+            path,
+            headers={**alice, "Idempotency-Key": "schedule"},
+            json={**confirm, "preview_hash": "0" * 64},
+        ).status_code
+        == 412
+    )
+    result = ok(client.post(path, headers={**alice, "Idempotency-Key": "schedule"}, json=confirm))
+    assert result["saved"] and result["event"]["application_id"] == app["id"]
+    current = ok(client.get("/api/v1/applications", headers=alice))[0]
+    assert current["status"] == "interviewing" and current["verification"] == "pending_verification"
+    m = material(client, alice, f"投递成功 TEST-123 {app['job']['title']}")
+    checked = ok(
+        client.post(
+            f"/api/v1/applications/{app['id']}/receipt",
+            headers=version(alice, current["version"]),
+            json=receipt_body(m),
+        )
+    )
+    assert (
+        checked["status"] == "interviewing" and checked["verification"] == "user_confirmed_receipt"
+    )
+    assert (
+        client.post(
+            path, headers={**alice, "Idempotency-Key": "schedule"}, json=confirm
+        ).status_code
+        == 412
+    )
+    assert (
+        len(
+            [
+                e
+                for e in ok(client.get("/api/v1/calendar-events", headers=alice))
+                if e.get("application_id") == app["id"]
+            ]
+        )
+        == 1
+    )
+
+
+def test_external_report_rejects_future_and_accepts_real_receipt(system):
+    client, _, alice, *_ = system
+    j = job(client, alice)
+    headers = {**alice, "Idempotency-Key": "external-receipt"}
+    body = {"job_id": j["id"], "submitted_at": "2099-01-01T00:00:00Z", "confirmed": True}
+    assert (
+        client.post("/api/v1/applications/external", headers=headers, json=body).status_code == 422
+    )
+    app = ok(
+        client.post(
+            "/api/v1/applications/external", headers=headers, json={**body, "submitted_at": None}
+        ),
+        201,
+    )
+    m = material(client, alice, f"投递成功 TEST-123 {app['job']['title']}")
+    saved = ok(
+        client.post(
+            f"/api/v1/applications/{app['id']}/receipt",
+            headers=version(alice, app["version"]),
+            json=receipt_body(m),
+        )
+    )
+    assert (
+        saved["verification"] == "user_confirmed_receipt"
+        and saved["receipt"]["resume_version_id"] is None
+    )

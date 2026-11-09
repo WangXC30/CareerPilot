@@ -12,6 +12,7 @@ from pathlib import Path
 import uvicorn
 from alembic import command
 from alembic.config import Config
+from browser_identity import connect_browser
 from browser_v4_locale import CONTRAST, MISMARKED
 from playwright.sync_api import expect, sync_playwright
 from sqlalchemy import select
@@ -71,7 +72,9 @@ def main():
             sock.bind(("127.0.0.1", 0))
             port = sock.getsockname()[1]
         server = uvicorn.Server(
-            uvicorn.Config(create_app(url), host="127.0.0.1", port=port, log_level="error")
+            uvicorn.Config(
+                create_app(url, local_only=False), host="127.0.0.1", port=port, log_level="error"
+            )
         )
         thread = threading.Thread(target=server.run, daemon=True)
         thread.start()
@@ -126,9 +129,7 @@ def check_case(browser, port, token, locale, width, dataset, report):
     try:
         page.goto(f"http://127.0.0.1:{port}/app/#local-tools")
         page.locator("#ui-locale").select_option(locale)
-        page.locator("#connect").click()
-        page.locator("#token").fill(token)
-        page.locator("#account-form button[type=submit]").click()
+        connect_browser(page, token)
         form = page.locator("#model-comparison-form")
         expect(form).to_be_attached()
         form.get_by_label("授权数据集 JSON" if zh else "Authorized dataset JSON").fill(

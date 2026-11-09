@@ -138,6 +138,17 @@ def fact(db, principal, fact_id):
 
 def create_fact(db, principal, body, trace):
     growth.lock_owner(db, principal)
+    return growth.save(
+        db,
+        principal,
+        "resume_fact",
+        {**fact_candidate(db, principal, body), "confirmed_at": growth.utc_now()},
+        trace,
+    )
+
+
+def fact_candidate(db, principal, body):
+    """Validate and resolve a statement without saving it, for shared confirmation previews."""
     source = {"type": body["source_type"], "basis": "user_confirmed_statement"}
     text = body.get("text", "")
     if source["type"] == "memory":
@@ -186,23 +197,19 @@ def create_fact(db, principal, body, trace):
     scan_upload(text.encode(), "resume-fact.txt")
     if body["kind"] == "name" and len(text) > 100:
         raise DomainError("INVALID_NAME", "姓名陈述最多 100 字符", 422)
-    return growth.save(
-        db,
-        principal,
-        "resume_fact",
-        {
-            "kind": body["kind"],
-            "text": text,
-            "source": source,
-            "confirmed_at": growth.utc_now(),
-            "verification": "user_confirmed_not_independently_verified",
-        },
-        trace,
-    )
+    return {
+        "kind": body["kind"],
+        "text": text,
+        "source": source,
+        "verification": "user_confirmed_not_independently_verified",
+    }
 
 
 def revoke_fact(db, principal, fact_id, reason, trace):
     growth.lock_owner(db, principal)
+    from careerpilot.workflows import invalidate_checkpoints
+
+    invalidate_checkpoints(db, principal, trace)
     scan_upload(reason.encode(), "fact-revocation.txt")
     growth.owned(db, principal, fact_id, "resume_fact")
     key = revoke_id(principal, fact_id)
@@ -237,8 +244,28 @@ def owned_version(db, principal, version_id):
     return growth.data(growth.owned(db, principal, version_id, "resume_version"))
 
 
+def valid_version_facts(db, principal, version):
+    current = valid_facts(db, principal, [f["id"] for f in version["facts"]])
+    if any(
+        before["version"] != after["version"] for before, after in zip(version["facts"], current)
+    ):
+        raise DomainError("STALE_FACT", "事实已修改，请核对后创建新简历版本", 409)
+    return current
+
+
 def version_status(db, principal, version):
-    current = [fact(db, principal, f["id"]) for f in version["facts"]]
+    current = []
+    for snapshot in version["facts"]:
+        try:
+            item = fact(db, principal, snapshot["id"])
+        except DomainError as exc:
+            if exc.code != "NOT_FOUND":
+                raise
+            item = {"id": snapshot["id"], "source_status": "source_deleted"}
+        else:
+            if item["source_status"] == "current" and item["version"] != snapshot["version"]:
+                item = {**item, "source_status": "needs_reconfirmation"}
+        current.append(item)
     return {
         "valid": all(f["source_status"] == "current" for f in current),
         "facts": [{"id": f["id"], "source_status": f["source_status"]} for f in current],
@@ -278,13 +305,14 @@ def append_version(
     job = job_snapshot if job_snapshot is not None else job_context(db, principal, job_id)
     content = {"facts": facts, "job": job, "layout": "ats-single-column.v1"}
     previous = growth.data(root)
+    sequence = previous["version_count"] + 1
     result = growth.save(
         db,
         principal,
         "resume_version",
         {
             "resume_id": root.id,
-            "sequence": expected,
+            "sequence": sequence,
             **content,
             "content_hash": payload_hash(content),
             "origin": origin,
@@ -295,7 +323,7 @@ def append_version(
         trace,
     )
     metadata = {k: v for k, v in previous.items() if k not in {"id", "version", "created_at"}}
-    metadata.update(current_version_id=result["id"], version_count=expected)
+    metadata.update(current_version_id=result["id"], version_count=sequence)
     growth.save(db, principal, "resume", metadata, trace, root, expected)
     return result
 
@@ -371,12 +399,19 @@ def restore(db, principal, resume_id, version_id, expected, trace):
     )
 
 
-def tailor(db, principal, resume_id, job_id, expected, trace):
+def tailor(db, principal, resume_id, job_id, expected, trace, job_version=None):
     growth.lock_owner(db, principal)
+    if job_version is not None and job_context(db, principal, job_id)["version"] != job_version:
+        raise DomainError("VERSION_CONFLICT", "岗位已更新，请重新预览", 412)
     root = growth.owned(db, principal, resume_id, "resume")
     if root.version != expected:
         raise DomainError("VERSION_CONFLICT", "简历已更新，请刷新版本列表", 412)
     version = owned_version(db, principal, growth.data(root)["current_version_id"])
+    fact_ids = tailored_fact_ids(db, principal, version, job_id)
+    return revise(db, principal, resume_id, fact_ids, job_id, expected, trace, origin="tailored")
+
+
+def tailored_fact_ids(db, principal, version, job_id):
     job = growth.data(growth.owned(db, principal, job_id, "job"))
     skills = {s["skill_id"] for s in job["skills"] if s["requirement"] != "mentioned"}
 
@@ -384,16 +419,7 @@ def tailor(db, principal, resume_id, job_id, expected, trace):
         return -sum(has_skill(key, item["text"]) for key in skills if key in growth.SKILLS)
 
     facts = sorted(version["facts"], key=lambda f: (list(KINDS).index(f["kind"]), relevance(f)))
-    return revise(
-        db,
-        principal,
-        resume_id,
-        [f["id"] for f in facts],
-        job_id,
-        expected,
-        trace,
-        origin="tailored",
-    )
+    return [f["id"] for f in facts]
 
 
 def ats(db, principal, version):
@@ -445,9 +471,7 @@ def ats(db, principal, version):
     }
 
 
-def material_draft(db, principal, version, kind, tone, trace):
-    growth.lock_owner(db, principal)
-    valid_facts(db, principal, [f["id"] for f in version["facts"]])
+def material_text(version, kind, tone):
     title = (version["job"]["title"] if version["job"] else None) or "相关岗位"
     opening = {
         "cover_letter": f"您好，我希望应聘{title}。以下是我确认的经历：",
@@ -457,6 +481,13 @@ def material_draft(db, principal, version, kind, tone, trace):
     body = opening + "\n\n" + "\n".join(f["text"] for f in version["facts"])
     if tone == "formal":
         body += "\n\n感谢您审阅我的申请。"
+    return body
+
+
+def material_draft(db, principal, version, kind, tone, trace):
+    growth.lock_owner(db, principal)
+    valid_version_facts(db, principal, version)
+    body = material_text(version, kind, tone)
     return growth.save(
         db,
         principal,

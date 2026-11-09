@@ -29,6 +29,7 @@ def create(db, principal, job_id, version_id, key, trace):
         )
     job = resumes.job_context(db, principal, job_id)
     version = resumes.owned_version(db, principal, version_id)
+    resumes.valid_version_facts(db, principal, version)
     root = growth.data(growth.owned(db, principal, version["resume_id"], "resume"))
     if version["job"] and version["job"]["id"] != job_id:
         raise DomainError("JOB_MISMATCH", "简历定制岗位与申请岗位不同", 422)
@@ -53,6 +54,69 @@ def create(db, principal, job_id, version_id, key, trace):
             "receipt": None,
             "checklist": None,
             "last_event": {"at": growth.utc_now(), "type": "created", "note": ""},
+        },
+        trace,
+    )
+    db.add(
+        IdempotencyRecord(
+            user_id=principal.user_id,
+            tenant_id=principal.tenant_id,
+            key=key,
+            request_hash=digest,
+            response_json=json.dumps({"id": result["id"]}),
+        )
+    )
+    from careerpilot import analytics
+
+    analytics.record(db, principal, "application_recorded", trace, trusted=True)
+    return result
+
+
+def record_external(db, principal, job_id, resume_description, submitted_at, note, key, trace):
+    """Record an owner-reported application without fabricating a resume snapshot."""
+    growth.lock_owner(db, principal)
+    body = {
+        "action": "application.external",
+        "job": job_id,
+        "resume": resume_description,
+        "submitted_at": submitted_at,
+        "note": note,
+    }
+    digest = payload_hash(body)
+    previous = db.get(IdempotencyRecord, (principal.user_id, principal.tenant_id, key))
+    if previous:
+        if previous.request_hash != digest:
+            raise DomainError("IDEMPOTENCY_CONFLICT", "幂等键已用于不同申请", 409)
+        return growth.data(
+            growth.owned(db, principal, json.loads(previous.response_json)["id"], "job_application")
+        )
+    job = resumes.job_context(db, principal, job_id)
+    for row in db.scalars(growth.owner_query(principal, "job_application")):
+        old = growth.data(row)
+        if old["job"]["id"] == job_id and old["status"] not in TERMINAL:
+            raise DomainError("DUPLICATE_APPLICATION", "此岗位已有进行中的申请", 409)
+    if submitted_at:
+        when = datetime.fromisoformat(submitted_at)
+        if when.tzinfo is None or when.timestamp() > datetime.now(timezone.utc).timestamp() + 300:
+            raise DomainError("INVALID_RECEIPT", "投递时间需包含时区且不能在未来", 422)
+    scan_upload((resume_description + "\n" + note).encode(), "application-report.txt")
+    result = growth.save(
+        db,
+        principal,
+        "job_application",
+        {
+            "job": job,
+            "resume_version_id": None,
+            "resume_content_hash": None,
+            "resume_title": resume_description or "外部简历／待补充",
+            "resume_sequence": None,
+            "resume_basis": "owner_reported_external",
+            "status": "reported_submitted",
+            "verification": "pending_verification",
+            "receipt": None,
+            "checklist": None,
+            "self_report": {"submitted_at": submitted_at, "note": note, "basis": "owner_reported"},
+            "last_event": {"at": growth.utc_now(), "type": "submission_claim", "note": note},
         },
         trace,
     )
@@ -112,7 +176,8 @@ def receipt(db, principal, application_id, body, expected, trace):
     item = growth.data(row)
     if row.version != expected:
         raise DomainError("VERSION_CONFLICT", "申请已更新，请刷新", 412)
-    if item["status"] != "awaiting_user_submission":
+    reported = bool(item.get("self_report")) and item["verification"] == "pending_verification"
+    if item["status"] != "awaiting_user_submission" and not reported:
         raise DomainError("INVALID_TRANSITION", "请先进入等待本人源站提交状态", 409)
     result = payload(item)
     result["last_event"] = {
@@ -149,11 +214,17 @@ def receipt(db, principal, application_id, body, expected, trace):
         or not any(value.casefold() in text.casefold() for value in context)
     ):
         raise DomainError("INVALID_RECEIPT", "回执需包含成功陈述、编号及本岗位或企业信息", 422)
-    validate_transition(
-        "application", item["status"], "submitted", {"confirmed": True, "receipt": material["id"]}
-    )
+    if not reported:
+        validate_transition(
+            "application",
+            item["status"],
+            "submitted",
+            {"confirmed": True, "receipt": material["id"]},
+        )
     result.update(
-        status="submitted",
+        status=(
+            item["status"] if reported and item["status"] != "reported_submitted" else "submitted"
+        ),
         verification="user_confirmed_receipt",
         receipt={
             "material_id": material["id"],

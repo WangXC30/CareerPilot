@@ -1,22 +1,14 @@
 """Single local assistant using schema-bound tools and the leased Worker runtime."""
 
-import json
 import re
-from datetime import datetime
-from zoneinfo import ZoneInfo
 
-from sqlalchemy.orm import Session
-
-from careerpilot import catalogue, growth, learning
-from careerpilot.domain import DomainError, Principal
-from careerpilot.persistence import utc_now
-from careerpilot.platform_models import BackgroundTask, RoleGrant
-from careerpilot.tools import ToolSpec, authorize_tool
-from careerpilot.web_sources import search
+from careerpilot import growth
+from careerpilot.domain import DomainError
 
 ROLES = frozenset({"student", "operator", "admin"})
 ARRAY_SCHEMA = {"type": "array", "items": {"type": "string", "maxLength": 36}, "maxItems": 20}
 SCHEMAS = {
+    "help": {"type": "object", "properties": {}, "additionalProperties": False},
     "diagnose": {
         "type": "object",
         "properties": {"job_ids": ARRAY_SCHEMA},
@@ -65,7 +57,35 @@ def intent_from(message):
     ]:
         if any(word in message for word in words) or re.search(english, text):
             return intent
-    return "progress"
+    if any(
+        word in message for word in ["进展", "进度", "完成情况", "掌握情况", "成长情况"]
+    ) or re.search(r"\b(?:progress|how am i doing)\b", text):
+        return "progress"
+    return "help"
+
+
+def help_reply(message):
+    greeting = bool(re.fullmatch(r"(?:你好[呀啊]?|您好|嗨|hello|hi|hey)[!！。.\s]*", message, re.I))
+    introduction = (
+        "你好！我是你的成长任务助手。" if greeting else "我还没有把这条消息识别为具体任务。"
+    )
+    return {
+        "kind": "assistant_help",
+        "summary": introduction
+        + "\n我可以帮你分析岗位差距、生成学习计划草案、查找学习资源、查看进展或预览重排。"
+        "\n你可以发“查看当前进展”“给我 Python 学习资源”，或关联岗位后发“分析岗位差距”。"
+        "\n目前是任务型助手，尚未接入开放式对话模型；不会把任意问题都当成读取进度。",
+        "summary_en": (
+            "Hello! I am your growth task assistant."
+            if greeting
+            else "I could not identify a specific task in this message."
+        )
+        + "\nI can analyze job gaps, draft study plans, find resources, "
+        "read progress and preview replanning."
+        "\nTry 'show my progress', 'find Python resources', "
+        "or select jobs and ask for a gap analysis."
+        "\nOpen-ended model chat is not connected yet.",
+    }
 
 
 def enqueue(db, principal, payload, key, trace):
@@ -75,6 +95,10 @@ def enqueue(db, principal, payload, key, trace):
     existing = db.get(growth.GrowthRecord, task["id"])
     if existing:
         return growth.data(growth.owned(db, principal, task["id"], "agent_run"))
+    if payload.get("conversation_id"):
+        from careerpilot.conversations import attach
+
+        attach(db, principal, payload, task["id"], trace)
     return growth.save(
         db,
         principal,
@@ -85,7 +109,8 @@ def enqueue(db, principal, payload, key, trace):
             "steps": [],
             "result": None,
             "trace_id": trace,
-            "mode": "local_controlled_tools",
+            "mode": "langgraph",
+            "graph_version": "growth.v1",
         },
         trace,
         record_id=task["id"],
@@ -93,87 +118,6 @@ def enqueue(db, principal, payload, key, trace):
 
 
 def handler(engine, task_id, token, now):
-    from careerpilot.runtime import checkpoint
+    from careerpilot.workflows import handler as graph_handler
 
-    if not checkpoint(engine, task_id, token, "growth_tools", now):
-        return
-    with Session(engine) as db, db.begin():
-        task = db.get(BackgroundTask, task_id)
-        if task is None or task.lease_token != token or task.status != "running":
-            return
-        grant = db.get(RoleGrant, (task.user_id, task.tenant_id))
-        principal = Principal(task.user_id, task.tenant_id, grant.role if grant else "student")
-        row = growth.owned(db, principal, task_id, "agent_run")
-        run = json.loads(row.payload_json)
-        if run["status"] in {"success", "failed"}:
-            return
-        body = run["input"]
-        try:
-            intent = intent_from(body["message"]) if body["intent"] == "auto" else body["intent"]
-            if intent in {"diagnose", "plan"}:
-                args = {"job_ids": body["job_ids"]}
-                if intent == "plan":
-                    profile = learning.profile_context(db, principal)
-                    args["start_date"] = (
-                        datetime.now(ZoneInfo(profile["timezone"])).date().isoformat()
-                    )
-            elif intent == "replan":
-                args = {"plan_id": body["plan_id"] or ""}
-            elif intent == "resources":
-                query = " ".join(
-                    skill["id"]
-                    for skill in catalogue.entries(db, "skill")
-                    if any(
-                        alias.casefold() in body["message"].casefold() for alias in skill["aliases"]
-                    )
-                )
-                args = {"query": query or body["message"][:200]}
-            else:
-                args = {}
-            spec = ToolSpec(
-                "growth." + intent, 1 if intent in {"plan", "replan"} else 0, SCHEMAS[intent], ROLES
-            )
-            authorize_tool(db, principal, spec, args)
-            if intent == "diagnose":
-                result = learning.gap(db, principal, args["job_ids"])
-                summary = f"已分析 {len(result['skills'])} 项技能要求，结论附原始岗位与证据。"
-            elif intent == "plan":
-                result = learning.create_plan(
-                    db, principal, args["job_ids"], args["start_date"], None, task.trace_id
-                )
-                summary = f"已生成 {len(result['tasks'])} 项任务的计划草案；需要你检查并发布。"
-            elif intent == "replan":
-                result = learning.replan_preview(
-                    db, principal, args["plan_id"], "UserRequested", task.trace_id
-                )
-                summary = "已生成重排差异预览，等待你接受或拒绝。"
-            elif intent == "resources":
-                result = search(db, args["query"], principal)
-                summary = f"在官方来源索引中找到 {len(result['results'])} 项资源。"
-            else:
-                result = {"skills": learning.snapshots(db, principal), "active_plan": None}
-                plan = learning.active_plan(db, principal)
-                if plan:
-                    result["active_plan"] = growth.data(plan)
-                summary = "已读取当前技能证据和学习计划。"
-            run.update(
-                status="success",
-                result=result,
-                summary=summary,
-                steps=[
-                    {
-                        "tool": spec.name,
-                        "arguments": args,
-                        "status": "success",
-                        "finished_at": utc_now(),
-                    }
-                ],
-            )
-        except DomainError as exc:
-            run.update(
-                status="failed",
-                result={"code": exc.code, "message": exc.message},
-                summary=exc.message,
-                steps=[{"status": "denied", "code": exc.code}],
-            )
-        growth.save(db, principal, "agent_run", run, task.trace_id, row, row.version)
+    return graph_handler(engine, task_id, token, now)

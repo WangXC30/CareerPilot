@@ -244,7 +244,7 @@ def test_jd_dedup_aliases_versions_filters_restart(system):
     assert changed["id"] == first["id"] and changed["version"] == 3
     history = client.get(f"/api/v1/jobs/{first['id']}/history", headers=alice).json()
     assert len(history) == 3 and history[-1]["payload"]["fields"]["salary"]["state"] == "unknown"
-    with TestClient(create_app(config.attributes["database_url"])) as restarted:
+    with TestClient(create_app(config.attributes["database_url"], local_only=False)) as restarted:
         assert (
             restarted.get("/api/v1/jobs?location=上海&q=Python", headers=alice).json()[0]["id"]
             == first["id"]

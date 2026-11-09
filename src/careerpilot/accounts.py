@@ -2,6 +2,7 @@
 
 import hashlib
 import hmac
+import json
 import secrets
 import time
 
@@ -174,6 +175,14 @@ def export_data(db, principal):
             )
         result["data"][table.name] = [dict(row) for row in db.execute(query).mappings()]
     result["data"]["account"] = {"display_name": db.get(User, principal.user_id).display_name}
+    from careerpilot import growth, workflows
+
+    run_ids = list(
+        db.scalars(
+            growth.owner_query(principal, "agent_run").with_only_columns(growth.GrowthRecord.id)
+        )
+    )
+    result["data"]["workflow_checkpoints"] = workflows.export_checkpoints(db.bind, run_ids)
     return result
 
 
@@ -215,6 +224,23 @@ def process_deletion(engine):
         if row is None:
             return False
         user_id, tenant_id = row.user_id, row.tenant_id
+        from careerpilot import growth, workflows
+        from careerpilot.domain import Principal
+
+        principal = Principal(user_id, tenant_id)
+        growth.lock_owner(db, principal)
+        run_ids = list(
+            db.scalars(
+                growth.owner_query(principal, "agent_run").with_only_columns(growth.GrowthRecord.id)
+            )
+        )
+        # A conversation may already be inaccessible while its single-Worker
+        # checkpoint cleanup is pending. Workspace deletion must include those IDs
+        # before removing the cleanup queue itself.
+        for pending in db.scalars(growth.owner_query(principal, "conversation_cleanup")):
+            run_ids.extend(json.loads(pending.payload_json)["run_ids"])
+        run_ids = list(dict.fromkeys(run_ids))
+        workflows.purge_checkpoints(engine, run_ids)
         for table in reversed(Base.metadata.sorted_tables):
             if table.name == "account_deletions":
                 continue

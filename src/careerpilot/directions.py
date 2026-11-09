@@ -50,8 +50,14 @@ def restore_direction(db, principal, key, target, expected, trace):
 
 
 def translate(db, principal, body, trace):
+    return growth.save(
+        db, principal, "resume_translation", translation_payload(db, principal, body), trace
+    )
+
+
+def translation_payload(db, principal, body):
     version = resumes.owned_version(db, principal, body["resume_version_id"])
-    resumes.valid_facts(db, principal, [f["id"] for f in version["facts"]])
+    resumes.valid_version_facts(db, principal, version)
     mappings = {item["fact_id"]: item["text"] for item in body["mappings"]}
     if len(mappings) != len(body["mappings"]) or set(mappings) != {
         f["id"] for f in version["facts"]
@@ -64,31 +70,25 @@ def translate(db, principal, body, trace):
             re.findall(r"\d+(?:[.,]\d+)?", translated)
         ):
             raise DomainError("TRANSLATION_FACT_MISMATCH", "数字与日期不一致，请核对翻译", 422)
-    return growth.save(
-        db,
-        principal,
-        "resume_translation",
-        {
-            "resume_version_id": version["id"],
-            "locale": body["locale"],
-            "mappings": body["mappings"],
-            "source_facts": version["facts"],
-            "review": "user_reviewed_translation",
-            "visibility": "private",
-            "notice": (
-                "数字一致性已检查；语义、专有名词与学历对应关系由本人逐条复核，不构成自动认证。"
-            ),
-        },
-        trace,
-    )
+    return {
+        "resume_version_id": version["id"],
+        "locale": body["locale"],
+        "mappings": body["mappings"],
+        "source_facts": version["facts"],
+        "review": "user_reviewed_translation",
+        "visibility": "private",
+        "notice": (
+            "数字一致性已检查；语义、专有名词与学历对应关系由本人逐条复核，不构成自动认证。"
+        ),
+    }
 
 
 def translation_detail(db, principal, key):
     value = growth.data(growth.owned(db, principal, key, "resume_translation"))
-    sources = [resumes.fact(db, principal, f["id"]) for f in value["source_facts"]]
+    status = resumes.version_status(db, principal, {"facts": value["source_facts"]})
     return {
         **value,
-        "sources_current": all(f["source_status"] == "current" for f in sources),
+        "sources_current": status["valid"],
         "brand_advice": [
             "公开前移除电话、住址与不必要的个人身份信息。",
             "只陈述有来源的成果，不将自述称为独立认证。",

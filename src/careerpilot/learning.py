@@ -192,10 +192,18 @@ def gap(db, principal, job_ids):
     }
 
 
-def profile_context(db, principal):
+def profile_context(db, principal, plan=None, weekly_minutes=None):
     profile = growth.profile(db, principal)
     if profile is None:
-        raise DomainError("PROFILE_REQUIRED", "请先确认学生档案", 422)
+        budget = (
+            weekly_minutes if weekly_minutes is not None else (plan or {}).get("budget_cap_minutes")
+        )
+        if budget is None:
+            raise DomainError("PROFILE_REQUIRED", "请先确认学生档案或明确本次计划的时间预算", 422)
+        if not isinstance(budget, int) or not 30 <= budget <= 10080:
+            raise DomainError("BUDGET_REQUIRED", "请先明确每周学习时间预算", 422)
+        # This is planning context, not a synthetic or saved profile.
+        return {"version": 0, "weekly_minutes": budget, "timezone": "Asia/Shanghai"}
     payload = growth.data(profile)
     if payload["weekly_minutes"] <= 0:
         raise DomainError("BUDGET_REQUIRED", "每周学习预算必须大于零", 422)
@@ -273,6 +281,9 @@ def validate_plan(payload, budget, graph, protected=None):
             raise DomainError("DEADLINE_CONFLICT", "计划无法在截止日期前完成", 422)
     if any(total > budget for total in totals.values()):
         raise DomainError("BUDGET_EXCEEDED", "周计划超出学习预算，请调整任务或档案预算", 422)
+    first_limit = payload.get("first_week_minutes")
+    if first_limit is not None and totals[week(payload["start_date"])] > first_limit:
+        raise DomainError("BUDGET_EXCEEDED", "第一周任务超出此次调整预算", 422)
     # Each prerequisite must have a verified snapshot or a preceding task in the DAG.
     for task in payload["tasks"]:
         ancestors = set()
@@ -291,11 +302,11 @@ def validate_plan(payload, budget, graph, protected=None):
             raise DomainError("PREREQUISITE_REQUIRED", "计划缺少先修学习或有效能力证明", 422)
     for task in protected or []:
         if by_id.get(task["id"]) != task:
-            raise DomainError("LOCKED_TASK", "调整不能覆盖锁定或已完成任务", 422)
+            raise DomainError("LOCKED_TASK", "调整不能覆盖锁定、进行中或已完成任务", 422)
     return {"weekly_minutes": dict(totals), "budget_minutes": budget, "valid": True}
 
 
-def schedule(tasks, start_date, budget, fixed=None):
+def schedule(tasks, start_date, budget, fixed=None, first_week_minutes=None):
     fixed = fixed or []
     totals: Counter = Counter()
     dates = {t["id"]: t["date"] for t in fixed}
@@ -307,7 +318,12 @@ def schedule(tasks, start_date, budget, fixed=None):
         minimum = max([start_date] + [dates[r] for r in task["requires"] if r in dates])
         day = max(day, date.fromisoformat(minimum))
         for _ in range(730):
-            if totals[week(day.isoformat())] + task["minutes"] <= budget:
+            limit = (
+                min(budget, first_week_minutes)
+                if first_week_minutes is not None and week(day.isoformat()) == week(start_date)
+                else budget
+            )
+            if totals[week(day.isoformat())] + task["minutes"] <= limit:
                 break
             day += timedelta(days=1)
         else:
@@ -319,8 +335,11 @@ def schedule(tasks, start_date, budget, fixed=None):
     return fixed + tasks
 
 
-def build_plan(db, principal, job_ids, start_date, deadline=None):
-    profile = profile_context(db, principal)
+def build_plan(db, principal, job_ids, start_date, deadline=None, weekly_minutes=None):
+    profile = profile_context(db, principal, weekly_minutes=weekly_minutes)
+    if weekly_minutes is not None and weekly_minutes > profile["weekly_minutes"]:
+        raise DomainError("BUDGET_EXCEEDED", "此次预算超过档案预算，请先在我的资料修改。", 422)
+    budget = weekly_minutes if weekly_minutes is not None else profile["weekly_minutes"]
     diagnosis = gap(db, principal, job_ids)
     graph = catalogue.skill_map(db)
     required = {s["skill_id"] for s in diagnosis["skills"] if s["status"] != "verified"}
@@ -334,7 +353,7 @@ def build_plan(db, principal, job_ids, start_date, deadline=None):
         dependencies = [previous[p] for p in graph[key]["requires"] if p in previous]
         segment = 0
         while minutes:
-            duration = min(90, profile["weekly_minutes"], minutes)
+            duration = min(90, budget, minutes)
             segment += 1
             task = {
                 "id": new_id(),
@@ -362,19 +381,28 @@ def build_plan(db, principal, job_ids, start_date, deadline=None):
         "profile_version": profile["version"],
         "start_date": start_date,
         "deadline": deadline,
-        "tasks": schedule(tasks, start_date, profile["weekly_minutes"]),
+        "tasks": schedule(tasks, start_date, budget),
         "verified_skills": verified,
         "catalogue_versions": diagnosis["catalogue_versions"],
         "weight_version": diagnosis["weight_version"],
         "milestones": ["完成先修基础", "完成目标技能学习与练习", "通过对应基础客观测验"],
     }
+    if profile["version"] == 0:
+        payload["budget_cap_minutes"] = profile["weekly_minutes"]
+    if budget != profile["weekly_minutes"]:
+        payload["mode_budget_minutes"] = budget
     payload["validation"] = validate_plan(payload, profile["weekly_minutes"], graph)
     payload["source_context"] = context_hash(db, principal)
     return payload
 
 
-def create_plan(db, principal, job_ids, start_date, deadline, trace):
-    payload = build_plan(db, principal, job_ids, start_date, deadline)
+def create_plan(db, principal, job_ids, start_date, deadline, trace, weekly_minutes=None):
+    if weekly_minutes is None and not growth.profile(db, principal):
+        active = active_plan(db, principal)
+        weekly_minutes = growth.data(active).get("budget_cap_minutes") if active else None
+        if weekly_minutes is None:
+            raise DomainError("BUDGET_REQUIRED", "请先明确每周学习时间预算", 422)
+    payload = build_plan(db, principal, job_ids, start_date, deadline, weekly_minutes)
     return growth.save(db, principal, "plan", payload, trace)
 
 
@@ -395,7 +423,7 @@ def publish_plan(db, principal, plan_id, version, trace):
     payload = json.loads(row.payload_json)
     if payload["status"] != "draft":
         raise DomainError("INVALID_STATE", "只有草案可以发布")
-    profile = profile_context(db, principal)
+    profile = profile_context(db, principal, payload)
     active_goal = next(
         (g["id"] for g in growth.goal_snapshot(db, principal) if g["status"] == "active"), None
     )
@@ -409,7 +437,7 @@ def publish_plan(db, principal, plan_id, version, trace):
     existing = active_plan(db, principal)
     if existing:
         old = json.loads(existing.payload_json)
-        if any(t["locked"] or t["status"] == "completed" for t in old["tasks"]):
+        if any(t["locked"] or t["status"] in {"running", "completed"} for t in old["tasks"]):
             raise DomainError("USE_REPLAN", "已有受保护任务，请使用重排预览")
         growth.save(
             db, principal, "plan", {**old, "status": "archived"}, trace, existing, existing.version
@@ -451,6 +479,8 @@ def task_action(db, principal, plan_id, task_id, body, version, trace):
         material = growth.owned(db, principal, body["material_id"], "material")
         task["material_id"] = material.id
     elif action in {"defer", "split"}:
+        if task["locked"] or task["status"] == "running":
+            raise DomainError("PROTECTED_TASK", "锁定或进行中的任务不能直接重排", 409)
         if task["status"] in {"completed", "skipped"}:
             raise DomainError("INVALID_STATE", "已结束任务不能调整")
         if action == "defer":
@@ -476,7 +506,7 @@ def task_action(db, principal, plan_id, task_id, body, version, trace):
             payload["tasks"].insert(payload["tasks"].index(task) + 1, second)
     else:
         raise DomainError("INVALID_ACTION", "未知任务操作", 422)
-    profile = profile_context(db, principal)
+    profile = profile_context(db, principal, payload)
     payload["validation"] = validate_plan(
         payload, profile["weekly_minutes"], catalogue.skill_map(db)
     )
@@ -504,7 +534,7 @@ def task_action(db, principal, plan_id, task_id, body, version, trace):
 def context_hash(db, principal):
     return growth.payload_hash(
         {
-            "profile": growth.data(growth.profile(db, principal)),
+            "profile": growth.data(profile) if (profile := growth.profile(db, principal)) else None,
             "goals": growth.goal_snapshot(db, principal),
             "evidence": ledger(db, principal),
             "skills": {k: v["version"] for k, v in catalogue.skill_map(db).items()},
@@ -520,7 +550,9 @@ def context_hash(db, principal):
 
 def protected_tasks(payload):
     by_id = {t["id"]: t for t in payload["tasks"]}
-    protected = {t["id"] for t in payload["tasks"] if t["locked"] or t["status"] == "completed"}
+    protected = {
+        t["id"] for t in payload["tasks"] if t["locked"] or t["status"] in {"running", "completed"}
+    }
     pending = list(protected)
     while pending:
         for parent in by_id[pending.pop()]["requires"]:
@@ -530,10 +562,10 @@ def protected_tasks(payload):
     return [copy.deepcopy(t) for t in payload["tasks"] if t["id"] in protected]
 
 
-def replan_preview(db, principal, plan_id, reason, trace):
+def build_replan_preview(db, principal, plan_id, reason):
     row = growth.owned(db, principal, plan_id, "plan")
     current = json.loads(row.payload_json)
-    profile = profile_context(db, principal)
+    profile = profile_context(db, principal, current)
     profile["weekly_minutes"] = plan_budget(current, profile["weekly_minutes"])
     protected = protected_tasks(current)
     states = {s["skill_id"]: s["status"] for s in snapshots(db, principal)}
@@ -615,6 +647,7 @@ def replan_preview(db, principal, plan_id, reason, trace):
         current["start_date"],
         profile["weekly_minutes"],
         protected,
+        current.get("first_week_minutes"),
     )
     validation_error = None
     try:
@@ -634,21 +667,21 @@ def replan_preview(db, principal, plan_id, reason, trace):
             if k in before and before[k] != t
         ],
     }
+    return {
+        "plan_id": plan_id,
+        "base_version": row.version,
+        "reason": reason,
+        "status": "pending",
+        "context_hash": context_hash(db, principal),
+        "candidate": candidate,
+        "diff": diff,
+        "validation_error": validation_error,
+    }
+
+
+def replan_preview(db, principal, plan_id, reason, trace):
     return growth.save(
-        db,
-        principal,
-        "plan_preview",
-        {
-            "plan_id": plan_id,
-            "base_version": row.version,
-            "reason": reason,
-            "status": "pending",
-            "context_hash": context_hash(db, principal),
-            "candidate": candidate,
-            "diff": diff,
-            "validation_error": validation_error,
-        },
-        trace,
+        db, principal, "plan_preview", build_replan_preview(db, principal, plan_id, reason), trace
     )
 
 
@@ -709,7 +742,7 @@ def decide_preview(db, principal, preview_id, accept, version, trace):
         protected = protected_tasks(old)
         validate_plan(
             payload["candidate"],
-            profile_context(db, principal)["weekly_minutes"],
+            profile_context(db, principal, payload["candidate"])["weekly_minutes"],
             catalogue.skill_map(db),
             protected,
         )
@@ -745,7 +778,10 @@ def restore_plan(db, principal, plan_id, target_version, version, trace):
     if target["goal_id"] != active_goal:
         raise DomainError("STALE_PLAN", "历史计划的职业目标已改变，请先切回目标或重新规划", 412)
     validate_plan(
-        target, profile_context(db, principal)["weekly_minutes"], catalogue.skill_map(db), protected
+        target,
+        profile_context(db, principal, old)["weekly_minutes"],
+        catalogue.skill_map(db),
+        protected,
     )
     result = growth.save(db, principal, "plan", target, trace, row, version)
     growth.audit(db, principal, row.id, f"plan.restored_from_{target_version}", row.version, trace)

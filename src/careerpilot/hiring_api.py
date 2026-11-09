@@ -90,6 +90,7 @@ class RestoreInput(Input):
 
 class TailorInput(Input):
     job_id: str = Field(min_length=1, max_length=100)
+    job_version: int | None = Field(default=None, ge=1)
     confirmed: Literal[True]
 
 
@@ -102,6 +103,14 @@ class DraftInput(Input):
 class ApplicationInput(Input):
     job_id: str = Field(min_length=1, max_length=100)
     resume_version_id: str = Field(min_length=1, max_length=100)
+    confirmed: Literal[True]
+
+
+class ExternalApplicationInput(Input):
+    job_id: str = Field(min_length=1, max_length=100)
+    resume_description: str = Field(default="", max_length=200)
+    submitted_at: datetime | None = None
+    note: str = Field(default="", max_length=2000)
     confirmed: Literal[True]
 
 
@@ -226,6 +235,29 @@ def register_hiring(app, session_dependency, identity):
         db=Db,
         principal=Identity,
     ):
+        import json
+
+        from careerpilot.persistence import IdempotencyRecord
+        from careerpilot.safety import payload_hash
+
+        growth.lock_owner(db, principal)
+        key = request.headers.get("idempotency-key")
+        digest = payload_hash(
+            {
+                "action": "resume-import.confirm",
+                "id": material_id,
+                "version": if_match,
+                "claims": body.model_dump(),
+            }
+        )
+        if key:
+            if len(key) > 128:
+                raise DomainError("VALIDATION_ERROR", "幂等键过长", 422)
+            previous = db.get(IdempotencyRecord, (principal.user_id, principal.tenant_id, key))
+            if previous:
+                if previous.request_hash != digest:
+                    raise DomainError("IDEMPOTENCY_CONFLICT", "幂等键已用于不同请求", 409)
+                return json.loads(previous.response_json)
         result = resumes.confirm_import(
             db,
             principal,
@@ -234,6 +266,16 @@ def register_hiring(app, session_dependency, identity):
             int(if_match.strip('"')),
             request.state.trace_id,
         )
+        if key:
+            db.add(
+                IdempotencyRecord(
+                    user_id=principal.user_id,
+                    tenant_id=principal.tenant_id,
+                    key=key,
+                    request_hash=digest,
+                    response_json=growth.dump(result),
+                )
+            )
         db.commit()
         return result
 
@@ -258,6 +300,21 @@ def register_hiring(app, session_dependency, identity):
     @app.get("/api/v1/resumes")
     def roots(db=Db, principal=Identity):
         return listing(db, principal, "resume")
+
+    @app.get("/api/v1/resume-version-options")
+    def resume_version_options(db=Db, principal=Identity):
+        roots = listing(db, principal, "resume")
+        root_ids = {root["id"] for root in roots}
+        versions = listing(db, principal, "resume_version")
+        grouped: dict[str, list[dict]] = {root_id: [] for root_id in root_ids}
+        for item in versions:
+            if item["resume_id"] in grouped:
+                grouped[item["resume_id"]].append(item)
+        return [
+            {"id": item["id"], "resume_id": root["id"], "sequence": item["sequence"]}
+            for root in roots
+            for item in sorted(grouped[root["id"]], key=lambda v: v["sequence"], reverse=True)
+        ]
 
     @app.post("/api/v1/resumes", status_code=201)
     def create(
@@ -325,6 +382,20 @@ def register_hiring(app, session_dependency, identity):
         db.commit()
         return result
 
+    @app.get("/api/v1/resumes/{resume_id}/tailor-preview")
+    def tailor_preview(resume_id: str, job_id: str, db=Db, principal=Identity):
+        root = growth.data(growth.owned(db, principal, resume_id, "resume"))
+        current = resumes.owned_version(db, principal, root["current_version_id"])
+        resumes.valid_version_facts(db, principal, current)
+        job = resumes.job_context(db, principal, job_id)
+        ordered = resumes.tailored_fact_ids(db, principal, current, job_id)
+        facts = {fact["id"]: fact for fact in current["facts"]}
+        return {
+            "resume_version": root["version"],
+            "job": job,
+            "facts": [facts[key] for key in ordered],
+        }
+
     @app.post("/api/v1/resumes/{resume_id}/tailor", status_code=201)
     def tailor(
         resume_id: str,
@@ -335,7 +406,13 @@ def register_hiring(app, session_dependency, identity):
         principal=Identity,
     ):
         result = resumes.tailor(
-            db, principal, resume_id, body.job_id, int(if_match.strip('"')), request.state.trace_id
+            db,
+            principal,
+            resume_id,
+            body.job_id,
+            int(if_match.strip('"')),
+            request.state.trace_id,
+            job_version=body.job_version,
         )
         db.commit()
         return result
@@ -377,7 +454,7 @@ def register_hiring(app, session_dependency, identity):
         # Serialize export against source changes and withdrawal.
         growth.lock_owner(db, principal)
         result = resumes.owned_version(db, principal, version_id)
-        resumes.valid_facts(db, principal, [f["id"] for f in result["facts"]])
+        resumes.valid_version_facts(db, principal, result)
         content = (
             resume_exports.docx(result) if output_format == "docx" else resume_exports.pdf(result)
         )
@@ -419,6 +496,27 @@ def register_hiring(app, session_dependency, identity):
             principal,
             body.job_id,
             body.resume_version_id,
+            idempotency_key,
+            request.state.trace_id,
+        )
+        db.commit()
+        return result
+
+    @app.post("/api/v1/applications/external", status_code=201)
+    def external_application(
+        body: ExternalApplicationInput,
+        idempotency_key: Key,
+        request: Request,
+        db=Db,
+        principal=Identity,
+    ):
+        result = applications.record_external(
+            db,
+            principal,
+            body.job_id,
+            body.resume_description,
+            body.submitted_at.isoformat() if body.submitted_at else None,
+            body.note,
             idempotency_key,
             request.state.trace_id,
         )

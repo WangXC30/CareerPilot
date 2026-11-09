@@ -10,6 +10,7 @@ from unittest.mock import patch
 import uvicorn
 from alembic import command
 from alembic.config import Config
+from browser_identity import connect_browser
 from fastapi.testclient import TestClient
 from playwright.sync_api import expect, sync_playwright
 
@@ -27,9 +28,7 @@ def ok(response, status=200):
 
 def connect(page, base, token):
     page.goto(base + "#local-tools")
-    page.locator("#connect").click()
-    page.locator("#token").fill(token)
-    page.locator("#account-form button[type=submit]").click()
+    connect_browser(page, token)
     expect(page.locator("#tool-application")).to_be_visible()
 
 
@@ -43,7 +42,7 @@ def main():
         seed(engine)
         _, token = provision(engine, "Synthetic application student")
         headers = {"Authorization": "Bearer " + token}
-        with TestClient(create_app(url)) as client:
+        with TestClient(create_app(url, local_only=False)) as client:
             facts = [
                 ok(
                     client.post(
@@ -138,7 +137,9 @@ def main():
             sock.bind(("127.0.0.1", 0))
             port = sock.getsockname()[1]
         server = uvicorn.Server(
-            uvicorn.Config(create_app(url), host="127.0.0.1", port=port, log_level="error")
+            uvicorn.Config(
+                create_app(url, local_only=False), host="127.0.0.1", port=port, log_level="error"
+            )
         )
         thread = threading.Thread(target=server.run, daemon=True)
         thread.start()

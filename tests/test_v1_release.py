@@ -76,10 +76,16 @@ def action(client, headers, plan, task_id, kind, **kwargs):
 def exam(client, headers, skill="python", answers=None):
     created = ok(client.post("/api/v1/assessments", headers=headers, json={"skill_id": skill}), 201)
     assert all("answer" not in q and "expected_choice" not in q for q in created["questions"])
+    bank = assessment.V4_BANK if created["bank_version"] == "foundation.v4" else assessment.V3_BANK
+    correct = [bank[skill][int(q["id"].rsplit(".", 1)[1])][2] for q in created["questions"]]
+    if answers is None:
+        answers = correct
+    elif len(answers) == 3:
+        answers = [(choice + 1) % 3 if i < 2 else choice for i, choice in enumerate(correct)]
     response = client.post(
         f"/api/v1/assessments/{created['id']}/submit",
         headers=version(headers, 1),
-        json={"answers": answers or [1, 0, 2]},
+        json={"answers": answers},
     )
     return created, response
 
@@ -350,28 +356,56 @@ def test_pass_evidence_replan_accept_restore_and_revocation(system):
     )
 
 
+def test_foundation_bank_versions_remain_gradeable():
+    assert assessment.grade("python", [1, 0, 2], "foundation.v1")["passed"]
+    assert all(len(questions) == 6 for questions in assessment.CURRENT_BANK.values())
+    for skill, questions in assessment.CURRENT_BANK.items():
+        assert assessment.grade(skill, [q[2] for q in questions], "foundation.v2")["passed"]
+    for skill, questions in assessment.V3_BANK.items():
+        assert len({question[0] for question in questions}) == len(questions)
+        assert all(len(q[1]) == len(set(q[1])) == 3 and 0 <= q[2] < 3 and q[3] for q in questions)
+        ids = [f"{skill}.{i}" for i in range(6, 12)]
+        assert assessment.grade(skill, [q[2] for q in questions[6:12]], "foundation.v3", ids)[
+            "passed"
+        ]
+    with pytest.raises(ValueError):
+        assessment.grade("python", [0] * 6, "foundation.v3", ["python.0"] * 6)
+
+
+def test_assessment_draws_and_grades_selected_questions(system):
+    client, _, alice, *_ = system
+    first, response = exam(client, alice)
+    result = ok(response)
+    assert len({q["id"] for q in first["questions"]}) == 6
+    assert result["result"]["passed"]
+    assert [f["question_id"] for f in result["result"]["feedback"]] == [
+        q["id"] for q in first["questions"]
+    ]
+
+
 def test_assessment_replay_forgery_wrong_version_and_evaluator_outage(system, monkeypatch):
     client, _, alice, bob, _, _ = system
     created = ok(
         client.post("/api/v1/assessments", headers=alice, json={"skill_id": "python"}), 201
     )
     path = f"/api/v1/assessments/{created['id']}/submit"
+    answers = [
+        assessment.V4_BANK["python"][int(q["id"].rsplit(".", 1)[1])][2]
+        for q in created["questions"]
+    ]
+    assert client.post(path, headers=version(bob, 1), json={"answers": answers}).status_code == 404
     assert (
-        client.post(path, headers=version(bob, 1), json={"answers": [1, 0, 2]}).status_code == 404
-    )
-    assert (
-        client.post(path, headers=version(alice, 99), json={"answers": [1, 0, 2]}).status_code
-        == 412
+        client.post(path, headers=version(alice, 99), json={"answers": answers}).status_code == 412
     )
     assert (
         client.post(
-            path, headers=version(alice, 1), json={"answers": [1, 0, 2], "passed": True}
+            path, headers=version(alice, 1), json={"answers": answers, "passed": True}
         ).status_code
         == 422
     )
-    good = ok(client.post(path, headers=version(alice, 1), json={"answers": [1, 0, 2]}))
+    good = ok(client.post(path, headers=version(alice, 1), json={"answers": answers}))
     assert (
-        ok(client.post(path, headers=version(alice, 1), json={"answers": [1, 0, 2]}))["id"]
+        ok(client.post(path, headers=version(alice, 1), json={"answers": answers}))["id"]
         == good["id"]
     )
     assert len(ok(client.get("/api/v1/skill-evidence", headers=alice))) == 1
@@ -558,7 +592,7 @@ def test_restart_retains_active_plan_evidence_and_preview_history(system):
     _, plan = setup_plan(system)
     _, response = exam(client, alice, answers=[0, 0, 0])
     preview = ok(response)["replan_preview"]
-    with TestClient(create_app(config.attributes["database_url"])) as restarted:
+    with TestClient(create_app(config.attributes["database_url"], local_only=False)) as restarted:
         assert (
             restarted.get(f"/api/v1/plans/{plan['id']}", headers=alice).json()["version"]
             == plan["version"]

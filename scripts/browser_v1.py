@@ -82,15 +82,7 @@ def run(output=None):
                 errors = []
                 page.on("pageerror", lambda error: errors.append(str(error)))
                 page.goto(base + "/app/#settings")
-                page.get_by_role("button", name="连接我的账号", exact=True).click()
-                form = page.locator("#login-form")
-                form.locator("[name=email]").fill("acceptance@example.com")
-                form.locator("[name=password]").fill("browser-local-only-2026!")
-                form.locator("[name=display_name]").fill("V1 验收学生")
-                form.locator("[name=privacy]").check()
-                form.get_by_role("button", name="注册账号", exact=True).click()
-                expect(page.locator("#account-dialog")).not_to_be_visible()
-                expect(page.locator("#notice")).to_contain_text("账号已创建")
+                expect(page.locator("#account-dialog")).to_have_count(0)
                 profile = page.locator("#profile-form")
                 for key, value in {
                     "major": "计算机",
@@ -246,16 +238,16 @@ def run(output=None):
                     page.get_by_role("button", name="导出我的资料").click()
                 assert download.value.suggested_filename == "careerpilot-export.json"
                 page.locator("#delete-account-form").locator("..").locator("summary").click()
-                page.locator("#delete-account-form [name=confirmation]").fill("DELETE MY ACCOUNT")
-                page.get_by_role("button", name="确认注销并删除").click()
-                expect(page.locator("#notice")).to_contain_text("注销完成", timeout=15000)
+                page.locator("#delete-account-form [name=confirmation]").fill("CLEAR LOCAL DATA")
+                page.get_by_role("button", name="确认清空本地资料").click()
+                expect(page.locator("#notice")).to_contain_text("本地资料已清空", timeout=15000)
                 assert not errors, errors
                 assert not worker_errors, worker_errors
                 assert page.evaluate("localStorage.length") == 0
                 browser.close()
             return {
                 "browser": "Chromium",
-                "mode": "local_email_and_real_worker",
+                "mode": "single_local_workspace_and_real_worker",
                 "e2e": {
                     key: "passed"
                     for key in [

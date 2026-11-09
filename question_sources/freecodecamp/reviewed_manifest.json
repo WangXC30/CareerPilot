@@ -1,0 +1,1377 @@
+{
+  "source_commit": "d71a60ba08113e8f999aeaa8c75c7d16aef1dbc0",
+  "notes": "Editorial review of question, options and explanation against linked references; source edits require review.",
+  "groups": [
+    {
+      "source": "python",
+      "topic": "Python",
+      "items": [
+        {
+          "index": 0,
+          "fingerprint": "562782fe9691205f04259e7f9c28be9605db8e9906365edb9ae490e59ea5774e",
+          "reference": "https://docs.python.org/3/library/stdtypes.html#ranges"
+        },
+        {
+          "index": 4,
+          "fingerprint": "8aba5681ff12efc93442dbea68e68e776dd0b16049b522ff5e84f78469cfacd9",
+          "reference": "https://docs.python.org/3/library/functions.html#len"
+        },
+        {
+          "index": 8,
+          "fingerprint": "686ac339e736119dc849382f2cf85b8bbeb5a7887341fb6feb6b63f7959c4f92",
+          "reference": "https://docs.python.org/3/library/stdtypes.html#set-types-set-frozenset"
+        },
+        {
+          "index": 10,
+          "fingerprint": "e3bbbf7147d72074e006b9326cac8d0f8abbb7684b33c6abc667e7f79270e445",
+          "reference": "https://docs.python.org/3/reference/expressions.html#unary-arithmetic-and-bitwise-operations"
+        },
+        {
+          "index": 11,
+          "fingerprint": "54ada86de999746d04aaaf3af66c2d6a0838a6435d517bdf3b7497a59e94efde",
+          "reference": "https://docs.python.org/3/reference/expressions.html#binary-bitwise-operations"
+        },
+        {
+          "index": 12,
+          "fingerprint": "8d39d86ddf4ad78e40ee23ac26573957a0dcf4f2bb497a84c7629f5f95254cc7",
+          "reference": "https://docs.python.org/3/reference/expressions.html#binary-bitwise-operations"
+        },
+        {
+          "index": 15,
+          "fingerprint": "051b114e2e8cb5ef0800160911352cfa9e33ff5f97ff06af90a2dfc1de13bda7",
+          "reference": "https://docs.python.org/3/reference/simple_stmts.html#the-raise-statement"
+        },
+        {
+          "index": 24,
+          "fingerprint": "c551ee90737bd25ce69b472d4ad2684781ee2bf5b274b1bc35d90c202d8bb63a",
+          "reference": "https://docs.python.org/3/library/functions.html#input"
+        },
+        {
+          "index": 30,
+          "fingerprint": "a42192f76cbb88b0a08bd1b784b034a484b59a97cc9dce289ddb493444a2372f",
+          "reference": "https://docs.python.org/3/library/stdtypes.html#common-sequence-operations"
+        },
+        {
+          "index": 37,
+          "fingerprint": "63a30595aefcfe347450314f97ec1a385fe26b35d985ebefb8ddb81a9ddba7ad",
+          "reference": "https://docs.python.org/3/library/stdtypes.html#mapping-types-dict"
+        },
+        {
+          "index": 40,
+          "fingerprint": "69d11021b1dd7fa15036ac1016ead28ac76ed64b7e9d421f8059c3e4caaa6740",
+          "reference": "https://docs.python.org/3/reference/expressions.html#membership-test-operations"
+        },
+        {
+          "index": 52,
+          "fingerprint": "181326d8c3573577555a66ca7a8e558e34f90097680b7889bc8e9d0f414c8303",
+          "reference": "https://docs.python.org/3/library/functions.html#max"
+        },
+        {
+          "index": 55,
+          "fingerprint": "ca064e60c1d804fc9abceaaa571489398aac8edbfd0609a63fd592ff3f497c97",
+          "reference": "https://docs.python.org/3/library/stdtypes.html#dict.pop"
+        },
+        {
+          "index": 56,
+          "fingerprint": "fd33199907daf1a2afc8c7806274376f7ca5ca87fdf41ebb239837784bba074d",
+          "reference": "https://docs.python.org/3/reference/expressions.html#binary-arithmetic-operations"
+        },
+        {
+          "index": 57,
+          "fingerprint": "6f707eadba2e764a2a7d2fdb7bc0073ca101e2f1b7a99cca5917f212f6e5b1a9",
+          "reference": "https://docs.python.org/3/reference/simple_stmts.html#the-return-statement"
+        },
+        {
+          "index": 58,
+          "fingerprint": "66a088096d42d99ce5430c4ace0ac9738340962bc08ec477f964de3dab09df18",
+          "reference": "https://docs.python.org/3/reference/compound_stmts.html#class-definitions"
+        },
+        {
+          "index": 60,
+          "fingerprint": "1a7a3d00955e11be9f13098fff32b406089b0a3f5a3957d0e5ec5718b0b41ed3",
+          "reference": "https://docs.python.org/3/library/exceptions.html#NameError"
+        },
+        {
+          "index": 61,
+          "fingerprint": "9806147ec2bb58785a885abc12f1458b106225d9b10fbec5252cae1486a1f0b1",
+          "reference": "https://docs.python.org/3/reference/expressions.html#the-power-operator"
+        },
+        {
+          "index": 64,
+          "fingerprint": "a7fd735dfeb2f81d82aeae4282ddcd1938f849018b655c92b357c6a217b6157b",
+          "reference": "https://docs.python.org/3/library/stdtypes.html#lists"
+        },
+        {
+          "index": 65,
+          "fingerprint": "fb2d44eb6bd100df70eee74dd46441df9c66d2c686f3a8ac0cfb721598e61dd3",
+          "reference": "https://docs.python.org/3/library/exceptions.html#TypeError"
+        },
+        {
+          "index": 66,
+          "fingerprint": "8c7b8c57ba3352a63e81b147333e4d2b7416f002d010c91d18a4e848131520be",
+          "reference": "https://docs.python.org/3/library/functions.html#any"
+        }
+      ]
+    },
+    {
+      "source": "javascript",
+      "topic": "JavaScript",
+      "items": [
+        {
+          "index": 0,
+          "fingerprint": "b73907b25aa25383136b8ad8decaac058de990193d173dd3a960de7a05bc05bc",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/substring"
+        },
+        {
+          "index": 1,
+          "fingerprint": "926411cffe69147b5ae8db7a6b2a8eedfa6534dfeaff3548b88767c234153b55",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random"
+        },
+        {
+          "index": 7,
+          "fingerprint": "c9a3c7f39076690b9e2e6ee9fbb6dc17bc8753a0e4a3dae513f6857d2d1f1e0b",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/slice"
+        },
+        {
+          "index": 14,
+          "fingerprint": "f0d91851cfbb5a121e414b0d5f30c056b5b107313d207d597f35850237346815",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener"
+        },
+        {
+          "index": 16,
+          "fingerprint": "8feb13cd20737e9cd8064102297cbcaa212e2c8fa1ca0803a59803dbf89b5ce7",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/API/Element/innerHTML"
+        },
+        {
+          "index": 18,
+          "fingerprint": "7185764e3c2ed8cdf6fc1a799ae83e62c4e5c88af845f5054b06a592c96c1b1f",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Unary_plus"
+        },
+        {
+          "index": 20,
+          "fingerprint": "316135da0fc7b6cd407381b7b8d449dbcf04dd49dabd1a616a64bc4e62f7dde0",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/trim"
+        },
+        {
+          "index": 28,
+          "fingerprint": "953c2ceead6842e83ba72a67bfa3883a5e9d9f0d7d0ffbfb5c98089c3fa33f48",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array"
+        },
+        {
+          "index": 32,
+          "fingerprint": "1d8d9e9dfa8344a4225bc38ef6d1cbc67f073203ab8f964b7f15cd6e99b54584",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing"
+        },
+        {
+          "index": 39,
+          "fingerprint": "9774b260310ed9ffce6efd1fe9ccca0f39272574bac70006405e261270216295",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getDate"
+        },
+        {
+          "index": 40,
+          "fingerprint": "afdf75c05624aacd973ab6f9660f4eede3abe6bb09e160adf38a59e68d57d690",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getDay"
+        },
+        {
+          "index": 45,
+          "fingerprint": "3a9605940829fd7caded444ff1212a18abb461cfe75ffe8e015466a2a97ffaca",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getMonth"
+        },
+        {
+          "index": 47,
+          "fingerprint": "573949ee17bbfa83385ddc6e79dd2d5202f4575e888ba27956d2fa1b1b0a0db0",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getTime"
+        },
+        {
+          "index": 49,
+          "fingerprint": "92cadcb2804a9791f85236cf87b9f41a7a568060193816d80fc96a368449cac8",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Addition"
+        },
+        {
+          "index": 53,
+          "fingerprint": "bffb34fde7a6b1b9db135875e9430411747f29ac8b3e176d27fc19de2b0c3366",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/indexOf"
+        },
+        {
+          "index": 54,
+          "fingerprint": "a3c3eb2cba94b2eb30bf65d027a1ea2622dab153b97afc5c3f93bc493490f80a",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/join"
+        }
+      ]
+    },
+    {
+      "source": "git",
+      "topic": "Git",
+      "items": [
+        {
+          "index": 6,
+          "fingerprint": "40a7c4b5f7d4c0093d8f9e9cead2eddd45257fbd80c88412e07ad6f4e9e3bd5f",
+          "reference": "https://git-scm.com/docs/git-branch"
+        },
+        {
+          "index": 10,
+          "fingerprint": "ccf5f1f7465694ff3663443ba3f7704769690e72d2121741c9acb244caceb3d1",
+          "reference": "https://git-scm.com/docs/git-init"
+        },
+        {
+          "index": 21,
+          "fingerprint": "56d21e1dd73ed09bfc6cebace400b4247d99e439d710f01e1cf69d3e8cddbe05",
+          "reference": "https://git-scm.com/docs/git"
+        },
+        {
+          "index": 33,
+          "fingerprint": "f46352c6ffb2725ba012e16874939162b7fe6d9b30c43459223cc2b10c7700b9",
+          "reference": "https://git-scm.com/docs/git-diff"
+        },
+        {
+          "index": 38,
+          "fingerprint": "ed60c39dc5264f1d6bbe48368e22a10d94846375325bbd2d3ebf54668e6a5548",
+          "reference": "https://git-scm.com/docs/git-branch"
+        },
+        {
+          "index": 42,
+          "fingerprint": "e781a1e7a3739b03c58e604bfd99710b55c746274439fdf99423a8fcac616a9a",
+          "reference": "https://git-scm.com/docs/git-stash"
+        },
+        {
+          "index": 53,
+          "fingerprint": "3d57e601d92c9384a610e94db213c71ce6cf47fd2d39c1415559eefb51381197",
+          "reference": "https://git-scm.com/docs/git-log"
+        },
+        {
+          "index": 58,
+          "fingerprint": "2d349a30ecc0bbad416c77de897e1144cecddae32c2dbbeca126ffd6ef356420",
+          "reference": "https://git-scm.com/docs/git-bisect"
+        }
+      ]
+    },
+    {
+      "source": "linux",
+      "topic": "Linux",
+      "items": [
+        {
+          "index": 18,
+          "fingerprint": "cdaba12436bcf49279878ecae62fed686b1325426e63a69556616a3fe734fa10",
+          "reference": "https://man7.org/linux/man-pages/man7/cgroups.7.html"
+        },
+        {
+          "index": 22,
+          "fingerprint": "e07b56044ef4ba0b08319da13d66a8c33d4b9f902c647b6dd3dca6365af82b11",
+          "reference": "https://www.gnu.org/software/bash/manual/html_node/Bourne-Shell-Builtins.html"
+        },
+        {
+          "index": 23,
+          "fingerprint": "75176137f70784f24f82e11d6e6346cfa52974935340b4d2e449b1113f26b3aa",
+          "reference": "https://man7.org/linux/man-pages/man1/grep.1.html"
+        },
+        {
+          "index": 25,
+          "fingerprint": "c3c4409ac229c866e5322b17d41f7ce40f8882d994e448983bfab237c5bc25b3",
+          "reference": "https://man7.org/linux/man-pages/man1/ln.1.html"
+        },
+        {
+          "index": 28,
+          "fingerprint": "da78e36fed98284346e6c6950ff5f2ebdc1f15ee87e5b28c58848b793207a073",
+          "reference": "https://man7.org/linux/man-pages/man1/uname.1.html"
+        },
+        {
+          "index": 29,
+          "fingerprint": "d9dec310819fb012c17e8e29de8df0c56bfcc01312a493e4099d1865ebad8981",
+          "reference": "https://man7.org/linux/man-pages/man1/xargs.1.html"
+        },
+        {
+          "index": 32,
+          "fingerprint": "e92388d154b48808d2c5e0b1951a91cb2ab0b9e447d19eba58051c4ef31bccf6",
+          "reference": "https://man7.org/linux/man-pages/man1/file.1.html"
+        },
+        {
+          "index": 33,
+          "fingerprint": "b9b76daace19f2c20bea10b6228c0eb18a7bd399728442237bec460cdee6e4e8",
+          "reference": "https://man7.org/linux/man-pages/man1/whereis.1.html"
+        },
+        {
+          "index": 34,
+          "fingerprint": "a3d7797c437ee82c856de9ebf9bb60f1d60275f2b3d5251285c0e7df9512bdb6",
+          "reference": "https://man7.org/linux/man-pages/man1/ps.1.html"
+        },
+        {
+          "index": 36,
+          "fingerprint": "de0709aea87229df6ddee542ea1b0fd1aee6d9ab86d811f31be8fcbab5308414",
+          "reference": "https://man7.org/linux/man-pages/man1/yes.1.html"
+        },
+        {
+          "index": 40,
+          "fingerprint": "09643a5f444a871f748b8fa9cc4147a5c59c9f2931128a87c01eefaf9b2914b8",
+          "reference": "https://man7.org/linux/man-pages/man1/printenv.1.html"
+        },
+        {
+          "index": 44,
+          "fingerprint": "8bd53e4b78cb154392ca9cdcd6c44ec355d259cb0b4e3fde2b33169887cec64a",
+          "reference": "https://man7.org/linux/man-pages/man1/pwd.1.html"
+        },
+        {
+          "index": 45,
+          "fingerprint": "66d7ccfcd38ce3c52e71c60b13cf3dea999eb8c40cb322d6d6326fe167e9fc60",
+          "reference": "https://www.gnu.org/software/bash/manual/html_node/Pipelines.html"
+        },
+        {
+          "index": 46,
+          "fingerprint": "90470da9f1b4ca84f73f18914a6ce30774c1fb4b0a80a2d91daf419fd2a87b45",
+          "reference": "https://curl.se/docs/manpage.html"
+        },
+        {
+          "index": 48,
+          "fingerprint": "b3f94010fd05ed38cb29f10c4b6c96b188e38f415dd4b6ab07bddfc07ca0084d",
+          "reference": "https://man7.org/linux/man-pages/man1/mkdir.1.html"
+        },
+        {
+          "index": 53,
+          "fingerprint": "3185cc64acba157c3a0c0b2d0e19a8474844ce68a38d198173229da2e96c1f09",
+          "reference": "https://man7.org/linux/man-pages/man1/mv.1.html"
+        },
+        {
+          "index": 54,
+          "fingerprint": "cd631fd1ed458d34ddec5993f1ac04d421e53fefcd683d7a75617c3c7fcc21f7",
+          "reference": "https://man7.org/linux/man-pages/man1/ls.1.html"
+        },
+        {
+          "index": 59,
+          "fingerprint": "1f6a3ab84133b4e7b19e7b61e8b758748eb3012f070bc966556179fd633bf7ca",
+          "reference": "https://man7.org/linux/man-pages/man1/touch.1.html"
+        },
+        {
+          "index": 60,
+          "fingerprint": "0c3907c052c18e98525639e4e1f14aacb53d20b19149dd740c4d984ebbb5ee18",
+          "reference": "https://man7.org/linux/man-pages/man1/wc.1.html"
+        },
+        {
+          "index": 61,
+          "fingerprint": "5cd3cea979631007d06143ec7344f227f2c3bf6598247adb214c9a96872fbde0",
+          "reference": "https://www.gnu.org/software/bash/manual/html_node/Bourne-Shell-Builtins.html"
+        },
+        {
+          "index": 63,
+          "fingerprint": "3d3c09c216a036b9053221a2c73d2c3a67215e69fa9a0c10c64d597fb8496289",
+          "reference": "https://man7.org/linux/man-pages/man1/wc.1.html"
+        },
+        {
+          "index": 64,
+          "fingerprint": "cc8fa2cf05ad6e125f0ab590b85377dee3f41b1f859eaf5b36b3f6aaa0ecadbd",
+          "reference": "https://www.gnu.org/software/bash/manual/html_node/Bourne-Shell-Builtins.html"
+        },
+        {
+          "index": 68,
+          "fingerprint": "2b1f11eb132d81a0657e73fe27e7744083fb2b5e3421d3d3225b4dd73d22adec",
+          "reference": "https://man7.org/linux/man-pages/man1/mkdir.1.html"
+        },
+        {
+          "index": 74,
+          "fingerprint": "7cb72b1d989d7a3a1110183936c5e87faadfbdf81f1a89308fc19726f70383f5",
+          "reference": "https://man7.org/linux/man-pages/man7/path_resolution.7.html"
+        },
+        {
+          "index": 75,
+          "fingerprint": "b921c9037714706d6a011d65342029f7db60f38c727d5561aa898e5d7a861f93",
+          "reference": "https://www.kernel.org/doc/html/latest/admin-guide/README.html"
+        },
+        {
+          "index": 77,
+          "fingerprint": "24ebdd3c76ebd5d482175072ba3507b353673d1a88239e1189b038f75a4b4601",
+          "reference": "https://www.gnu.org/software/gzip/manual/gzip.html"
+        },
+        {
+          "index": 78,
+          "fingerprint": "ce04f4dacb460d96971eae6a56c10de892cd19083ae01f0b2941c4e865e74eec",
+          "reference": "https://man7.org/linux/man-pages/man1/ln.1.html"
+        }
+      ]
+    },
+    {
+      "source": "css",
+      "topic": "CSS",
+      "items": [
+        {
+          "index": 0,
+          "fingerprint": "2dc22e5de591dcfda1510946c2379852965536b9e8f3f63bff290621bd0a776f",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/CSS/flex"
+        },
+        {
+          "index": 1,
+          "fingerprint": "673306318a3e44f6bef35cb981db74814243fd15b6745589c27b1fb48d59af90",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/CSS/opacity"
+        },
+        {
+          "index": 2,
+          "fingerprint": "5f01d54688f30434a341a7ebf15eb67eb4d033e179a5199e60b01064cc739262",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/CSS/order"
+        },
+        {
+          "index": 3,
+          "fingerprint": "57dcb26cf3d3f4b1fea92db36f1e0a590ccfb4b971ec6187c4801ddb74069ea6",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/CSS/:active"
+        },
+        {
+          "index": 7,
+          "fingerprint": "88d40d1d0c848a8948456161b3d2c09c847beda25424ecf499f8187d0423c2b3",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template-columns"
+        },
+        {
+          "index": 12,
+          "fingerprint": "c03f472e54a1725692817cdd0e25832bd9d151b6e7c87dc5b41acf9d79ca1537",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/CSS/animation-direction"
+        },
+        {
+          "index": 19,
+          "fingerprint": "87fc91a33ba565f669d3d3f68aed78f8772c0b3bbc8a7dbe4ce43d6e8d85402e",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/CSS/align-items"
+        },
+        {
+          "index": 20,
+          "fingerprint": "87a45a613f47682c714e8c08fe52da39a5f2fc60a6257d59ed2e793448c741a4",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/CSS/flex-wrap"
+        },
+        {
+          "index": 21,
+          "fingerprint": "6403178e1d7dd9af5a6b2ff3acc38b6eb19d63d725cd7954ed72ab725631daff",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/CSS/background-color"
+        },
+        {
+          "index": 24,
+          "fingerprint": "47d4a2d085bd4f9614a95d06285ea7c12cf50cefbcd22bbf6bc2c6559ac2f937",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/CSS/:hover"
+        },
+        {
+          "index": 25,
+          "fingerprint": "60a3d48e803861b8275a00e862dffcbc709de624a219929fba516723659beeae",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template-rows"
+        },
+        {
+          "index": 26,
+          "fingerprint": "10de0e9d57460fb82f66b3a21814f72d5f2d6a2118d0f1935340093a7900d795",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/CSS/background-repeat"
+        },
+        {
+          "index": 28,
+          "fingerprint": "0e37078549fb5b2d7936ee51c6eecb9664f8da3de2b28808765f7c59160d81cf",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/CSS/animation-iteration-count"
+        },
+        {
+          "index": 30,
+          "fingerprint": "9daa57be7899c0e45dee0f6db6c8e2eac4aeb4e21867a3907dda55d68d0b3b48",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/CSS/animation-play-state"
+        },
+        {
+          "index": 31,
+          "fingerprint": "566136d6a7fcc948fa777ee4e6976e5b6305d4656278a975ca1480a4057864b5",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/CSS/scroll-behavior"
+        },
+        {
+          "index": 33,
+          "fingerprint": "c56d921f0c0182741c9fbd2bc71b681f5fdab00a9aa37d2daecf69c51394be8c",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/CSS/background-repeat"
+        },
+        {
+          "index": 34,
+          "fingerprint": "078b9ed408f30abd628ffabd5319df0d80f1c6cd6dd6f88a0a7fc544e6ef8698",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/CSS/Class_selectors"
+        },
+        {
+          "index": 37,
+          "fingerprint": "45d9d0e2d010fbe3bc6d3e96378cf168411669222159df72c8ac426475136adf",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/CSS/flex-direction"
+        },
+        {
+          "index": 38,
+          "fingerprint": "4f48be31cefc79451e63aeed1dcde5a52fbab6c2ba0203d258b5f245382e21d0",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/CSS/flex-direction"
+        },
+        {
+          "index": 40,
+          "fingerprint": "00ced4dda2c87c1ca4c7f2e2286ba1d13fada24311e4910802484f0665d5eb30",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/CSS/background-position"
+        },
+        {
+          "index": 41,
+          "fingerprint": "316290a56135f6b1165e4c50327ddbbd62c3d6bef2eeee4c6a0b28c7f29eb12a",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/CSS/length"
+        },
+        {
+          "index": 45,
+          "fingerprint": "c57a53cb1bbb02318fefc8452192a05a822170fa435b190d03743da9ebf348fd",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/CSS/Universal_selectors"
+        },
+        {
+          "index": 46,
+          "fingerprint": "3f7e7975e9ca8225a8e13d37c2075dfe30182b9f5447540a94e3aecabbee3fb5",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/CSS/background-position"
+        },
+        {
+          "index": 49,
+          "fingerprint": "6b25ff4e3cc01986b08129801b6b3c9f25b9c82ce7c56ff1d5ab1e4613cdeafe",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/CSS/flex-direction"
+        },
+        {
+          "index": 50,
+          "fingerprint": "bbb2a083e7d3ff0416ad2457a2c66edb1566cc756bc25383f606eb930d435099",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/CSS/background-origin"
+        },
+        {
+          "index": 51,
+          "fingerprint": "cfdc9d78e99de3ff0276912f2267f7354549717ea171fcb8248d9903d9d6eaec",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/CSS/column-gap"
+        },
+        {
+          "index": 52,
+          "fingerprint": "0be3e672639c994db38c3afe19e7878004d4a6bab14d587e1500d5cd378c07c6",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/CSS/animation-timing-function"
+        },
+        {
+          "index": 59,
+          "fingerprint": "4ede7a9df63cd869c9f24d39e35d14d50152ce9534928ffc459a7477d1b22d32",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/CSS/background-origin"
+        },
+        {
+          "index": 60,
+          "fingerprint": "9ebccddda1b38da1d0b7ccc2af6518d6043edbbe2e2aff2d40c79e78580628d4",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/CSS"
+        },
+        {
+          "index": 63,
+          "fingerprint": "cfdc25752499a82061912c094e7e4f4f3861c3b0725cc6df7c36c4f4d671fa26",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/CSS/text-transform"
+        },
+        {
+          "index": 66,
+          "fingerprint": "0b18a3f963b03fbc45461ff60b528042c1b53bdea55b696ef9aaa1ada059c94d",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hsl"
+        },
+        {
+          "index": 67,
+          "fingerprint": "91e668313ec86cbb4223e440551d184a15a9604ef15063e9aed0b57d0d87c8ee",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/CSS/background-attachment"
+        }
+      ]
+    },
+    {
+      "source": "html",
+      "topic": "HTML",
+      "items": [
+        {
+          "index": 0,
+          "fingerprint": "cbfc559a2ad80e2fd4982224dc5cdb37829093b2a6329e9de75566366e671d46",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script"
+        },
+        {
+          "index": 1,
+          "fingerprint": "46fad3e4eb27c52517f53feb49ad6313dfafbd7171e37d165a68bee7b1ef3f8c",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/link"
+        },
+        {
+          "index": 4,
+          "fingerprint": "011a8279208c2f6c99560d699a0cb61f8a709b7c81a999237e722ce49e307354",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script"
+        },
+        {
+          "index": 5,
+          "fingerprint": "f63d0522f8f750e0e0349ec6de3b91cabb05415a1ee69c08d897771845e71a73",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/Heading_Elements"
+        },
+        {
+          "index": 7,
+          "fingerprint": "a83ea5349065577917c2a23ca2159031ec8595fc124c18cf15cf33e7a4e1fbe2",
+          "reference": "https://developer.mozilla.org/en-US/docs/Glossary/Doctype"
+        },
+        {
+          "index": 9,
+          "fingerprint": "7ab530fbe24981f86edae7b4012d85d1dd351eb74b3c6016de2b4fc5e42d0d5f",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/form"
+        },
+        {
+          "index": 10,
+          "fingerprint": "497875ce41f13b0c1516a6a3a630bab9d9d9504c2d3644bafb73f4c472285a1a",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input"
+        },
+        {
+          "index": 11,
+          "fingerprint": "c9cc635c72b38cb42159338e249dbb1c664250594356309d0d2481c9075487fd",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/canvas"
+        },
+        {
+          "index": 15,
+          "fingerprint": "a02ef9692a0a84fdeb2beb22e79481d5b1f637a4cbc34c579ae967b66dd18ff0",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/ins"
+        },
+        {
+          "index": 16,
+          "fingerprint": "c05bbe895b139f3822ee8f957d3bb2c37c3ba4f7baf2f4b8e6177ba0ef301140",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Global_attributes/title"
+        },
+        {
+          "index": 17,
+          "fingerprint": "db2534085f6f8d26be5a3c023af4e9e79f89b33b493d79edeca1b29d927fdd95",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/img"
+        },
+        {
+          "index": 19,
+          "fingerprint": "4d068d9ae732de979435ba6c93ccd7778c596bed504926c65db8835870c6879f",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector"
+        },
+        {
+          "index": 22,
+          "fingerprint": "7cce30c35b2757fc5d708ec67a14a439a3daea49ca2fc3be3f82b80992f72d35",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/body"
+        },
+        {
+          "index": 23,
+          "fingerprint": "9cd6db7827436cd6d93d413ad6cea7731f40de012ce2351bac14fbf73f12ce94",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/td"
+        },
+        {
+          "index": 24,
+          "fingerprint": "0fa6a2f0ac00c2b68f88757b502f1f5f943dd45a3ef229faea5b3cd34c047b21",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/details"
+        },
+        {
+          "index": 25,
+          "fingerprint": "11aac59dcbd467f27b5bf7a05b1fade63a69ad699ff0f7b1e5d992c2140111f8",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input"
+        },
+        {
+          "index": 28,
+          "fingerprint": "62583afa9a7aba30864c2ccd2e245ee356d0ba1de084270b802d5707a917a651",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/a"
+        },
+        {
+          "index": 29,
+          "fingerprint": "3e5e0b1aa2ced245b713de655fc62b8be10c5d43c63255b4b069ef78df03c16f",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Global_attributes/tabindex"
+        },
+        {
+          "index": 30,
+          "fingerprint": "0c9d163efeb90962283756705aa835aa783873747783b573771368f83988581e",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/main"
+        },
+        {
+          "index": 31,
+          "fingerprint": "5c848bbc092912f984e6d8277cea7e530f1763c83c103a30c21cc1d526ae2577",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/dl"
+        },
+        {
+          "index": 32,
+          "fingerprint": "ae27f6f008e4a418c08834092cc09431f3090842a76854750bbba80ae03793e6",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/div"
+        },
+        {
+          "index": 33,
+          "fingerprint": "3084e0ebb62555c586e01be49bae15e2a0b2af47cadcd2d3c8cadcdea4fa374d",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/head"
+        },
+        {
+          "index": 37,
+          "fingerprint": "cdb06ef6b3728074bf14149b7120ddbc47ae61c4265e92f3f4b84f96e2e9b55e",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/form"
+        },
+        {
+          "index": 38,
+          "fingerprint": "e97a4e2ed9142a29f8fc1b0f09febcb4192920403132c639958b2ae198aecbcf",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/link"
+        },
+        {
+          "index": 39,
+          "fingerprint": "60d85e6622f74103714e8890b5a8ad755a7b15c02b9eb16b97ba6607ded5b855",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/mark"
+        },
+        {
+          "index": 40,
+          "fingerprint": "0a773a9e402c70c94129c49c3e9a49f0a5e593b0e7913a38f499e9c513d7ef47",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input"
+        },
+        {
+          "index": 42,
+          "fingerprint": "fe15bc84cf6398d223e3489c56d009a5e2253916a9f950978508f96002c1dac2",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML"
+        },
+        {
+          "index": 48,
+          "fingerprint": "9e95a424085a2f9b67d909bb4f7c3593d270bec45966ff91dc9bdd465587dd49",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/data"
+        },
+        {
+          "index": 51,
+          "fingerprint": "695373a07b751d27f1faa4dd25c228dc1f684f26139f759a2cb94ca32dbf4619",
+          "reference": "https://html.spec.whatwg.org/multipage/named-characters.html"
+        },
+        {
+          "index": 55,
+          "fingerprint": "c1b6c54081aa5f0f9eef7db466ad92d764f9471165e232ffaba844f8751d396f",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/ul"
+        },
+        {
+          "index": 56,
+          "fingerprint": "729f7d8a7eefd1e4ce9beda3f07ecdfcffff6be37eb2e1fddffec6d340230c7f",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/caption"
+        },
+        {
+          "index": 58,
+          "fingerprint": "d032424f3b67f6e7457affabe58918a8a23f50492f9dd1c83f6f9e615bcd61ca",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/audio"
+        },
+        {
+          "index": 59,
+          "fingerprint": "c0ba5eaeff490536d40200cc45ec35dd6da2708292448574b7b503f5a5f7c710",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/option"
+        },
+        {
+          "index": 60,
+          "fingerprint": "20bd06458d8a3e6e5c9292d7d70113d7efdd5eb43e7677a82cb3174a0c5118df",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/i"
+        },
+        {
+          "index": 63,
+          "fingerprint": "0647add0463bc1280429a8bf9088d99cd8ae990d28263d3f5281bb85826feb7d",
+          "reference": "https://html.spec.whatwg.org/multipage/named-characters.html"
+        },
+        {
+          "index": 65,
+          "fingerprint": "1b329279f89a169f2cc1b50b88722468bd211b9b82da0d98b78ff9804e062891",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input"
+        },
+        {
+          "index": 66,
+          "fingerprint": "2022d9fce883fa6c6abb918e7056f8fcc668594db3ab0cc1f8189ce9ca8b5348",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/meta"
+        },
+        {
+          "index": 68,
+          "fingerprint": "240478e4f0d412fcb6f9a475aa441e69d16a54f2ebd50ea8413f412c21476689",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/td"
+        },
+        {
+          "index": 69,
+          "fingerprint": "9c152a131a2b8f9ef5a169113b720eefb8d2057f8f13a3a1bf8dd413fefc25c0",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input"
+        },
+        {
+          "index": 70,
+          "fingerprint": "87bd03f5b5a9a563dfa24fd1f89d3ad9215d01ef3d9ec508b6190991c800eb5e",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/ol"
+        },
+        {
+          "index": 71,
+          "fingerprint": "bcbb8bac607a798493a6af95cd020daeab5e0ddfd16f025fe8da5e8413992e62",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input"
+        },
+        {
+          "index": 72,
+          "fingerprint": "16ff0e6d5760ddc94a401d2bde19dc24a0b0780142674ac6cb0380bfce74e3e7",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/table"
+        },
+        {
+          "index": 73,
+          "fingerprint": "3c1f4105471668302690ebee741e962ac3ea82d6f582d031aaa2d95146943190",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/del"
+        },
+        {
+          "index": 74,
+          "fingerprint": "9cd0efa478405ae9c103abd4a5a33aac48e56e9efed48777528870b2b417f329",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/tfoot"
+        },
+        {
+          "index": 75,
+          "fingerprint": "dc47287da42b30dd5e91ee91cc2d97242702f29412ce6b87508d341229dd7106",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/select"
+        },
+        {
+          "index": 76,
+          "fingerprint": "6ae1846ad04567b7d1c5fc826ba99077fda0fcb61cecd5d3bc091a8587d5edb3",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/hr"
+        },
+        {
+          "index": 77,
+          "fingerprint": "4c7cacd3b6320a3d0b6a5fb2e4b7715b0dda46131a2ebc78e8dee80b1b5559f3",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/span"
+        },
+        {
+          "index": 78,
+          "fingerprint": "63f63e53a26c7fb2c1c5f01f985023fcae6582dbb224550350e63416866be619",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/header"
+        },
+        {
+          "index": 79,
+          "fingerprint": "35d241340e630609cb3dad005c4ebf3bee9a7268f17adac96083aecd9c45acb7",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/tr"
+        },
+        {
+          "index": 80,
+          "fingerprint": "bac1fe5506f2c624888f311ee6534107ee2f079785fd6f67bfc0ab1fe47d9df8",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input"
+        },
+        {
+          "index": 82,
+          "fingerprint": "04da3bc7013c3bafdd2f1eeade063d476464542a6d8a55659f824cd5f1e2ac12",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/bdo"
+        },
+        {
+          "index": 85,
+          "fingerprint": "98d4eca15b9d122d8cfb8706933e49bf9312405311ec4e4cb922c53998657b6d",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/area"
+        },
+        {
+          "index": 86,
+          "fingerprint": "383c2237750c628df51c7981e4dc2122925bb54dd0a458714b7c7b7b9982b36e",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input"
+        },
+        {
+          "index": 89,
+          "fingerprint": "bd36da4a4eb6b80059777bd2e544351bdf080ac90e9970eaf4e84dfc4c542da9",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/em"
+        },
+        {
+          "index": 90,
+          "fingerprint": "1d9343bef4d92f57cdd411d0e6090f62b6c6340679d63e035a0819892a196dcb",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/small"
+        },
+        {
+          "index": 93,
+          "fingerprint": "29f185af57f4e44740f306ccaf91b850eb53e7e075d128d37726a1ea96f4b8be",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/sup"
+        },
+        {
+          "index": 94,
+          "fingerprint": "52b99e77ec75d21b9a64c147fcfc140147ecc9f7c6167f211468b56731f7b380",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/dialog"
+        },
+        {
+          "index": 95,
+          "fingerprint": "eeb772e7b03706b4f9a24bc1cfef5e19d19da06942a6c5a2283f2de17814566f",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/a"
+        },
+        {
+          "index": 96,
+          "fingerprint": "f1d95001c97821e097010fc757d3badf566ed884c151c9934866eb4746cc3f7b",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/img"
+        },
+        {
+          "index": 98,
+          "fingerprint": "836bfcce1791dbfa2f5fd83540c30baa20bc518e98385473b33042e9eb094de4",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/img"
+        }
+      ]
+    },
+    {
+      "source": "sql",
+      "topic": "SQL",
+      "items": [
+        {
+          "index": 3,
+          "fingerprint": "46b36263a2597df6425445043306d1ef766e3808d79dfcfac833adf3e348bd6e",
+          "reference": "https://www.postgresql.org/docs/18/sql-insert.html"
+        },
+        {
+          "index": 4,
+          "fingerprint": "48d9e8c58454c0a3173cf0471b10fbe20aa711dc5e827451d2dedda410e084b9",
+          "reference": "https://www.postgresql.org/docs/18/sql-createtable.html"
+        },
+        {
+          "index": 5,
+          "fingerprint": "a6f6f62a1dba1d1fa3936c7e84df494111745b99ef5b28ca58859a636ef4f403",
+          "reference": "https://www.postgresql.org/docs/18/queries-table-expressions.html#QUERIES-WHERE"
+        },
+        {
+          "index": 18,
+          "fingerprint": "23b35188d5f3cf1c4c01d045e471284838ee7fad0fc1192743f18f045d6f892e",
+          "reference": "https://www.postgresql.org/docs/18/queries-table-expressions.html#QUERIES-WHERE"
+        },
+        {
+          "index": 23,
+          "fingerprint": "f28a48f806c67d4acd0e97e1333b1ca5c29a5e48b328107678dcdfe4fdd3fd42",
+          "reference": "https://www.postgresql.org/docs/18/sql-delete.html"
+        },
+        {
+          "index": 25,
+          "fingerprint": "9aab470883e48cdc8a000d77ac54d8c732ae4d6b17cd81c32fc415bdfa4b3c42",
+          "reference": "https://www.postgresql.org/docs/18/sql-createtable.html"
+        },
+        {
+          "index": 27,
+          "fingerprint": "a1d738cbbce630b9f5cb3ea64750e2bea265a68ad0a99d2c5c3c97bb1c19d552",
+          "reference": "https://www.postgresql.org/docs/18/sql-insert.html"
+        },
+        {
+          "index": 32,
+          "fingerprint": "353de9a4e788e6cce0680218ca9230b832f4c563b723212004c1eec776f7ce94",
+          "reference": "https://www.postgresql.org/docs/18/sql-update.html"
+        },
+        {
+          "index": 34,
+          "fingerprint": "a4f61e8d270b51fbaf073dffd1d76c9ff91d6eaa5024f1570fe845428b4e1349",
+          "reference": "https://www.postgresql.org/docs/18/functions-matching.html"
+        },
+        {
+          "index": 35,
+          "fingerprint": "782d2c0bbb3c1e00f0fa21d18d64c0daf6b9c605a5119b101962d91af6a91566",
+          "reference": "https://docs.oracle.com/en/database/oracle/oracle-database/19/sqlrf/SELECT.html"
+        },
+        {
+          "index": 38,
+          "fingerprint": "d21d751c9c19306b797295db8f0d54372f43bffdf878012b9407ce2602168c97",
+          "reference": "https://www.postgresql.org/docs/18/sql-select.html"
+        },
+        {
+          "index": 43,
+          "fingerprint": "56359269073ccfee9bc9d54943d098953ea9d463c205643f777ddf28ecea6d15",
+          "reference": "https://www.ibm.com/think/topics/database-normalization"
+        },
+        {
+          "index": 44,
+          "fingerprint": "fb44808ada8bdae2606e63ffc5e07f0d1404a4068a81b4e0c023ede8bf2c60c3",
+          "reference": "https://www.postgresql.org/docs/18/functions-matching.html"
+        },
+        {
+          "index": 46,
+          "fingerprint": "2aad90a4c66b9536750b096c633686b7f2eeeb90a49aff9bf8e32a85fc8229ad",
+          "reference": "https://www.ibm.com/think/topics/structured-query-language"
+        },
+        {
+          "index": 51,
+          "fingerprint": "fa69a6e1a0cbbfdd829fed879b0adc4c18c569e2bbb2bd92b1e13527bb93ede0",
+          "reference": "https://www.postgresql.org/docs/18/sql-select.html"
+        },
+        {
+          "index": 53,
+          "fingerprint": "e67a202b64e9cb668a50e30d134638bb9ecff66b1fb89c944b064b40d39b158a",
+          "reference": "https://www.ibm.com/think/topics/structured-query-language"
+        },
+        {
+          "index": 56,
+          "fingerprint": "5e47292a01e7b024f2d72d90788d15cc79d97fdd83d9885c322de43e8a91c0ba",
+          "reference": "https://www.postgresql.org/docs/18/queries-table-expressions.html#QUERIES-JOIN"
+        },
+        {
+          "index": 57,
+          "fingerprint": "73083a8f3ebb81bb843ad01af74bf09bb534fb097c9998055fcca67a7780e125",
+          "reference": "https://www.ibm.com/think/topics/structured-query-language"
+        },
+        {
+          "index": 58,
+          "fingerprint": "5e0194db9912abe504029b6fab94c6da78a5449a1a53b540534e717ec321acec",
+          "reference": "https://www.postgresql.org/docs/18/queries-order.html"
+        },
+        {
+          "index": 60,
+          "fingerprint": "b675917f402f88f019e9dbf1528427ce7c9626922aa0169db7310ad4cd729ae6",
+          "reference": "https://www.ibm.com/think/topics/structured-query-language"
+        },
+        {
+          "index": 61,
+          "fingerprint": "025645c4a3d711e9cb13fdeb0509506508911351e5d27a1c34ff4b211f44421c",
+          "reference": "https://www.postgresql.org/docs/18/tutorial-agg.html"
+        },
+        {
+          "index": 63,
+          "fingerprint": "263866909e7d14242f38a4c1731f35f61d791e4dab8aa8b1ff2082707213d89d",
+          "reference": "https://www.postgresql.org/docs/18/functions-aggregate.html"
+        },
+        {
+          "index": 64,
+          "fingerprint": "ae08de517db884bc8d8cd0cae1ac91242de81a8dc44d595ba487715e591a4c82",
+          "reference": "https://www.postgresql.org/docs/18/sql-altertable.html"
+        },
+        {
+          "index": 65,
+          "fingerprint": "1b87c64bc33897859a7f615498745c4fb25ff18e96b44e43edbceae5efbf5eb8",
+          "reference": "https://www.ibm.com/think/topics/structured-query-language"
+        },
+        {
+          "index": 69,
+          "fingerprint": "bb9491a4b9f68f48b3487fd74cd4de01528605c4e4517db3320020faf3bd4eb7",
+          "reference": "https://www.postgresql.org/docs/18/queries-table-expressions.html#QUERIES-JOIN"
+        },
+        {
+          "index": 70,
+          "fingerprint": "43d3cb38083a7bdedd40eedfee00fc14f7e5d8362c9cadaf8f87709514f79446",
+          "reference": "https://www.postgresql.org/docs/18/sql-update.html"
+        },
+        {
+          "index": 71,
+          "fingerprint": "575bddc99a4324794ce2ca9392e04d9ac104ece0d0182cb35b524ef686b05bf6",
+          "reference": "https://www.postgresql.org/docs/18/ddl-constraints.html"
+        },
+        {
+          "index": 72,
+          "fingerprint": "ba2fa3e3c04aac10163ae3e5fd259113fd4b3403fe72cdc9f58d96fc22028463",
+          "reference": "https://www.postgresql.org/docs/18/sql-droptable.html"
+        },
+        {
+          "index": 75,
+          "fingerprint": "99e097bafb6f2dc93d783e2897864b4b645da8440b04cf8beba0d03c52bb3ceb",
+          "reference": "https://www.postgresql.org/docs/18/sql-revoke.html"
+        }
+      ]
+    },
+    {
+      "source": "general-cs",
+      "topic": "计算机基础",
+      "items": [
+        {
+          "index": 2,
+          "fingerprint": "ddda3621891d603c20ce8273754bb52843b4c1bb4fba990443bfb7d32f8815c9",
+          "reference": "https://developer.mozilla.org/en-US/docs/Glossary/Recursion"
+        },
+        {
+          "index": 6,
+          "fingerprint": "860908b5cb4dbf4031000090055e7440604159c52c09541b2f06af24bf78c698",
+          "reference": "https://algs4.cs.princeton.edu/cheatsheet/"
+        },
+        {
+          "index": 15,
+          "fingerprint": "4f005808240de0dd34ceb25ab727a26dfd42b1a4830add9c3277b4cd087c2322",
+          "reference": "https://algs4.cs.princeton.edu/cheatsheet/"
+        },
+        {
+          "index": 20,
+          "fingerprint": "40766ddf98d283be8db42fa1c27f4f5191e44e1b80431a1e531a00edb23ffeea",
+          "reference": "https://algs4.cs.princeton.edu/lectures/keynote/13StacksAndQueues.pdf"
+        },
+        {
+          "index": 26,
+          "fingerprint": "78d8ec9996a7021e9892582192da7e10bb9b1e83c17be5f4e3cdadd456ece39d",
+          "reference": "https://algs4.cs.princeton.edu/41graph/index.php"
+        },
+        {
+          "index": 30,
+          "fingerprint": "f6aaae8120b5e963f6144fe6fa15a0f9e3db3d844c9e041f51cd4471a0ffff3f",
+          "reference": "https://algs4.cs.princeton.edu/41graph/index.php"
+        },
+        {
+          "index": 34,
+          "fingerprint": "179a146042ce4a71d449e72869fc833e153febc1bc1abde452d35692b395b952",
+          "reference": "https://developer.mozilla.org/en-US/docs/Glossary/Syntax"
+        },
+        {
+          "index": 35,
+          "fingerprint": "1b2317d89f7b2b42f6254215c273735c974212a93f58652f1a8ec8bc6c584c66",
+          "reference": "https://algs4.cs.princeton.edu/lectures/keynote/13StacksAndQueues.pdf"
+        },
+        {
+          "index": 38,
+          "fingerprint": "a3a49d0e8a93aadf07103d32722b68d5762bbd2c60b22daa498207e638ec13ba",
+          "reference": "https://algs4.cs.princeton.edu/lectures/"
+        },
+        {
+          "index": 39,
+          "fingerprint": "f2990aa56c9d83d41981c19c1e5eb94bf5dca5a6f6b410601ce0793172a1452a",
+          "reference": "https://www.rfc-editor.org/rfc/rfc20"
+        },
+        {
+          "index": 44,
+          "fingerprint": "b418782dc19f549770c08980a61a0680d64f8df1c76176db3f82f91b9b42fa65",
+          "reference": "https://algs4.cs.princeton.edu/cheatsheet/"
+        },
+        {
+          "index": 45,
+          "fingerprint": "ebe15d97afb10077b5c646eccb8ea0c3bd63ce32be9794520d99485fd114deef",
+          "reference": "https://algs4.cs.princeton.edu/lectures/keynote/13StacksAndQueues.pdf"
+        },
+        {
+          "index": 46,
+          "fingerprint": "12405043cb9868e17ef0cc420882bbc6dadadcbef4313582adeb224165d87051",
+          "reference": "https://algs4.cs.princeton.edu/lectures/keynote/13StacksAndQueues.pdf"
+        },
+        {
+          "index": 50,
+          "fingerprint": "3b4b15fc7c51d64a98bf95e1bb4f702980cd381379d1fc59bcd79d37d36cd820",
+          "reference": "https://algs4.cs.princeton.edu/cheatsheet/"
+        },
+        {
+          "index": 54,
+          "fingerprint": "00785e34c885fc8092e10e31c3e95f5a95bf4a4be58010eae0b77c565c9eea93",
+          "reference": "https://algs4.cs.princeton.edu/lectures/keynote/13StacksAndQueues.pdf"
+        },
+        {
+          "index": 55,
+          "fingerprint": "9d8c17fab2b646230a665a1e6e6cf4f15c9ba6b926c78cb6f88a0d027d7d0a11",
+          "reference": "https://algs4.cs.princeton.edu/cheatsheet/"
+        },
+        {
+          "index": 57,
+          "fingerprint": "b4dd2c9396a41a9c3ab9c190885ec2b0e40266cacc6d0a94193bd0054cbfe429",
+          "reference": "https://developer.mozilla.org/en-US/docs/Glossary/First-class_Function"
+        },
+        {
+          "index": 65,
+          "fingerprint": "e39ec95108bddcd1b0de225f81cb706fdb4c114afc27710a0f62fd2b1540b109",
+          "reference": "https://developer.mozilla.org/en-US/docs/Glossary/Operator"
+        },
+        {
+          "index": 66,
+          "fingerprint": "6d7e41981e701a3a2e031088dc54dbe3be889ee708c7979c13933c736c5266f5",
+          "reference": "https://developer.mozilla.org/en-US/docs/Glossary/Algorithm"
+        },
+        {
+          "index": 70,
+          "fingerprint": "454ffd196c5d4fd310c8c49c75d25e969b1050797bc30ecbfd2afda2f1ec168f",
+          "reference": "https://developer.mozilla.org/en-US/docs/Glossary/API"
+        },
+        {
+          "index": 83,
+          "fingerprint": "270d50dc4c4a98425a5873f18dd078683bc497fe97cee6e6899cb8121526fe3d",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean"
+        },
+        {
+          "index": 86,
+          "fingerprint": "cde26268cc0ed9663a9a8a47b8f51562e1a6e3dbf908e87740571e81ebe350ef",
+          "reference": "https://developer.mozilla.org/en-US/docs/Glossary/Operator"
+        },
+        {
+          "index": 90,
+          "fingerprint": "f1e725d4ff1b01f6114e2d1aedd3836ace9ee2df7ed36d13ffa9256559fc270b",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/MIME_types"
+        },
+        {
+          "index": 92,
+          "fingerprint": "bb592ad1d9a2c8c09d7af4cbee184eae127ba9249b731108c9eab15e6a98839a",
+          "reference": "https://developer.mozilla.org/en-US/docs/Glossary/DOM"
+        },
+        {
+          "index": 93,
+          "fingerprint": "a8b89fef785c2a410a1329007336e27753d6c2e1eb3081dbb7288409f131618b",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/MIME_types"
+        },
+        {
+          "index": 95,
+          "fingerprint": "e49a05197b0910ba31bc281c7581f5dbc61ffc0896de7d2e687538fa5df63ab0",
+          "reference": "https://developer.mozilla.org/en-US/docs/Glossary/Syntax"
+        },
+        {
+          "index": 96,
+          "fingerprint": "50b78d3166f0a5416d36e9adcc297aefb41d8eb3ea586744bac16bc30fc8cfd0",
+          "reference": "https://developer.mozilla.org/en-US/docs/Glossary/RGB"
+        },
+        {
+          "index": 117,
+          "fingerprint": "8dc3f0bcfabb3f5ab44aa21dbde8369178e56ad851d584c752b4b3b9e8c785ef",
+          "reference": "https://developer.mozilla.org/en-US/docs/Glossary/Argument"
+        },
+        {
+          "index": 118,
+          "fingerprint": "17c128d7aea74ed2918919ad3710646963dffca37b10e7b52f60b671b05ff22a",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/MIME_types"
+        },
+        {
+          "index": 119,
+          "fingerprint": "151114e5e53076746f8d724ab603e3d97199e460a8e07b7ed1574378b7ae970b",
+          "reference": "https://developer.mozilla.org/en-US/docs/Glossary/Lossless_compression"
+        },
+        {
+          "index": 129,
+          "fingerprint": "9d965334de82538e0cc4de3dca33be63f0c493b2aa9bc743a44e33ac6aa10554",
+          "reference": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Loops_and_iteration"
+        },
+        {
+          "index": 139,
+          "fingerprint": "79e0e235049efef855c601c74ab0e830abd2b6889de19d69a4e88ff28f176eb8",
+          "reference": "https://algs4.cs.princeton.edu/cheatsheet/"
+        },
+        {
+          "index": 145,
+          "fingerprint": "dacb1fd72602e20e96490dbef4cc3c6bff44b10cd9f4c43a10013147f61ec9b3",
+          "reference": "https://algs4.cs.princeton.edu/cheatsheet/"
+        },
+        {
+          "index": 148,
+          "fingerprint": "f5a14bcb11c0883f270960c4868d1d8e783807747c2af2481c529d2525069d68",
+          "reference": "https://algs4.cs.princeton.edu/cheatsheet/"
+        },
+        {
+          "index": 164,
+          "fingerprint": "e1dc92342e2da92e080182593f79f504c3d30228d8aeb28b88cc9432bfeb2b25",
+          "reference": "https://courses.csail.mit.edu/6.890/fall14/scribe/lec21.pdf"
+        },
+        {
+          "index": 167,
+          "fingerprint": "927c875b1c3cc4a8ae38d0510b4af4d5436b7e5236c3f9cd70c00d01761ab68a",
+          "reference": "https://computationalthinking.mit.edu/Fall24/images_abstractions/dynamicprograms/"
+        },
+        {
+          "index": 172,
+          "fingerprint": "fd3cbf996e7d19f40186678d3b55357b71de95d163a639a757294d925925d59f",
+          "reference": "https://algs4.cs.princeton.edu/lectures/keynote/13StacksAndQueues.pdf"
+        }
+      ]
+    },
+    {
+      "source": "security",
+      "topic": "网络安全",
+      "items": [
+        {
+          "index": 6,
+          "fingerprint": "b519fc5d270090885e8a87a4555c62c208b6c1c25294861c9cbf2aa07a6f20c1",
+          "reference": "https://api-security.owasp.org/editions/2023/en/0xa4-unrestricted-resource-consumption/"
+        },
+        {
+          "index": 10,
+          "fingerprint": "eeea8d3bee660885752ba019f43122de2411a13d2cfc1bc577d0996c71cd8bb6",
+          "reference": "https://gnupg.org/index.html"
+        },
+        {
+          "index": 11,
+          "fingerprint": "94e4dfd82d942f8cdd0c82e086aeedeb314d601a1d3ff5d2506ed2350af144ab",
+          "reference": "https://csrc.nist.gov/glossary/term/asymmetric_cryptography"
+        },
+        {
+          "index": 15,
+          "fingerprint": "a9efbad30854e3d611f3181e849211fcf84b108f244c0c46ba1b0676b2ffcaea",
+          "reference": "https://developer.mozilla.org/en-US/docs/Glossary/HTTPS"
+        },
+        {
+          "index": 16,
+          "fingerprint": "d96adde371bb4796b56a3e8fd2c4a30b8e72b5c13669c0344d6963e38c960047",
+          "reference": "https://www.rfc-editor.org/rfc/rfc5321"
+        },
+        {
+          "index": 18,
+          "fingerprint": "94dc619a1960e30cea6fdbd808ed557ea7c616aa848a5e26dbc0e5d2cf57c423",
+          "reference": "https://csrc.nist.gov/glossary/term/man_in_the_middle_attack"
+        },
+        {
+          "index": 25,
+          "fingerprint": "f2b45864c3a4699f22ced34d72cfd6752a691c73b813a40e87d6c2f52b900de9",
+          "reference": "https://nmap.org/book/nmap-overview-and-demos.html"
+        },
+        {
+          "index": 34,
+          "fingerprint": "8f7142437c9bbac47e037e5b87049cc2d2450ab89f8d7d774a592aaa8ed0a5b1",
+          "reference": "https://csrc.nist.gov/glossary/term/steganography"
+        },
+        {
+          "index": 38,
+          "fingerprint": "11ae84b631d2cef1d1e66ce68a9c1cadee77eb922da79c31277ec26a4bae39a0",
+          "reference": "https://developer.mozilla.org/en-US/docs/Glossary/SSL"
+        },
+        {
+          "index": 44,
+          "fingerprint": "456dc94d6361a0c17d02c625717c6184e30bf670ed15c3a1fee9ea136e306ee4",
+          "reference": "https://csrc.nist.gov/glossary/term/least_privilege"
+        },
+        {
+          "index": 45,
+          "fingerprint": "f224c9a3125ae16c14b882ab2d5eb697d55209c059c34db81b93245dc6b77359",
+          "reference": "https://sqlmap.org/"
+        }
+      ]
+    },
+    {
+      "source": "cloud-computing",
+      "topic": "云计算",
+      "items": [
+        {
+          "index": 5,
+          "fingerprint": "4f67b3b06671e39eb61778919ab3672968a3bcb3d35aab43233a0015ce34ce60",
+          "reference": "https://aws.amazon.com/what-is/microservices-architecture/"
+        },
+        {
+          "index": 6,
+          "fingerprint": "a4d481cd1bc859a4c4b71b395e8866378ece0191e0cc7ec745712fb47fabb152",
+          "reference": "https://aws.amazon.com/what-is/microservices-architecture/"
+        },
+        {
+          "index": 11,
+          "fingerprint": "ba0e7cc7a571f9892a4aba1f6f7df91ada6f7487a19d7f0e8cf8d5dfab962ed6",
+          "reference": "https://aws.amazon.com/what-is/nas/"
+        },
+        {
+          "index": 15,
+          "fingerprint": "9725e6aa190d56fa5d5124f9515c2f15fdbdcca409cfb06c616c2d3c03fb4385",
+          "reference": "https://aws.amazon.com/ec2/faqs/"
+        },
+        {
+          "index": 24,
+          "fingerprint": "6d1649912c83c593785ae9c724c6477eab1507b1ef4c27a8ec462627b5a2241b",
+          "reference": "https://csrc.nist.gov/pubs/sp/800/145/final"
+        },
+        {
+          "index": 26,
+          "fingerprint": "4760ede57c87de3ffadaac7c04d3ca7e5e923e38b653b751093586efa5e3d169",
+          "reference": "https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/migration-strategies.html"
+        },
+        {
+          "index": 28,
+          "fingerprint": "4e4d849183299cf30ef2d7de2902e3d09609271c50aa10c543c6c0fd1abf2fb3",
+          "reference": "https://csrc.nist.gov/pubs/sp/800/145/final"
+        },
+        {
+          "index": 31,
+          "fingerprint": "378e14a7a7ddce1e237e6bc4c3925b48cba4ebe80645a0e22935fc1217bd4059",
+          "reference": "https://csrc.nist.gov/pubs/sp/800/145/final"
+        },
+        {
+          "index": 32,
+          "fingerprint": "e372ca191670edb9b07ae4c10c6e5cc27a25b280c89a75a4b9ce25e17c542023",
+          "reference": "https://csrc.nist.gov/pubs/sp/800/145/final"
+        },
+        {
+          "index": 36,
+          "fingerprint": "a2480774d3d6b805bb8b0abb9da5629ed83bd8f5c098b071df8fcccf71080d45",
+          "reference": "https://csrc.nist.gov/pubs/sp/800/145/final"
+        },
+        {
+          "index": 39,
+          "fingerprint": "cb98f8cf21f4dffc1724dc63154ce5c042c2dc314c2d5d87b38ebea85434c6b5",
+          "reference": "https://cloud.google.com/learn/what-is-a-cloud-service-provider"
+        }
+      ]
+    },
+    {
+      "source": "devops",
+      "topic": "DevOps",
+      "items": [
+        {
+          "index": 1,
+          "fingerprint": "f78e0bb67a9a24c5c85a37a2aa78cc2d6aef1d4c795d7f9760a52526bb28afba",
+          "reference": "https://learn.microsoft.com/azure/well-architected/operational-excellence/infrastructure-as-code-design"
+        },
+        {
+          "index": 2,
+          "fingerprint": "55c476da5aae8f4eecc66c858ede30477ba2582fd19548ebc173fc3966c21449",
+          "reference": "https://aws.amazon.com/what-is/microservices-architecture/"
+        },
+        {
+          "index": 3,
+          "fingerprint": "19aee1fe936cd13a2dd9779aa9689189cf24b1258778a974ad9b6a7453958afa",
+          "reference": "https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control"
+        },
+        {
+          "index": 4,
+          "fingerprint": "481a8dd9d7bedbd6fd81a57c1799ef69102daa6a635073bbabfb3094b65c5e5c",
+          "reference": "https://docs.docker.com/reference/dockerfile/"
+        },
+        {
+          "index": 5,
+          "fingerprint": "fd14de78ebb524523fa15134d272cc9a05f67c79508875e47e3e9c01090be94f",
+          "reference": "https://learn.microsoft.com/en-us/devops/what-is-devops"
+        },
+        {
+          "index": 6,
+          "fingerprint": "d0cd22d843218673bb539df74872cedb7fd8c2dfa9e4964e94914194cc2367e3",
+          "reference": "https://learn.microsoft.com/en-gb/devops/develop/what-is-continuous-integration"
+        },
+        {
+          "index": 9,
+          "fingerprint": "0eb21e444954d8725f54f717ccd419c106ccc3897b4ffc59c1e1bb8f8aa5ae5d",
+          "reference": "https://learn.microsoft.com/en-us/azure/virtual-machines/overview"
+        },
+        {
+          "index": 12,
+          "fingerprint": "5331c79add116ccc19b489e350dcbeb029e35d4081d452552f4ebd56f699bb45",
+          "reference": "https://learn.microsoft.com/en-us/devops/deliver/what-is-continuous-delivery"
+        },
+        {
+          "index": 16,
+          "fingerprint": "b9ec50601458d3d244d5531fb70ab3a03350b142591b1d227638c9d3854e4a3a",
+          "reference": "https://learn.microsoft.com/en-us/devops/deliver/what-is-infrastructure-as-code"
+        }
+      ]
+    }
+  ]
+}

@@ -10,6 +10,7 @@ from pathlib import Path
 import uvicorn
 from alembic import command
 from alembic.config import Config
+from browser_identity import connect_browser
 from playwright.sync_api import expect, sync_playwright
 
 from careerpilot.api import create_app
@@ -40,11 +41,10 @@ SHELL_TEXT = """() => {
   const parts = [];
   const take = node => { if (node) parts.push(node.innerText || ''); };
   take(document.querySelector('#sidebar'));
-  take(document.querySelector('header'));
+  take(document.querySelector('#connect'));
   take(document.querySelector('.page-heading'));
-  take(document.querySelector('.toolbar'));
+  take(document.querySelector('.page-footer'));
   take(document.querySelector('#locale-scope'));
-  take(document.querySelector('.footnote'));
   for (const option of document.querySelectorAll('#preview-state option')) parts.push(option.text);
   for (const node of document.querySelectorAll('[aria-label]')) {
     if (!node.closest('#view')) parts.push(node.getAttribute('aria-label'));
@@ -105,7 +105,9 @@ def main():
             sock.bind(("127.0.0.1", 0))
             port = sock.getsockname()[1]
         server = uvicorn.Server(
-            uvicorn.Config(create_app(url), host="127.0.0.1", port=port, log_level="error")
+            uvicorn.Config(
+                create_app(url, local_only=False), host="127.0.0.1", port=port, log_level="error"
+            )
         )
         thread = threading.Thread(target=server.run, daemon=True)
         thread.start()
@@ -141,6 +143,7 @@ def check_width(browser, port, token, width, engine):
     errors = []
     page.on("pageerror", lambda e: errors.append(str(e)))
     page.goto(f"http://127.0.0.1:{port}/app/#dashboard")
+    connect_browser(page, token)
     page.locator("#ui-locale").select_option("en-US")
     expect(page.locator("html")).to_have_attribute("lang", "en-US")
     parity = page.evaluate(
@@ -158,11 +161,12 @@ def check_width(browser, port, token, width, engine):
         }"""
     )
     assert parity == {"onlyZh": [], "onlyEn": [], "missing": []}, parity
-    expect(page.locator("#title")).to_have_text("Turn your goal into your next action.")
+    expect(page.locator("#title")).to_have_text("Growth dashboard")
     expect(page.locator("#view")).to_have_attribute("lang", "en-US")
     shell = page.evaluate(SHELL_TEXT)
     assert not CJK.search(shell), shell
     assert not CJK.search(page.locator("#view").inner_text())
+    page.locator("#page-options summary").click()
     for state in ("loading", "empty", "error"):
         page.locator("#preview-state").select_option(state)
         assert not CJK.search(page.locator("#view").inner_text()), state
@@ -170,7 +174,8 @@ def check_width(browser, port, token, width, engine):
         assert not CJK.search(page.evaluate(SHELL_TEXT)), state
     page.locator("#preview-state").select_option("default")
 
-    # Keyboard: skip link first, then landmarks; mobile menu has an English name.
+    # Reset focus after exercising footer controls, then check the first tab stop.
+    page.reload()
     page.keyboard.press("Tab")
     expect(page.locator(".skip")).to_be_focused()
     expect(page.locator(".skip")).to_have_text("Skip to main content")
@@ -183,24 +188,11 @@ def check_width(browser, port, token, width, engine):
         expect(menu).to_have_attribute("aria-expanded", "false")
         expect(menu).to_be_focused()
 
-    # Sign-in dialog and server explanations follow the interface language.
-    page.locator("#connect").click()
-    dialog = page.locator("#account-dialog")
-    expect(dialog.get_by_role("heading", name="Sign in or register")).to_be_visible()
-    expect(dialog.get_by_role("heading", name="Sign in or register")).to_be_focused()
-    page.keyboard.press("Tab")
-    expect(dialog.get_by_label("Email", exact=True)).to_be_focused()
-    dialog.get_by_label("Email", exact=True).fill("nobody@example.com")
-    dialog.get_by_label("Password", exact=True).fill("x" * 12)
-    dialog.get_by_role("button", name="Sign in with email").click()
-    expect(page.locator("#login-error")).to_have_text(
-        re.compile(r"^(Incorrect email or password\.|Too many requests\. Try again later\.)$")
+    # The local product has no credential UI; its data notice remains accessible.
+    expect(page.locator("#account-dialog, #connect, #login-form")).to_have_count(0)
+    notice_link = page.locator(".page-footer").get_by_role(
+        "link", name="Local use and data notice (new window)"
     )
-    page.locator("#token").fill("invalid-token")
-    dialog.get_by_role("button", name="Connect", exact=True).click()
-    expect(page.locator("#account-error")).to_have_text("A valid sign-in credential is required.")
-    assert not CJK.search(dialog.inner_text())
-    notice_link = dialog.get_by_role("link", name="Local use and data notice (new window)")
     expect(notice_link).to_have_attribute("href", "local-use.html#english")
     notice_link.focus()
     with page.expect_popup() as opened:
@@ -217,17 +209,13 @@ def check_width(browser, port, token, width, engine):
     )
     assert notice.evaluate(CONTRAST) == []
     notice.close()
-    page.locator("#token").fill(token)
-    dialog.get_by_role("button", name="Connect", exact=True).click()
-    expect(page.locator("#connect")).to_have_text("Account connected")
-
     check_growth_forms(page, width)
     check_learning_forms(page, width, engine)
 
     # Every page: shell stays English; Chinese business text is marked zh-CN.
     for name in PAGES:
         page.evaluate(f"location.hash={name!r}")
-        expect(page.locator("#breadcrumb")).not_to_have_text("")
+        expect(page.locator("#title")).not_to_have_text("")
         page.wait_for_load_state("networkidle")
         page.wait_for_timeout(150)
         shell = page.evaluate(SHELL_TEXT)
@@ -245,11 +233,7 @@ def check_width(browser, port, token, width, engine):
     page.locator("#ui-locale").select_option("zh-CN")
     expect(page.locator("html")).to_have_attribute("lang", "zh-CN")
     page.evaluate("location.hash='dashboard'")
-    expect(page.locator("#title")).to_have_text("让目标，成为下一步行动。")
-    page.locator("#connect").click()
-    page.locator("#token").fill("invalid-token")
-    page.locator("#account-form button[type=submit]").click()
-    expect(page.locator("#account-error")).to_have_text(CJK)
+    expect(page.locator("#title")).to_have_text("成长工作台")
     assert not errors, errors
     context.close()
 
@@ -422,8 +406,9 @@ def check_learning_forms(page, width, engine):
     expect(row.get_by_role("button", name="Confirm completion", exact=True)).to_be_visible()
     page.evaluate("location.hash='dashboard'")
     assistant = page.locator("#assistant-form")
-    expect(assistant.get_by_label("Action", exact=True)).to_be_visible()
+    expect(assistant.get_by_label("Action", exact=True)).not_to_be_visible()
     assistant.locator("summary").click()
+    expect(assistant.get_by_label("Action", exact=True)).to_be_visible()
     assistant.locator('[name="job_ids"]').first.check()
     assistant.get_by_label("Your request", exact=True).fill("Please PLAN my learning")
     assistant.get_by_role("button", name="Ask the growth assistant").focus()
@@ -569,6 +554,7 @@ def check_learning_forms(page, width, engine):
     # Resolve the latest request before an older response: the latest summary must win.
     page.evaluate("location.hash='dashboard'")
     expect(assistant).to_be_visible()
+    assistant.locator("summary").click()
     held = []
     page.route("**/api/v1/assistant/runs/*", lambda route: held.append(route))
     assistant.get_by_label("Action", exact=True).select_option("progress")

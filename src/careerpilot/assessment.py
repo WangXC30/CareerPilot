@@ -1,11 +1,14 @@
 """Versioned, objective foundation checks. Learning completion never grants verification."""
 
+import hashlib
 import json
+import random
+from pathlib import Path
 
-from careerpilot import catalogue, growth, learning
+from careerpilot import catalogue, growth, learning, question_bank_v3
 from careerpilot.domain import DomainError
 
-BANK_VERSION = "foundation.v1"
+BANK_VERSION = "foundation.v3"
 # Locally authored questions; explanations are editorial, linked to the skill's official material.
 BANK = {
     "python": [
@@ -145,14 +148,201 @@ BANK = {
     ],
 }
 
+# Keep the original rubric available for assessments created before this release.
+LEGACY_BANK = {skill: list(questions) for skill, questions in BANK.items()}
+EXTRA = {
+    "python": [
+        (
+            "列表 a=[1, 2]，执行 a.append(3) 后 a 的长度是？",
+            ["2", "3", "4"],
+            1,
+            "append 在列表末尾增加一个元素。",
+        ),
+        (
+            "遍历字典的键，通常可以使用？",
+            ["for key in d", "for key in d.values()", "d.append(key)"],
+            0,
+            "直接迭代字典会依次得到键。",
+        ),
+        (
+            "with open(...) 的主要好处是？",
+            ["自动把文件内容排序", "保证文件永远存在", "退出代码块时关闭文件"],
+            2,
+            "上下文管理器退出时会释放文件资源。",
+        ),
+    ],
+    "sql": [
+        (
+            "COUNT(column) 会统计 NULL 值吗？",
+            ["会", "不会", "仅统计 NULL"],
+            1,
+            "COUNT(column) 统计该列非 NULL 的行。",
+        ),
+        (
+            "对聚合结果过滤通常使用哪个子句？",
+            ["HAVING", "WHERE", "ORDER BY"],
+            0,
+            "HAVING 用于过滤分组后的聚合结果。",
+        ),
+        (
+            "LEFT JOIN 未匹配的右表列通常是什么？",
+            ["0", "空字符串", "NULL"],
+            2,
+            "未匹配的右表列以 NULL 补齐。",
+        ),
+    ],
+    "git": [
+        ("查看提交历史通常使用？", ["git add", "git log", "git init"], 1, "git log 展示提交历史。"),
+        (
+            "创建并切换到新分支可以使用？",
+            ["git switch -c 分支名", "git status 分支名", "git fetch -c"],
+            0,
+            "git switch -c 创建分支并切换。",
+        ),
+        (
+            "git diff 默认展示什么？",
+            ["远端所有分支", "已提交的历史", "工作区相对暂存区的差异"],
+            2,
+            "默认 diff 比较工作区和暂存区。",
+        ),
+    ],
+    "javascript": [
+        (
+            "数组的 map 通常返回什么？",
+            ["原数组长度", "映射后的新数组", "一个布尔值"],
+            1,
+            "map 对每个元素调用函数并返回新数组。",
+        ),
+        (
+            "JSON.parse 的用途是？",
+            ["将 JSON 字符串解析为值", "将对象写入数据库", "比较对象引用"],
+            0,
+            "JSON.parse 解析合法的 JSON 字符串。",
+        ),
+        (
+            "Promise 被拒绝时可使用什么处理？",
+            [".thenOnly()", ".finallyError()", ".catch()"],
+            2,
+            "catch 可处理 Promise 的拒绝。",
+        ),
+    ],
+    "docker": [
+        (
+            "查看运行中容器通常使用？",
+            ["docker build", "docker ps", "docker image save"],
+            1,
+            "docker ps 默认列出运行中的容器。",
+        ),
+        (
+            "镜像和容器的关系是？",
+            ["容器是镜像的运行实例", "镜像是运行中的容器", "二者是同一个进程"],
+            0,
+            "镜像提供创建容器的模板。",
+        ),
+        (
+            "映射容器端口时常用哪个选项？",
+            ["-v", "--name", "-p"],
+            2,
+            "-p 可将宿主机端口映射到容器端口。",
+        ),
+    ],
+    "fastapi": [
+        (
+            "路径参数 /items/{item_id} 中 item_id 来自哪里？",
+            ["请求头", "URL 路径", "响应体"],
+            1,
+            "花括号中的名称对应 URL 路径参数。",
+        ),
+        (
+            "请求数据不符合声明的模型时通常会怎样？",
+            ["返回校验错误", "自动忽略全部错误并成功", "重启服务"],
+            0,
+            "FastAPI 会返回请求校验错误。",
+        ),
+        (
+            "表示资源不存在通常使用哪个 HTTP 状态码？",
+            ["200", "201", "404"],
+            2,
+            "404 表示请求的资源未找到。",
+        ),
+    ],
+    "pytorch": [
+        (
+            "model.eval() 主要用于？",
+            ["清空参数", "切换模块到评估模式", "自动更新权重"],
+            1,
+            "eval 切换 Dropout 等模块的行为；它本身不关闭梯度。",
+        ),
+        (
+            "optimizer.step() 通常用于？",
+            ["根据梯度更新参数", "读取数据文件", "定义模型结构"],
+            0,
+            "优化器使用当前梯度更新参数。",
+        ),
+        (
+            "训练循环中 optimizer.zero_grad() 通常用于？",
+            ["保存模型", "关闭 GPU", "清除已有梯度"],
+            2,
+            "PyTorch 梯度默认累积，通常需要在下一次反向传播前清除。",
+        ),
+    ],
+    "react": [
+        (
+            "父组件向子组件传递数据通常使用？",
+            ["数据库迁移", "props", "CSS 选择器"],
+            1,
+            "props 是父组件向子组件传递数据的方式。",
+        ),
+        (
+            "事件处理函数应如何传给 onClick？",
+            ["传递函数", "渲染时立即调用并传递结果", "传递 CSS 类名"],
+            0,
+            "传递函数使 React 在事件发生时调用它。",
+        ),
+        (
+            "useEffect 的清理函数通常用于？",
+            ["修改 JSX 语法", "替代所有状态", "取消订阅或清理定时器"],
+            2,
+            "清理函数用于撤销 effect 建立的订阅等资源。",
+        ),
+    ],
+}
+CURRENT_BANK = {skill: questions + EXTRA[skill] for skill, questions in LEGACY_BANK.items()}
+V3_BANK = {
+    skill: questions + question_bank_v3.QUESTIONS[skill]
+    for skill, questions in CURRENT_BANK.items()
+}
+GENERATED_VERSION = "foundation.v4"
+GENERATED_SHA256 = "d01037aa4314ca5db91feb30d57412600643190d6dc9507ac0ea5d3aff54202b"
+generated_bytes = (Path(__file__).parent / "generated_foundation_v4.json").read_bytes()
+if hashlib.sha256(generated_bytes).hexdigest() != GENERATED_SHA256:
+    raise RuntimeError("Frozen foundation.v4 question bank has changed")
+generated_bank = json.loads(generated_bytes)
+V4_BANK = {skill: V3_BANK[skill] + questions for skill, questions in generated_bank.items()}
+QUESTIONS_PER_ASSESSMENT = 6
+
 
 def create(db, principal, skill_id, trace):
     catalogue.require_skill(db, skill_id)
     if skill_id not in BANK:
         raise DomainError("ASSESSMENT_UNAVAILABLE", "此技能尚无当前版本测验", 422)
+    rng = random.SystemRandom()
+    version = GENERATED_VERSION if skill_id in V4_BANK else BANK_VERSION
+    bank = V4_BANK if version == GENERATED_VERSION else V3_BANK
+    if version == GENERATED_VERSION:
+        # Mix editorial coverage with distinct executable exercise families.
+        start = len(V3_BANK[skill_id])
+        families = rng.sample(range(10), 3)
+        indices = rng.sample(range(start), 3) + [
+            start + family * 500 + rng.randrange(500) for family in families
+        ]
+        rng.shuffle(indices)
+    else:
+        indices = rng.sample(range(len(bank[skill_id])), QUESTIONS_PER_ASSESSMENT)
     questions = [
         {"id": f"{skill_id}.{i}", "prompt": q[0], "choices": q[1]}
-        for i, q in enumerate(BANK[skill_id])
+        for i in indices
+        for q in [bank[skill_id][i]]
     ]
     return growth.save(
         db,
@@ -160,8 +350,8 @@ def create(db, principal, skill_id, trace):
         "assessment",
         {
             "skill_id": skill_id,
-            "bank_version": BANK_VERSION,
-            "rubric_version": BANK_VERSION + ":" + skill_id,
+            "bank_version": version,
+            "rubric_version": version + ":" + skill_id,
             "scope": "foundation",
             "pass_count": len(questions),
             "questions": questions,
@@ -172,20 +362,49 @@ def create(db, principal, skill_id, trace):
     )
 
 
-def grade(skill_id, answers, bank_version):
-    if bank_version != BANK_VERSION or skill_id not in BANK:
+def grade(skill_id, answers, bank_version, question_ids=None):
+    bank = (
+        LEGACY_BANK
+        if bank_version == "foundation.v1"
+        else CURRENT_BANK
+        if bank_version == "foundation.v2"
+        else V3_BANK
+        if bank_version == "foundation.v3"
+        else V4_BANK
+        if bank_version == GENERATED_VERSION
+        else {}
+    )
+    if skill_id not in bank:
         raise ValueError("Question bank version unavailable")
-    expected = BANK[skill_id]
+    indices = list(range(len(bank[skill_id])))
+    if bank_version in {"foundation.v3", GENERATED_VERSION}:
+        prefix = skill_id + "."
+        if not isinstance(question_ids, list) or len(question_ids) != QUESTIONS_PER_ASSESSMENT:
+            raise ValueError("Invalid question selection")
+        if any(
+            not isinstance(q, str) or not q.startswith(prefix) or not q[len(prefix) :].isdigit()
+            for q in question_ids
+        ):
+            raise ValueError("Invalid question identifier")
+        indices = [int(q[len(prefix) :]) for q in question_ids]
+        if len(set(indices)) != len(indices) or any(i >= len(bank[skill_id]) for i in indices):
+            raise ValueError("Invalid question selection")
+    expected = [bank[skill_id][i] for i in indices]
     if len(answers) != len(expected):
         raise DomainError("ANSWERS_REQUIRED", "请回答全部题目", 422)
+    if any(
+        type(answer) is not int or not 0 <= answer < len(q[1])
+        for answer, q in zip(answers, expected, strict=True)
+    ):
+        raise DomainError("ANSWER_INVALID", "请选择题目中提供的选项", 422)
     feedback = [
         {
-            "question_id": f"{skill_id}.{i}",
+            "question_id": f"{skill_id}.{index}",
             "correct": answer == q[2],
             "explanation": q[3],
             "expected_choice": q[2],
         }
-        for i, (answer, q) in enumerate(zip(answers, expected, strict=True))
+        for index, answer, q in zip(indices, answers, expected, strict=True)
     ]
     score = sum(f["correct"] for f in feedback)
     return {
@@ -205,7 +424,15 @@ def submit(db, principal, assessment_id, answers, version, trace):
             return growth.data(row)
         raise DomainError("ALREADY_SUBMITTED", "测验已提交，请新建一次测验")
     try:
-        result = grade(payload["skill_id"], answers, payload["bank_version"])
+        if payload["bank_version"] in {"foundation.v3", GENERATED_VERSION}:
+            result = grade(
+                payload["skill_id"],
+                answers,
+                payload["bank_version"],
+                [q["id"] for q in payload["questions"]],
+            )
+        else:
+            result = grade(payload["skill_id"], answers, payload["bank_version"])
     except DomainError:
         raise
     except Exception:

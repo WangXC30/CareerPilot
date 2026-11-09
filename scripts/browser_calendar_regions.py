@@ -9,6 +9,7 @@ from pathlib import Path
 import uvicorn
 from alembic import command
 from alembic.config import Config
+from browser_identity import connect_browser
 from fastapi.testclient import TestClient
 from playwright.sync_api import expect, sync_playwright
 
@@ -30,7 +31,9 @@ def main():
             sock.bind(("127.0.0.1", 0))
             port = sock.getsockname()[1]
         server = uvicorn.Server(
-            uvicorn.Config(create_app(url), host="127.0.0.1", port=port, log_level="error")
+            uvicorn.Config(
+                create_app(url, local_only=False), host="127.0.0.1", port=port, log_level="error"
+            )
         )
         thread = threading.Thread(target=server.run, daemon=True)
         thread.start()
@@ -40,7 +43,10 @@ def main():
                     break
                 time.sleep(0.05)
             assert server.started
-            with TestClient(create_app(url)) as client, sync_playwright() as playwright:
+            with (
+                TestClient(create_app(url, local_only=False)) as client,
+                sync_playwright() as playwright,
+            ):
                 browser = playwright.chromium.launch()
                 try:
                     for locale in ("zh-CN", "en-US"):
@@ -112,9 +118,7 @@ def check_case(browser, port, token, locale, width, records, scratch):
     try:
         page.goto(f"http://127.0.0.1:{port}/app/#local-tools")
         page.locator("#ui-locale").select_option(locale)
-        page.locator("#connect").click()
-        page.locator("#token").fill(token)
-        page.locator("#account-form button[type=submit]").click()
+        connect_browser(page, token)
         page.locator("#calendar-add > summary").click()
         form = page.locator("#calendar-add form")
         zone = form.get_by_label("时区" if zh else "Time zone", exact=True)
@@ -204,8 +208,8 @@ def check_case(browser, port, token, locale, width, records, scratch):
             arg=event["id"],
         )
         result = page.evaluate(
-            "async id=>{const r=await fetch('/api/v1/calendar-syncs/'+id+'/export',"
-            "{headers:{Authorization:'Bearer '+token}});return r.status;}",
+            "async id=>{const r=await fetch('/api/v1/calendar-syncs/'+id+'/export');"
+            "return r.status;}",
             grant_id,
         )
         assert result == 409
@@ -216,11 +220,14 @@ def check_case(browser, port, token, locale, width, records, scratch):
         syncs = page.evaluate("async()=>await api('/calendar-syncs')")
         fresh = next(item for item in syncs if item["id"] != grant_id)
         response = page.evaluate(
-            "async id=>(await fetch('/api/v1/calendar-syncs/'+id+'/export',"
-            "{headers:{Authorization:'Bearer '+token}})).text()",
+            "async id=>(await fetch('/api/v1/calendar-syncs/'+id+'/export')).text()",
             fresh["id"],
         )
         assert "DTSTART;VALUE=DATE:20261201" in response
+        detail = page.locator(f'[data-calendar-event="{event["id"]}"]')
+        detail.locator(":scope > summary").click()
+        detail.locator("[data-calendar-event-remove]").click()
+        expect(page.locator(f'[data-calendar-event="{event["id"]}"]')).to_have_count(0)
         assert not errors, errors
         assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1")
     finally:

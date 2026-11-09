@@ -5,8 +5,8 @@ from typing import Annotated, Literal
 from fastapi import Depends, Header, Request, Response
 from pydantic import Field
 
-from careerpilot import i18n, learning_resources, study
-from careerpilot.growth_api import ConfirmInput
+from careerpilot import i18n, interview_knowledge, interview_quiz, learning_resources, study
+from careerpilot.growth_api import ConfirmInput, Input
 
 
 class ModeInput(ConfirmInput):
@@ -18,6 +18,10 @@ class ResourceInput(ConfirmInput):
     quality: Literal["unrated", "helpful", "poor"] = "unrated"
     broken: bool = False
     note: str = Field(default="", max_length=1000)
+
+
+class PracticeAnswerInput(Input):
+    choice: int = Field(ge=0, le=3, strict=True)
 
 
 def register_study(app, session_dependency, identity):
@@ -57,6 +61,18 @@ def register_study(app, session_dependency, identity):
     @app.get("/api/v1/study-reviews")
     def reviews(db=Db, principal=Identity):
         return study.review_queue(db, principal)
+
+    @app.get("/api/v1/interview-knowledge")
+    def interview_cards(principal=Identity):
+        return {"items": interview_knowledge.cards()}
+
+    @app.get("/api/v1/interview-practice")
+    def interview_practice(principal=Identity):
+        return {"items": interview_quiz.public_questions()}
+
+    @app.post("/api/v1/interview-practice/{question_id}/answer")
+    def practice_answer(question_id: str, body: PracticeAnswerInput, principal=Identity):
+        return interview_quiz.answer(question_id, body.choice)
 
     @app.put("/api/v1/learning-resources/{resource_id}/feedback")
     def resource_feedback(

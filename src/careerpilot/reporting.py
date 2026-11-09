@@ -34,15 +34,7 @@ def range_dates(start, end):
 def save_log(db, principal, args, key, trace):
     growth.lock_owner(db, principal)
     timezone = user_timezone(db, principal)
-    if date.fromisoformat(args["day"]) > datetime.now(ZoneInfo(timezone)).date():
-        raise DomainError("FUTURE_STUDY_LOG", "不能记录未来已经学习的时长", 422)
-    if args["plan_id"]:
-        plan = growth.data(growth.owned(db, principal, args["plan_id"], "plan"))
-        if not any(t["id"] == args["task_id"] for t in plan["tasks"]):
-            raise DomainError("UNKNOWN_TASK", "请选择此计划内的学习任务", 422)
-    elif args["task_id"]:
-        raise DomainError("PLAN_REQUIRED", "记录任务时需同时指定所属计划", 422)
-    scan_upload(args["note"].encode(), "study-note.txt")
+    validate_log(db, principal, args, check_daily=False)
     record_id = str(
         uuid5(NAMESPACE_URL, f"study-log:{principal.tenant_id}:{principal.user_id}:{key}")
     )
@@ -53,13 +45,7 @@ def save_log(db, principal, args, key, trace):
         if old["request_hash"] != request_hash:
             raise DomainError("IDEMPOTENCY_CONFLICT", "幂等键已用于不同学习记录", 409)
         return old
-    daily = sum(
-        growth.data(r)["minutes"]
-        for r in db.scalars(growth.owner_query(principal, "study_log"))
-        if growth.data(r)["day"] == args["day"] and not growth.data(r)["withdrawn"]
-    )
-    if daily + args["minutes"] > 1440:
-        raise DomainError("DAILY_TIME_EXCEEDED", "当天本人记录的时长不能超过 1440 分钟", 422)
+    validate_log(db, principal, args)
     return growth.save(
         db,
         principal,
@@ -74,6 +60,30 @@ def save_log(db, principal, args, key, trace):
         trace,
         record_id=record_id,
     )
+
+
+def validate_log(db, principal, args, excluding=None, check_daily=True):
+    timezone = user_timezone(db, principal)
+    if date.fromisoformat(args["day"]) > datetime.now(ZoneInfo(timezone)).date():
+        raise DomainError("FUTURE_STUDY_LOG", "不能记录未来已经学习的时长", 422)
+    if args["plan_id"]:
+        plan = growth.data(growth.owned(db, principal, args["plan_id"], "plan"))
+        if not any(t["id"] == args["task_id"] for t in plan["tasks"]):
+            raise DomainError("UNKNOWN_TASK", "请选择此计划内的学习任务", 422)
+    elif args["task_id"]:
+        raise DomainError("PLAN_REQUIRED", "记录任务时需同时指定所属计划", 422)
+    scan_upload(args["note"].encode(), "study-note.txt")
+    if not check_daily:
+        return
+    daily = sum(
+        growth.data(r)["minutes"]
+        for r in db.scalars(growth.owner_query(principal, "study_log"))
+        if r.id != excluding
+        and growth.data(r)["day"] == args["day"]
+        and not growth.data(r)["withdrawn"]
+    )
+    if daily + args["minutes"] > 1440:
+        raise DomainError("DAILY_TIME_EXCEEDED", "当天本人记录的时长不能超过 1440 分钟", 422)
 
 
 def withdraw_log(db, principal, record_id, expected, trace):

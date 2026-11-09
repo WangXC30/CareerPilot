@@ -2,9 +2,7 @@
 
 import json
 import os
-import secrets
 import time
-from uuid import uuid4
 
 import httpx
 
@@ -13,17 +11,9 @@ def main():
     if os.environ.get("CAREERPILOT_ACCEPTANCE") != "1":
         raise RuntimeError("Requires an explicitly disposable acceptance project")
     with httpx.Client(base_url="http://127.0.0.1:8000", trust_env=False, timeout=10) as client:
-        registered = client.post(
-            "/api/v1/auth/register",
-            json={
-                "email": f"acceptance-{uuid4()}@example.com",
-                "password": secrets.token_urlsafe(24),
-                "display_name": "Synthetic runtime student",
-                "privacy_accepted": True,
-            },
-        )
-        assert registered.status_code == 201, registered.status_code
-        headers = {"Authorization": "Bearer " + registered.json()["access_token"]}
+        workspace = client.get("/api/v1/local-workspace").json()
+        assert workspace["requires_login"] is False
+        headers = {"X-Workspace-Id": workspace["user_id"]}
         profile = client.put(
             "/api/v1/profile",
             headers={**headers, "If-Match": '"0"'},
@@ -73,7 +63,9 @@ def main():
         assert result["result"]["active_plan"]["id"] == plan.json()["id"]
         assert result["steps"][0]["tool"] == "growth.progress"
         deletion = client.post(
-            "/api/v1/account/deletion", headers=headers, json={"confirmation": "DELETE MY ACCOUNT"}
+            "/api/v1/local-workspace/reset",
+            headers=headers,
+            json={"confirmation": "CLEAR LOCAL DATA"},
         )
         assert deletion.status_code == 202, deletion.status_code
         receipt = deletion.json()
@@ -86,17 +78,18 @@ def main():
                 break
             time.sleep(0.2)
         assert status["status"] == "completed", status["status"]
-        assert client.get("/api/v1/me", headers=headers).status_code == 401
-        assert client.get("/health/ready").json()["schema_revision"] == "0005"
+        assert client.get("/api/v1/me", headers=headers).status_code == 409
+        assert client.get("/api/v1/local-workspace").json()["user_id"] != workspace["user_id"]
+        assert client.get("/health/ready").json()["schema_revision"] == "0006"
         print(
             json.dumps(
                 {
-                    "schema_revision": "0005",
+                    "schema_revision": "0006",
                     "separate_worker": True,
                     "assistant_status": "success",
                     "tool_results_match_persisted_plan": True,
                     "deletion_status": "completed",
-                    "sessions_revoked": True,
+                    "old_workspace_context_rejected": True,
                 }
             )
         )

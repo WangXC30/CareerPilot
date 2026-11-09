@@ -135,6 +135,16 @@ def cancel(db, principal, task_id, version):
 
 def retry(db, principal, task_id, version):
     task = owned_task(db, principal, task_id)
+    if task.kind == "growth.assistant":
+        from careerpilot import growth
+
+        growth.lock_owner(db, principal)
+        record = db.get(growth.GrowthRecord, task_id)
+        body = json.loads(record.payload_json).get("input", {}) if record else {}
+        if conversation_id := body.get("conversation_id"):
+            conversation = growth.data(growth.owned(db, principal, conversation_id, "conversation"))
+            if conversation["run_ids"][-1] != task_id:
+                raise DomainError("CHAT_RETRY_STALE", "已有后续消息，请重新发送请求。", 409)
     validate_transition("agent_task", task.status, "queued")
     if task.status != "failed":
         raise DomainError("INVALID_TRANSITION", "仅失败任务可手动重试")
@@ -317,7 +327,8 @@ def run_once(engine, *, now=None, handler=None):
         now = int(time.time())
     with Session(engine) as db, db.begin():
         task = db.get(BackgroundTask, task_id)
-        assert task is not None
+        if task is None:
+            return False
         if task.status != "running" or task.lease_token != token or task.lease_until <= now:
             return False
         old = task.status

@@ -87,6 +87,7 @@ class CalendarEventInput(ConfirmInput):
     date: date
     time: str | None = Field(default=None, pattern=r"^(?:[01]\d|2[0-3]):[0-5]\d$")
     timezone: str = Field(default="Asia/Shanghai", min_length=1, max_length=100)
+    preparation_note: str = Field(default="", max_length=2000)
 
 
 class ApplicationInput(ConfirmInput):
@@ -320,7 +321,7 @@ def register_local_tools(app, session_dependency, identity):
         value = personal_tools.save_calendar_event(
             db,
             principal,
-            body.model_dump(mode="json", exclude={"confirmed"}),
+            body.model_dump(mode="json", exclude={"confirmed"}, exclude_unset=True),
             request.state.trace_id,
             key,
             int(if_match.strip('"')),

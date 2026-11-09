@@ -9,6 +9,7 @@ from pathlib import Path
 import uvicorn
 from alembic import command
 from alembic.config import Config
+from browser_identity import connect_browser
 from browser_v4_locale import MISMARKED
 from fastapi.testclient import TestClient
 from playwright.sync_api import expect, sync_playwright
@@ -44,7 +45,9 @@ def main():
             sock.bind(("127.0.0.1", 0))
             port = sock.getsockname()[1]
         server = uvicorn.Server(
-            uvicorn.Config(create_app(url), host="127.0.0.1", port=port, log_level="error")
+            uvicorn.Config(
+                create_app(url, local_only=False), host="127.0.0.1", port=port, log_level="error"
+            )
         )
         thread = threading.Thread(target=server.run, daemon=True)
         thread.start()
@@ -54,7 +57,10 @@ def main():
                     break
                 time.sleep(0.05)
             assert server.started
-            with TestClient(create_app(url)) as client, sync_playwright() as playwright:
+            with (
+                TestClient(create_app(url, local_only=False)) as client,
+                sync_playwright() as playwright,
+            ):
                 browser = playwright.chromium.launch()
                 try:
                     for width in (1440, 375):
@@ -139,9 +145,7 @@ def check_width(browser, port, token, width, records, engine, client, scratch):
     try:
         page.goto(f"http://127.0.0.1:{port}/app/#portfolio")
         page.locator("#ui-locale").select_option("en-US")
-        page.locator("#connect").click()
-        page.locator("#token").fill(token)
-        page.locator("#account-form").get_by_role("button", name="Connect", exact=True).click()
+        connect_browser(page, token)
         recommendations = page.locator("#project-recommend")
         expect(recommendations.get_by_label("Target job", exact=True)).to_be_visible()
         recommendations.get_by_role("button", name="View practice suggestions").focus()
@@ -258,6 +262,8 @@ def check_width(browser, port, token, width, records, engine, client, scratch):
         page.get_by_role("button", name="Load revision history").click()
         expect(detail.locator("#project-history-results h3")).to_be_focused()
         expect(detail.locator("#project-history-results")).to_contain_text("GMT-4")
+        detail.locator("#project-narrative-history").click()
+        expect(detail.locator("#project-narrative-versions")).to_contain_text("Version 1")
 
         second = post(
             "/projects",
@@ -317,6 +323,11 @@ def check_width(browser, port, token, width, records, engine, client, scratch):
             if f["id"] in {v["id"] for v in facts}
         )
         originals()
+        detail.locator("#project-review [name=note]").fill("本人检查合成项目，保留待改进项")
+        detail.locator("#project-review button").click()
+        expect(page.locator("#notice")).to_contain_text("Stage review saved")
+        detail.locator("[data-project-asset-withdraw]").first.click()
+        expect(page.locator("#notice")).to_contain_text("Artifact withdrawn")
         assert not errors, errors
     finally:
         context.close()

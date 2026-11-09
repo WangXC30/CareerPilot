@@ -29,6 +29,7 @@ def main():
             ["-m", "ruff", "format", "--check", "--no-cache", "."],
             ["-m", "mypy", f"--cache-dir={Path(scratch) / 'mypy'}"],
             ["scripts/scan_secrets.py"],
+            ["scripts/export_web_contract.py", "--check"],
             ["scripts/check_traceability.py", "--check"],
             [
                 "-m",
@@ -51,42 +52,12 @@ def main():
             ["scripts/smoke_http.py"],
             ["scripts/operations_drill.py"]
             + (["--output", str(report / "operations-v0.json")] if report else []),
-            ["scripts/browser_smoke.py"]
-            + (["--output", str(report / "ui-platform")] if report else []),
-            ["scripts/browser_v1.py"] + (["--output", str(report / "ui-v1")] if report else []),
-            ["scripts/browser_v2.py"] + (["--output", str(report / "ui-v2")] if report else []),
-            ["scripts/browser_v2_discovery.py"]
-            + (["--output", str(report / "ui-discovery")] if report else []),
-            ["scripts/browser_v2_hiring.py"]
-            + (["--output", str(report / "ui-hiring")] if report else []),
-            ["scripts/browser_v2_interviews.py"]
-            + (["--output", str(report / "ui-interviews")] if report else []),
-            ["scripts/browser_v2_sources.py"]
-            + (["--output", str(report / "ui-sources")] if report else []),
-            ["scripts/browser_v2_progress.py"]
-            + (["--output", str(report / "ui-progress")] if report else []),
-            ["scripts/browser_v3_graph.py"]
-            + (["--output", str(report / "ui-graph")] if report else []),
-            ["scripts/browser_v3_study.py"]
-            + (["--output", str(report / "ui-study")] if report else []),
-            ["scripts/browser_v3_profile_history.py"],
-            ["scripts/browser_v4.py"],
-            ["scripts/browser_v4_voice.py"],
-            ["scripts/browser_v4_collaboration.py"],
-            ["scripts/browser_v4_application.py"],
-            ["scripts/browser_v4_calendar.py"],
-            ["scripts/browser_calendar_regions.py"],
-            ["scripts/browser_v4_governance.py"],
-            ["scripts/browser_v4_learning.py"],
-            ["scripts/browser_v4_remaining.py"],
-            ["scripts/browser_v4_locale.py"],
-            ["scripts/browser_matching_locale.py"],
-            ["scripts/browser_recruiting_locale.py"],
-            ["scripts/browser_project_locale.py"],
-            ["scripts/browser_community_locale.py"],
-            ["scripts/browser_remaining_locale.py"],
-            ["scripts/browser_model_comparison.py"],
-            ["scripts/browser_expert_comparison.py"],
+            ["scripts/browser_web.py"],
+            ["scripts/browser_web.py", "--navigation-only"],
+            ["scripts/browser_web.py", "--asset-loading-only"],
+            ["scripts/browser_web.py", "--journey-only"],
+            ["scripts/browser_web.py", "--followup-only"],
+            ["scripts/browser_business_editor.py"],
         ]
         for command in commands:
             print(f"Running: python {' '.join(command)}", flush=True)

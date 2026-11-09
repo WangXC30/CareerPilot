@@ -1,4 +1,11 @@
-FROM python:3.14-slim
+FROM node:24-slim AS web-build
+WORKDIR /web
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci --ignore-scripts --no-audit --no-fund
+COPY frontend/ ./
+RUN npm run build
+
+FROM python:3.14-slim AS runtime
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -6,6 +13,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PLAYWRIGHT_BROWSERS_PATH=/ms-playwright \
     VIRTUAL_ENV=/opt/venv \
     PATH="/opt/venv/bin:$PATH"
+ENV CAREERPILOT_WEB_ROOT=/opt/careerpilot-web \
+    LANGCHAIN_TRACING_V2=false \
+    LANGSMITH_TRACING=false
 
 WORKDIR /workspace
 RUN python -m venv /opt/venv
@@ -17,6 +27,7 @@ RUN sed -i 's|http://deb.debian.org|https://deb.debian.org|g' /etc/apt/sources.l
     && python -m playwright install --with-deps chromium \
     && rm -rf /var/lib/apt/lists/*
 COPY . .
+COPY --from=web-build /web/dist /opt/careerpilot-web
 RUN pip install --no-cache-dir --no-deps -e .
 
 # Named volumes inherit ownership on first creation. Source is mounted read-only.

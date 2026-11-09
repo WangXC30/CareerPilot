@@ -11,6 +11,7 @@ from pathlib import Path
 import uvicorn
 from alembic import command
 from alembic.config import Config
+from browser_identity import connect_browser
 from fastapi.testclient import TestClient
 from playwright.sync_api import expect, sync_playwright
 from study_contract import create_study
@@ -33,7 +34,7 @@ def run(output=None):
         command.upgrade(config, "head")
         engine = make_engine(url)
         seed(engine)
-        with TestClient(create_app(url)) as client:
+        with TestClient(create_app(url, local_only=False)) as client:
             state = create_study(client, engine)
         with socket.socket() as sock:
             sock.bind(("127.0.0.1", 0))
@@ -41,7 +42,11 @@ def run(output=None):
         base = f"http://127.0.0.1:{port}"
         server = uvicorn.Server(
             uvicorn.Config(
-                create_app(url), host="127.0.0.1", port=port, log_level="error", access_log=False
+                create_app(url, local_only=False),
+                host="127.0.0.1",
+                port=port,
+                log_level="error",
+                access_log=False,
             )
         )
         thread = threading.Thread(target=server.run, daemon=True)
@@ -61,11 +66,7 @@ def run(output=None):
                 errors = []
                 page.on("pageerror", lambda error: errors.append(str(error)))
                 page.goto(base + "/app/#learning")
-                page.locator("#connect").click()
-                page.locator("#token").fill(
-                    state["headers"]["Authorization"].removeprefix("Bearer ")
-                )
-                page.locator("#account-form button[type=submit]").click()
+                connect_browser(page, state["headers"]["Authorization"].removeprefix("Bearer "))
                 mode = page.locator("#study-mode-form")
                 expect(mode).to_be_visible()
                 mode.locator("select").select_option("research_busy")

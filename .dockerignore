@@ -12,6 +12,9 @@ data
 backups
 dist
 build
+**/node_modules
+frontend/dist
+src/careerpilot/web_dist
 *.log
 .agents
 .codex

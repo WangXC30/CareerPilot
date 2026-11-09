@@ -9,6 +9,7 @@ from pathlib import Path
 import uvicorn
 from alembic import command
 from alembic.config import Config
+from browser_identity import connect_browser
 from playwright.sync_api import expect, sync_playwright
 from sqlalchemy.orm import Session
 
@@ -45,7 +46,9 @@ def main():
             sock.bind(("127.0.0.1", 0))
             port = sock.getsockname()[1]
         server = uvicorn.Server(
-            uvicorn.Config(create_app(url), host="127.0.0.1", port=port, log_level="error")
+            uvicorn.Config(
+                create_app(url, local_only=False), host="127.0.0.1", port=port, log_level="error"
+            )
         )
         thread = threading.Thread(target=server.run, daemon=True)
         thread.start()
@@ -79,9 +82,7 @@ def main():
                     })();""")
                     base = f"http://127.0.0.1:{port}/app/"
                     page.goto(base + "#local-tools")
-                    page.locator("#connect").click()
-                    page.locator("#token").fill(token)
-                    page.locator("#account-form button[type=submit]").click()
+                    connect_browser(page, token)
                     expect(page.locator("#voice-start")).to_be_visible()
                     page.locator("#voice-start").click()
                     expect(page.locator("#notice")).to_contain_text("请先同意")
@@ -97,6 +98,18 @@ def main():
                     page.locator("details").filter(has=page.locator(".voice-transcript")).locator(
                         "summary"
                     ).click()
+                    draft = page.locator(".voice-draft")
+                    draft.locator('[type="checkbox"]').check()
+                    with page.expect_response(
+                        "**/api/v1/voice-records/*/draft", timeout=45000
+                    ) as response:
+                        draft.locator("button").click()
+                    assert response.value.status in {200, 422}
+                    if response.value.status == 200:
+                        expect(page.locator("#tool-result")).to_contain_text("英文实验草稿")
+                    else:
+                        expect(page.locator("#notice .error")).not_to_be_empty()
+                    page.locator(".voice-transcript").locator("..").evaluate("n=>n.open=true")
                     page.locator("[data-voice-play]").click()
                     page.wait_for_function("() => document.querySelector('audio')?.readyState >= 1")
                     page.locator(".voice-transcript textarea").fill("本人核对的本地模拟录音")
@@ -119,6 +132,12 @@ def main():
                     assert page.evaluate(ALL_STOPPED)
                     assert page.locator(".voice-transcript").count() == 1
                     # Navigating away releases the actual synthetic MediaStream tracks.
+                    page.locator("#voice-consent").check()
+                    page.locator("#voice-start").click()
+                    expect(page.locator("#voice-cancel")).to_be_enabled()
+                    page.locator("#voice-cancel").click()
+                    expect(page.locator("#voice-start")).to_be_enabled()
+                    assert page.evaluate(ALL_STOPPED)
                     page.locator("#voice-consent").check()
                     page.locator("#voice-start").click()
                     expect(page.locator("#voice-stop")).to_be_enabled()
@@ -147,6 +166,11 @@ def main():
                     expect(page.locator("#notice")).to_contain_text("Denied")
                     expect(page.locator("#voice-start")).to_be_enabled()
                     assert page.locator(".voice-transcript").count() == 1
+                    page.locator("details").filter(has=page.locator(".voice-transcript")).locator(
+                        "summary"
+                    ).click()
+                    page.locator("[data-voice-delete]").click()
+                    expect(page.locator(".voice-transcript")).to_have_count(0)
                     assert not errors, errors
                     page.close()
                 finally:

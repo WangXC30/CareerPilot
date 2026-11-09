@@ -4,27 +4,28 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>CareerPilot · 本地使用与数据说明 / Local use and data</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="/local-use.css">
 </head>
 <body>
   <main class="local-use">
     <p><a href="./">返回成长空间 / <span lang="en-US">Return to CareerPilot</span></a></p>
     <h1>本地使用与数据说明</h1>
     <p lang="en-US"><a href="#english">Read in English</a></p>
-    <p>版本：local-use.v1 · 2026-10-26</p>
+    <p>版本：local-use.v2 · 2026-10-26</p>
     <section aria-labelledby="scope-title">
       <h2 id="scope-title">仅本人本地使用</h2>
       <p>当前版本用于你在自己电脑上管理职业成长资料。默认服务只绑定本机回环地址。
         本说明描述当前工程行为，不是面向公众的服务协议或经法务签核的隐私政策。
-        不向其他用户或未成年人提供服务，不应据此开放公网注册。</p>
+        不提供登录、注册或运营角色，不向其他用户或未成年人提供服务。</p>
       <p>只导入你有权处理的资料，避免导入他人个人信息、凭据或未经许可的内容。
         公开链接、星数和模型评语不等于内容许可或已验证能力。
         本地申请演练不会联系雇主；实际投递仍由你在源站完成。</p>
     </section>
     <section aria-labelledby="data-title">
       <h2 id="data-title">保存哪些资料</h2>
-      <p>注册保存邮箱、昵称、密码盐和密码派生摘要；登录保存会话令牌摘要、设备说明和到期时间。
-        页面访问令牌只保留在内存中。邮箱当前仅作账号标识，不发送验证或找回邮件。</p>
+      <p>打开应用即进入本地个人工作区，无需账号、邮箱、密码或访问令牌。
+        首次空库自动建立工作区；已有一份历史资料时直接沿用其来源和记录，不建立空账号代替。
+        历史账号字段只为旧数据兼容保留，不再用于当前应用的登录或角色授权。</p>
       <p>你提交的档案、JD、材料、目标、计划、测验、项目、简历版本、申请及复盘记录，
         连同必要的来源、版本、授权和审计信息，保存在本地数据库中。
         历史版本可能包含旧正文；删除源记录不一定删除已冻结的业务快照。</p>
@@ -33,7 +34,7 @@
     </section>
     <section aria-labelledby="external-title">
       <h2 id="external-title">外部处理须另行授权</h2>
-      <p>注册勾选不授予外部模型、公开网页访问或产品分析权限。你可以在设置中分别授权或撤销。
+      <p>打开本地工作区不授予外部模型、公开网页访问或产品分析权限。你可以在设置中分别授权或撤销。
         默认助手使用本地受控工具；配置模型密钥本身不会自动发送资料。
         显式运行外部模型评测时，选定场景会发送给所选供应商，供应商处理和留存以其约定为准；
         撤销本地授权不能删除供应商已收到的内容。</p>
@@ -43,15 +44,15 @@
     </section>
     <section aria-labelledby="retention-title">
       <h2 id="retention-title">保留、导出、撤销与删除</h2>
-      <p>普通业务记录及其版本没有统一的自动到期日，保留至对应删除流程或账号注销。
+      <p>普通业务记录及其版本没有统一的自动到期日，保留至对应删除流程或清空本地资料。
         主动导入来源与公开仓库元数据保留 30 天；媒体文字索引默认 7 天，可选 1–30 天；
         面试录音默认 1 天，可选 1–7 天。到期后停止使用，Worker 清理相应记录和修订；
         Worker 停止时物理清理会延后。媒体原文件在临时处理结束后删除。</p>
       <p>产品分析默认关闭，启用后仅保存限定事件，90 天清理；撤销时清除本人分析事件与修订。
         请求指标不含请求正文，维护命令默认清理 30 天前指标；业务审计没有因此自动到期。</p>
-      <p>设置页可导出本人数据、撤销用途授权和管理登录会话。导出不包含密码派生摘要、会话令牌、
-        GitHub 密钥及分享票据。注销需输入 DELETE MY ACCOUNT；会话立即失效，
-        Worker 随后清理在线库中本人数据。请保管一次性删除回执用于查询处理状态。</p>
+      <p>资料与设置页可导出本人数据、撤销用途授权和清空本地资料。导出不包含历史密码摘要、令牌、
+        GitHub 密钥及分享票据。清空需输入 CLEAR LOCAL DATA；Worker 随后清理本地工作区记录，
+        完成后可重新开始，处理中不会继续写入原资料。离线备份仍由本人保管或删除。</p>
       <p>已下载的导出、他人已取得的副本、源站和外部供应商内容、离线备份不会因本机删除而自动消失。
         恢复旧备份可能恢复旧授权和旧内容，恢复后应先离线核对并重新执行必要撤销或删除，
         再启动会访问外部服务的任务。不要用删除 Docker 数据卷代替日常停止服务。</p>
@@ -64,17 +65,17 @@
     </section>
     <section id="english" lang="en-US" aria-labelledby="english-title">
       <h2 id="english-title">Personal local use</h2>
-      <p>Version local-use.v1 · 2026-10-26. This build is for your own computer and personal use.
+      <p>Version local-use.v2 · 2026-10-26. This build is for your own computer and personal use.
         The default server binds to loopback. This is an engineering disclosure, not public service
-        terms or a legally approved privacy policy. Do not use it to open registration to others
-        or provide a service to minors. Import only materials you may process, and avoid other
+        terms or a legally approved privacy policy. There is no login, registration or operations role.
+        Do not use it to serve others or minors. Import only materials you may process, and avoid other
         people's personal information, credentials and unlicensed content. Public links, stars
         and model comments do not establish permission or verified skills. Application simulations
         do not contact employers; actual submission is your action on the source site.</p>
       <h3>Data and storage</h3>
-      <p>Registration stores your email, display name, password salt and derived password hash.
-        Sessions store token digests, device labels and expiry; the browser keeps its token in
-        page memory. Email is an identifier only, without verification or recovery email.
+      <p>The app opens your local workspace without an account, email, password or access token.
+        An empty database receives a personal workspace; a single existing dataset is reused.
+        Historical credential fields remain only for data compatibility, not current sign-in or roles.
         Profiles, jobs, materials, goals, plans, assessments, projects, resume versions,
         applications and reviews are stored with provenance, versions, consent and audit metadata.
         Old versions and frozen snapshots may retain old text after a source is deleted.</p>
@@ -82,7 +83,7 @@
         Local storage does not imply disk encryption. Anyone with access to your computer,
         Docker or backups may be able to read the data.</p>
       <h3>Optional external processing</h3>
-      <p>Registration does not authorize external models, public web access or product analytics.
+      <p>Opening the local workspace does not authorize external models, public web access or product analytics.
         Grant or withdraw these separately in Settings. The default assistant uses controlled local
         tools; configuring a model key does not automatically send data. Explicit external model
         evaluations send selected scenarios to the chosen provider under its own processing and
@@ -93,7 +94,7 @@
         real automatic applications and multi-model collaboration remain disabled.</p>
       <h3>Retention and control</h3>
       <p>Ordinary business records and versions have no general automatic expiry; they remain until
-        their deletion workflow or account deletion. Imported references and public repository
+        their deletion workflow or clearing local data. Imported references and public repository
         metadata last 30 days. Media text indexes default to 7 days (range 1–30); interview audio
         defaults to 1 day (range 1–7). Expired content stops being used; the worker removes the
         corresponding records and revisions. Stopping the worker delays physical cleanup.
@@ -101,10 +102,10 @@
       <p>Analytics is off by default. Opted-in bounded events expire after 90 days; withdrawal removes
         your analytics events and revisions. Request metrics omit request bodies; the maintenance
         command defaults to removing metrics older than 30 days, without expiring business audits.</p>
-      <p>Settings provides personal data export, purpose withdrawal and session management. Exports
-        omit password hashes, session tokens, GitHub secrets and sharing tickets. Account deletion
-        requires DELETE MY ACCOUNT, revokes sessions immediately and queues worker cleanup of
-        your online database records. Keep the one-time deletion receipt to check completion.</p>
+      <p>Profile and settings provides data export, purpose withdrawal and clearing local data. Exports
+        omit historical password hashes, tokens, GitHub secrets and sharing tickets. Clearing requires
+        CLEAR LOCAL DATA and queues worker cleanup of your local records; further writes are blocked
+        until cleanup completes. You can then start again. Offline backups remain under your control.</p>
       <p>Downloaded exports, copies already obtained by others, source sites, external providers and
         offline backups are not automatically erased. Restoring a backup may restore old content
         and consent: review it offline and repeat needed withdrawals or deletions before enabling

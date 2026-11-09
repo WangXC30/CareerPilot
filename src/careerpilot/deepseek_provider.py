@@ -6,7 +6,7 @@ import json
 import os
 from pathlib import Path
 
-from careerpilot.gateway import ProviderReply, strict_json
+from careerpilot.gateway import EmptyModelResponse, ProviderReply, strict_json
 
 MODEL = "deepseek-flash"
 HOST = "api.deepseek.com"
@@ -44,6 +44,8 @@ def configured_key(path=Path(".env")):
 class DeepSeekProvider:
     external = True
     model_id = MODEL
+    system_prompt = SYSTEM
+    max_timeout = 8
     # Fixed system message plus a conservative allowance for chat-template tokens.
     # Accounting remains a token-price upper estimate, never a billing receipt.
     input_token_overhead = len(SYSTEM.encode()) + 1024
@@ -54,7 +56,7 @@ class DeepSeekProvider:
             or len(api_key) > 512
             or any(not 33 <= ord(char) <= 126 for char in api_key)
             or type(timeout) not in (float, int)
-            or not 0 < timeout <= 8
+            or not 0 < timeout <= self.max_timeout
         ):
             raise ValueError("Invalid DeepSeek configuration")
         self._api_key = api_key
@@ -74,10 +76,7 @@ class DeepSeekProvider:
             body = json.dumps(
                 {
                     "model": MODEL,
-                    "messages": [
-                        {"role": "system", "content": SYSTEM},
-                        {"role": "user", "content": envelope},
-                    ],
+                    "messages": self.messages(envelope),
                     "response_format": {"type": "json_object"},
                     "thinking": {"type": "disabled"},
                     "temperature": 0,
@@ -107,6 +106,12 @@ class DeepSeekProvider:
             connection.close()
         return parse_reply(raw, max_tokens)
 
+    def messages(self, envelope):
+        return [
+            {"role": "system", "content": self.system_prompt},
+            {"role": "user", "content": envelope},
+        ]
+
 
 def parse_reply(raw, max_tokens):
     try:
@@ -123,16 +128,19 @@ def parse_reply(raw, max_tokens):
             or message["role"] != "assistant"
             or message.get("tool_calls")
             or not isinstance(content, str)
-            or not content.strip()
             or len(content.encode()) > 65536
             or any(type(count) is not int or count < 0 for count in counts)
             or counts[2] != counts[0] + counts[1]
             or counts[1] > max_tokens
         ):
             raise ValueError
+        if not content.strip():
+            raise EmptyModelResponse(counts[0], counts[1])
         # The gateway validates content against its schema. CoT and all other metadata
         # are discarded here, even if a provider unexpectedly sends them.
         return ProviderReply(content, counts[0], counts[1])
+    except EmptyModelResponse:
+        raise
     except (KeyError, IndexError, TypeError, ValueError):
         raise ValueError("Invalid DeepSeek response or usage") from None
 

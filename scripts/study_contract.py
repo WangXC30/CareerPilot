@@ -3,6 +3,7 @@
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
+from careerpilot import assessment
 from careerpilot.cli import provision
 
 
@@ -55,11 +56,16 @@ def create_study(client, engine):
         )
     )
     a = checked(client.post("/api/v1/assessments", headers=h, json={"skill_id": "python"}), 201)
+    answers = []
+    for index, question in enumerate(a["questions"]):
+        bank_index = int(question["id"].rsplit(".", 1)[1])
+        correct = assessment.V4_BANK["python"][bank_index][2]
+        answers.append((correct + 1) % len(question["choices"]) if index < 2 else correct)
     checked(
         client.post(
             f"/api/v1/assessments/{a['id']}/submit",
             headers={**h, "If-Match": '"1"'},
-            json={"answers": [0, 0, 0]},
+            json={"answers": answers},
         )
     )
     preview = checked(

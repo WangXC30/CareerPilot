@@ -54,7 +54,7 @@ VERSION = "adaptive.editorial.v1"
 
 
 def item(skill, index):
-    questions = assessment.BANK[skill] + EXTRA.get(skill, [])
+    questions = assessment.LEGACY_BANK[skill] + EXTRA.get(skill, [])
     q = questions[index]
     return {
         "skill_id": skill,
@@ -111,7 +111,7 @@ def answer(db, principal, key, choice, expected, trace):
         raise DomainError("BANK_UNAVAILABLE", "题库版本已改变，请重新开始", 409)
     current = value["current"]
     skill, index = current["skill_id"], current["index"]
-    q = (assessment.BANK[skill] + EXTRA.get(skill, []))[index]
+    q = (assessment.LEGACY_BANK[skill] + EXTRA.get(skill, []))[index]
     elapsed = max(0, int(time.time()) - value["issued_at"])
     correct = choice == q[2]
     answers = value["answers"] + [
@@ -130,7 +130,7 @@ def answer(db, principal, key, choice, expected, trace):
         next_index = next(
             i
             for i in candidates
-            if i not in seen and i < len(assessment.BANK[skill] + EXTRA.get(skill, []))
+            if i not in seen and i < len(assessment.LEGACY_BANK[skill] + EXTRA.get(skill, []))
         )
         current = item(skill, next_index)
     else:

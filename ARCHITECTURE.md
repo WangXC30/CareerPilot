@@ -1,14 +1,22 @@
 # CareerPilot — 系统架构设计（ARCHITECTURE）
 
-> **文档版本**：v1.2 · 2026-10-23  
-> **状态**：完整产品目标架构；V0 本地实施与技术验证见 docs/V0-EXIT.md，生产和后续业务仍待各阶段验证  
-> **产品输入**：[`PRD.md`](./PRD.md) v1.0（110 条 `FR-*`、18 条 `NFR-*`、18 条 `E2E-*`）；源文件 SHA-256：`09a37e400ad9fc165e6624fa2c4bf14de5cbe645a6f79ebeabb3be0138df3b1d`  
+> **文档版本**：v1.8 · 2026-10-27<br>
+> **状态**：§1.2 说明当前网页端与 Docker 边界；其余平台架构保留历史设计；W-056 已实施原位替换，实际验证范围见 PLAN<br>
+> **产品输入**：[`PRD.md`](./PRD.md) v1.6（保留 110 条 `FR-*`、18 条 `NFR-*`、18 条 `E2E-*` 历史映射；当前范围见其 §0.4）<br>
 > **研发落地**：[`TASKS.md`](./TASKS.md)；需求编号保持 PRD 原样。  
-> **架构原则**：这是完整产品的目标架构与分阶段演进设计，**不是仅面向 MVP 的临时方案**。标记为“建议”的选型需经技术验证才进入正式 ADR。
+> **架构原则**：当前以本人本地成长求职闭环为主；历史平台设计不作为默认交付依赖。标记为“建议”的选型需经技术验证才进入正式 ADR。
 
 ---
 
 ## 1. 架构目标、范围与约束
+
+W-074：information_api 在原 GrowthRecord/Revision 上提供本人资料跨类型检索、历史和有版本指纹的删除预览/确认；写入使用显式 Pydantic 契约及原资料、来源、JD、学习日志校验，没有通用任意 payload 更新接口或新资料库。材料修订使旧陈述失效并重新确认，事实版本与简历内快照版本比较；缺失事实返回 source_deleted，不使历史查看报错。档案删除后重新建档使用新 ID，防止旧事实因版本号重置而复活。删除清理所属子项/历史及 HTTP 幂等正文，撤销关联客观证据并取消旧工作流可恢复性；成本和额度不在管理范围，原 Schema 0007 保持。具体范围见 WEB-CONTRACTS，实际验证见 PLAN。
+
+W-077：planning_editor 接受显式 PlanEdit/PlanTaskEdit，经原 validate_plan 校验后写入 plan_preview；接受/拒绝复用原事务、版本与 context_hash，保留任务状态/验证及保护任务。business_editor 仅允许说明等显式字段、Offer 重算和译文事实/数字校验；新增业务记录通过 user_archived 可恢复管理，目标沿用 archived/draft 与原审计历史，关联有效计划时拦截。统一检索扩展为 21 类，面试正文及历史沿用公开投影，隐藏答案与 rubric。没有新表、迁移、背景任务取消或关联记录脱钩。
+
+求职工具通过 chat_hiring 接入唯一会话图，复用 resumes/applications 与求职表单的 Pydantic 契约；共享无写入的事实解析、岗位定制排序及材料正文函数，先生成确认预览，恢复后校验事实来源、简历版本和预览指纹。原工具回执与领域写入同事务防重，Schema 0007、业务库和模型预算保持；细节见 ADR-030。
+
+W-065：chat_profile 将个人资料补充接入唯一助手图。基础档案复用 ProfileInput/save_profile 和计划影响预览，经历复用 ExperienceInput/save_experience，文字补充写入原 memory；三者沿用 interrupt 确认、工作区版本边界、同事务工具回执和 checkpoint 恢复，不新增资料库、HTTP 写入口或数据库迁移。
 
 CareerPilot 将大学生的职业探索、真实岗位情报、技能能力证据、学习训练与实习/校招全过程，构成可审计的闭环：
 
@@ -38,6 +46,31 @@ CareerPilot 将大学生的职业探索、真实岗位情报、技能能力证�
 | 可测试 | 合同测试、确定性规则测试、金标集、E2E 回归 | NFR-012、PRD §14 |
 
 ---
+
+### 1.2 当前网页端、Docker 与资料边界（W-056 已实施）
+
+2026-10-28 最新方向以 [PLAN](PLAN.md) 为准：AI 助手、学习和求职三个日常入口复用现有服务；工作区引导状态和未完成资料复用私人草稿，按版本并发控制，按动作只读检查当前资料。聊天导入 JD 和档案草稿经预览确认、原领域校验及事务回执，不建立平行事实库。实际范围与验证见 PLAN。
+
+W-053 已按 [ADR-028](docs/ADR-028-local-personal-workspace.md) 将旧栈默认运行改为免登录的单人本地工作区。0006 新增唯一工作区关联，正常请求自动解析其内部归属；不读取运营角色或 Bearer 凭据，认证/运营/会话接口不进入默认路由。保留本机同源访问边界，原所有权字段服务历史完整性。下文平台账号和角色架构仅保留历史参考，不是当前产品能力。
+
+本轮范围调整依据 [功能收敛设计](docs/PRODUCT-FOCUS.md)。目标采用 React/TypeScript/Vite 网页、Python/FastAPI、LangGraph、SQLite/本地附件，明确保留 Docker Compose 部署，不采用 Electron。运行结构、接口与恢复边界以 [网页端重构规范](docs/WEB-REFACTOR-PLAN.md) 和 [ADR-029](docs/ADR-029-web-stack-docker.md) 为准，原桌面草案已失效。以下 §2 的 CDN、多租户、对象存储和规模化部署保留历史设计，不是当前个人网页应用的前置。
+
+- 构建版采用 Node 构建阶段 + Python API 运行镜像，FastAPI 同源提供 `/app/` 和 `/api/v1`；开发 profile 由 Vite 提供 HMR/受控代理，运行版不启动 Vite 服务。SPA 深链接回退不能吞掉资源或 API 404。
+- Compose 保留一次性 `migrate`、`api`、独立 `worker` 和隔离 `checks`。API/Worker 共享持久化数据卷，SQLite 以单 API/Worker 和短事务控制并发；现有业务库不因前端重构重建。
+- 浏览器关闭不停止后台任务，停止容器后则不再执行；重启从持久状态恢复。LangGraph checkpoints 保存图内部状态，业务库只投影运行状态，Outbox/稳定幂等回执处理跨库中断。
+- API 仅回环发布并保持 Host/Origin/跨站边界；不重新引入产品登录或令牌输入，不把密钥放入网页资源。文件经后端受控上传/下载，代码评测保留独立隔离容器。
+
+- 资料在同一领域服务中写入：优先复用现有 profile/material/memory、项目和 resume_fact；界面通过引用与适配呈现，不能为导航合并建立第二套档案或事实库。
+- 共享事实不是共享可变快照。资料草稿、本人已确认事实、有效技能证据、不可变简历版本、申请材料快照分别管理；展示来源 ID/版本、原文、确认与有效性。
+- 草稿使用独立契约，绑定用户、资料类型及编辑版本；支持保存失败提示、恢复与冲突比较。草稿不参与匹配/技能升级/正式材料输出，不放宽现有 ProfileInput 的正式提交规则来容纳半成品。
+- 结构化教育/经历扩展原 memory 记录，日期使用 value/precision；详见 WEB-CONTRACTS，不另建事实仓库。未知值不以 0、空学历或虚构日期替代。
+- 统一材料导入/选择与内容摘要去重；相似内容只建议合并，来源授权和原文仍分别保留。确认命令与事实转换继续幂等，不能因为草稿恢复重放写入。
+- 上游修改/撤回影响当前引用及新用许可，不覆写已生成简历和申请历史；导出、删除和撤销覆盖草稿、来源、工作流及附件，防止残留副本。
+- 通知与复盘统一入口/偏好，保留事件类型、幂等回执和历史快照。公共词库发布仍有校验和回滚；个人设置中的诊断不暴露其他人的材料。
+
+功能分区合并不删除领域状态机、授权、审计、模型网关、Outbox 或隔离评测。专家协作继续关闭，延期的平台能力不接入新默认工作流。React 已接管产品界面，LangGraph 是唯一助手编排；草稿和经历沿用原领域持久化，新增 0007 事件表。实现见 [WEB-CONTRACTS](docs/WEB-CONTRACTS.md)，旧功能完成数不代表本次新栈验收。
+
+成长助手现按 [ADR-030](docs/ADR-030-conversational-assistant.md) 增加会话与有界模型/工具循环：conversation_id 关联消息，run_id 继续标识单次执行与 checkpoint；摘要、近期原文和相关资料组合上下文。DeepSeek 对话策略与提取策略分离，复用授权、预算与响应校验；每个模型决策及工具效果都有稳定回执，外部 I/O 不占用业务写事务。业务状态仍由原领域服务校验，新的会话/偏好/回执沿用 GrowthRecord 与现有导出/清空，不改真实库 Schema。
 
 ## 2. 总体架构与部署演进
 
@@ -299,7 +332,7 @@ erDiagram
 - **LearningTask**：`pending → in_progress → pending_verification → passed / needs_review / skipped / expired`；`passed` 为任务层状态，不直接等同所有相关技能 `verified`。
 - **Skill**：`unassessed → declared → learning → evidence_supported → verified → needs_reassessment`。从 `declared` 到 `verified` 必须引用符合 rubric 的有效证据；模型推断没有升级权限。
 - **JobPosting**：`discovered → unverified / verified → possibly_expired / closed`；来源失败 ≠ closed。
-- **Application**：`draft → prepared → awaiting_user_submission → submitted → assessment / interviewing → offer / rejected / withdrawn / no_response`；`submitted` 需用户确认的凭据或可信渠道回执，不能从“点击投递按钮”推断。
+- **Application**：系统简历沿 `draft → prepared → awaiting_user_submission → submitted`；`submitted` 需用户确认的凭据或可信渠道回执。外部投递本人自述从独立的 `reported_submitted` 开始，可跟进考核、面试或结果，但保持 `pending_verification`；核验回执后才确认投递，已进入后续阶段时不回退。不能从点击推断投递。
 - **AgentTask**：`queued → running → awaiting_approval → success / partial_success / failed / cancelled`；每个步骤有独立 checkpoint、重试计数和输出摘要。
 
 在同一个聚合中以数据库事务 + optimistic locking (`version` / If-Match) 实现修改；跨聚合使用 Outbox，消费者去重；敏感/不可逆动作先确认再执行，不用“最终一致性”掩盖多次对外发送。
@@ -676,3 +709,7 @@ ADR 文档统一包含：背景、备选、选择、取舍、风险、验证数�
 - [ ] 灰度/正式发布门禁覆盖完整用户旅程与 18 个 E2E 场景。
 
 > **注意**：本文件是产品 PRD 的工程实现候选基线；涉及版权/合规/资费/算法效果的承诺须由验证报告和正式 ADR 才能确定。
+
+2026-10-28 对话扩展复用申请状态机、本地日程、interview_review 与学习计划预览；面试安排在版本与状态复核后事务提交，真实面试复盘保留本人自述来源及修订，计划预览需另行接受。项目评测读取原记录真实状态，不创造验证结论。
+
+2026-10-28 求职补充：外部简历投递只保存用户自述及岗位快照，简历版本 ID 和内容哈希为空，不伪造版本；无法用于依赖系统简历的本地申请演练。自述的独立阶段与核验状态分开，回执统计仍以实际回执为准。申请内面试复用聊天面试预览与原子执行，预览指纹、申请版本和确认均需校验；无新表或迁移。

@@ -22,6 +22,19 @@ class SessionInput(ConfirmInput):
         return value
 
 
+class ScheduleInput(Input):
+    version: int = Field(ge=1)
+    date: str = Field(min_length=10, max_length=10)
+    time: str | None = Field(default=None, pattern=r"^(?:[01]\d|2[0-3]):[0-5]\d$")
+    timezone: str = Field(min_length=1, max_length=100)
+    preparation_note: str = Field(default="", max_length=2000)
+
+
+class ScheduleConfirmInput(ScheduleInput):
+    preview_hash: str = Field(min_length=64, max_length=64)
+    confirmed: Literal[True]
+
+
 class AnswerInput(Input):
     question_id: str = Field(min_length=1, max_length=100)
     text: str = Field(default="", max_length=6000)
@@ -53,6 +66,26 @@ class PreviewInput(ConfirmInput):
     plan_id: str = Field(min_length=1, max_length=100)
 
 
+class SelfReviewDecision(Input):
+    skill_id: str = Field(min_length=1, max_length=80)
+    minutes: int = Field(ge=10, le=180, strict=True)
+    note: str = Field(default="", max_length=2000)
+
+
+class SelfReviewInput(ConfirmInput):
+    status: Literal["confirmed", "withdrawn"]
+    summary: str = Field(min_length=1, max_length=4000)
+    application_id: str | None = Field(default=None, min_length=1, max_length=36)
+    decisions: list[SelfReviewDecision] = Field(default_factory=list, max_length=12)
+
+    @field_validator("decisions")
+    @classmethod
+    def unique(cls, value):
+        if len({item.skill_id for item in value}) != len(value):
+            raise ValueError("复习技能重复")
+        return value
+
+
 def register_interviews(app, session_dependency, identity):
     Db, Identity = Depends(session_dependency), Depends(identity)
     Version = Annotated[str, Header(pattern=r'^"[0-9]+"$')]
@@ -67,6 +100,48 @@ def register_interviews(app, session_dependency, identity):
                 )
             )
         ]
+
+    @app.post("/api/v1/applications/{application_id}/interview-preview")
+    def schedule_preview(application_id: str, body: ScheduleInput, db=Db, principal=Identity):
+        from careerpilot import chat_followup
+
+        return chat_followup.proposal(
+            db,
+            principal,
+            "record_interview",
+            {"application_id": application_id, **body.model_dump()},
+        )
+
+    @app.post("/api/v1/applications/{application_id}/interview")
+    def schedule_interview(
+        application_id: str,
+        body: ScheduleConfirmInput,
+        idempotency_key: Key,
+        request: Request,
+        db=Db,
+        principal=Identity,
+    ):
+        from careerpilot import chat_followup
+        from careerpilot.domain import DomainError
+
+        args = {
+            "application_id": application_id,
+            **body.model_dump(exclude={"preview_hash", "confirmed"}),
+        }
+        proposed = chat_followup.proposal(db, principal, "record_interview", args)
+        if proposed["context_hash"] != body.preview_hash:
+            raise DomainError("STALE_PREVIEW", "申请或面试安排已改变，请重新预览。", 412)
+        result = chat_followup.execute(
+            db,
+            principal,
+            "record_interview",
+            args,
+            proposed,
+            request.state.trace_id,
+            idempotency_key,
+        )
+        db.commit()
+        return result
 
     @app.get("/api/v1/interviews")
     def sessions(db=Db, principal=Identity):
@@ -168,6 +243,40 @@ def register_interviews(app, session_dependency, identity):
     @app.get("/api/v1/interview-reviews")
     def reviews(db=Db, principal=Identity):
         return listing(db, principal, "interview_review")
+
+    @app.post("/api/v1/interview-reviews/self-report", status_code=201)
+    def create_self_review(
+        body: SelfReviewInput, idempotency_key: Key, request: Request, db=Db, principal=Identity
+    ):
+        result = interviews.save_self_review(
+            db,
+            principal,
+            body.model_dump(exclude={"confirmed"}),
+            request.state.trace_id,
+            key=idempotency_key,
+        )
+        db.commit()
+        return result
+
+    @app.put("/api/v1/interview-reviews/{review_id}/self-report")
+    def edit_self_review(
+        review_id: str,
+        body: SelfReviewInput,
+        if_match: Version,
+        request: Request,
+        db=Db,
+        principal=Identity,
+    ):
+        result = interviews.save_self_review(
+            db,
+            principal,
+            body.model_dump(exclude={"confirmed"}),
+            request.state.trace_id,
+            review_id=review_id,
+            expected=int(if_match.strip('"')),
+        )
+        db.commit()
+        return result
 
     @app.put("/api/v1/interview-evaluations/{evaluation_id}/review")
     def review(

@@ -7,7 +7,7 @@ import json
 import pytest
 
 from careerpilot import deepseek_provider as ds
-from careerpilot.gateway import ProviderReply, structured_envelope
+from careerpilot.gateway import EmptyModelResponse, ProviderReply, structured_envelope
 
 
 def response():
@@ -164,3 +164,14 @@ def test_bad_limits_or_header_injection_cannot_make_a_request(connection):
         with pytest.raises(ValueError):
             asyncio.run(ds.DeepSeekProvider("synthetic").generate("{}", limit))
     assert not connection.instances
+
+
+def test_whitespace_reply_is_rejected_but_validated_usage_is_preserved(connection):
+    value = response()
+    value["choices"][0]["message"]["content"] = "\n\t "
+    connection.raw = json.dumps(value).encode()
+    with pytest.raises(EmptyModelResponse) as error:
+        generate()
+    assert (error.value.input_tokens, error.value.output_tokens) == (40, 5)
+    assert "content" not in error.value.__dict__
+    assert connection.instances[-1].closed

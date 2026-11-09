@@ -52,7 +52,7 @@ class SkillInput(Input):
 
 
 class AnswersInput(Input):
-    answers: list[Annotated[int, Field(ge=0, le=2, strict=True)]] = Field(
+    answers: list[Annotated[int, Field(ge=0, le=3, strict=True)]] = Field(
         min_length=1, max_length=30
     )
 
@@ -70,6 +70,7 @@ class SkillGraphInput(Input):
 class PlanInput(GapInput):
     start_date: Date
     deadline: Date | None = None
+    weekly_minutes: int | None = Field(default=None, ge=30, le=10080)
 
 
 class RestorePlanInput(ConfirmInput):
@@ -136,8 +137,10 @@ class RevokeInput(ConfirmInput):
 
 class AssistantInput(GapInput):
     message: str = Field(min_length=1, max_length=4000)
-    intent: Literal["auto", "diagnose", "plan", "progress", "resources", "replan"] = "auto"
+    intent: Literal["auto", "help", "diagnose", "plan", "progress", "resources", "replan"] = "auto"
     plan_id: str | None = Field(default=None, max_length=36)
+    conversation_id: str | None = Field(default=None, min_length=1, max_length=36)
+    locale: Literal["zh-CN", "en-US"] = "zh-CN"
 
 
 class MemoryResolution(ConfirmInput):
@@ -315,6 +318,7 @@ def register_v1(app, session_dependency, identity):
             body.start_date.isoformat(),
             body.deadline.isoformat() if body.deadline else None,
             request.state.trace_id,
+            body.weekly_minutes,
         )
         db.commit()
         return result

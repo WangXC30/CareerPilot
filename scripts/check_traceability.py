@@ -11,7 +11,8 @@ ROOT = Path(__file__).resolve().parents[1]
 def build():
     tasks = (ROOT / "TASKS.md").read_text(encoding="utf-8")
     prd = (ROOT / "PRD.md").read_text(encoding="utf-8")
-    plan = (ROOT / "PLAN.md").read_text(encoding="utf-8")
+    # The 84 legacy task rows were archived when PLAN.md became the v4 roadmap.
+    plan = (ROOT / "PLAN-HISTORY-20261028.md").read_text(encoding="utf-8")
     pattern = r"(?:FR-[A-Z]+-\d{3}|NFR-\d{3}|E2E-\d{2})"
     expected = set(re.findall(pattern, prd))
     records = {}
@@ -367,7 +368,7 @@ def build():
     records["FR-SKL-007"]["test_evidence"] = [
         "tests/test_v4_matching_history.py",
         "tests/test_v4_growth.py",
-        "scripts/browser_v4_governance.py",
+        "tests/test_v4_matching_history.py",
         "scripts/v4_contract.py",
     ]
     for requirement in ("FR-NOT-004", "FR-NOT-005", "FR-NOT-006"):

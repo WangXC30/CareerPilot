@@ -6,7 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PATTERNS = [
-    re.compile(r"(?:cpk_|cak_|sk-)[A-Za-z0-9_\-]{24,}"),
+    re.compile(r"(?<![A-Za-z0-9_])(?:cpk_|cak_|sk-)[A-Za-z0-9_\-]{24,}"),
     re.compile(r"AKIA[A-Z0-9]{16}"),
     re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----"),
 ]
@@ -21,6 +21,7 @@ SKIP = {
     "__pycache__",
     ".pytest_cache",
     ".ruff_cache",
+    "node_modules",
 }
 
 
@@ -38,6 +39,9 @@ def scan():
                 ".toml",
                 ".md",
                 ".js",
+                ".ts",
+                ".tsx",
+                ".css",
                 ".html",
                 ".txt",
                 ".lock",

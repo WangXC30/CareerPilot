@@ -10,6 +10,7 @@ from pathlib import Path
 import uvicorn
 from alembic import command
 from alembic.config import Config
+from browser_identity import connect_browser
 from browser_v4_locale import CONTRAST, MISMARKED
 from fastapi.testclient import TestClient
 from playwright.sync_api import expect, sync_playwright
@@ -35,7 +36,9 @@ def main():
             sock.bind(("127.0.0.1", 0))
             port = sock.getsockname()[1]
         server = uvicorn.Server(
-            uvicorn.Config(create_app(url), host="127.0.0.1", port=port, log_level="error")
+            uvicorn.Config(
+                create_app(url, local_only=False), host="127.0.0.1", port=port, log_level="error"
+            )
         )
         thread = threading.Thread(target=server.run, daemon=True)
         thread.start()
@@ -45,26 +48,23 @@ def main():
                     break
                 time.sleep(0.05)
             assert server.started
-            with TestClient(create_app(url)) as client, sync_playwright() as playwright:
+            with (
+                TestClient(create_app(url, local_only=False)) as client,
+                sync_playwright() as playwright,
+            ):
                 browser = playwright.chromium.launch()
                 try:
                     for width in (1440, 375):
                         uid, token = provision(engine, f"Synthetic remaining locale {width}")
                         records = prepare(client, engine, uid, token)
                         check_width(browser, port, token, width, records)
-                        _, admin = provision(
-                            engine, f"Synthetic locale admin {width}", role="admin"
-                        )
-                        _, reviewer = provision(
-                            engine, f"Synthetic locale reviewer {width}", role="admin"
-                        )
-                        check_operations(browser, port, admin, reviewer, width)
+                        check_operations_absent(browser, port, token, width)
                 finally:
                     browser.close()
             print(
                 "Chromium remaining locale: directions/scenarios/trends/exams/tutoring/"
                 "translations/brand/media/calendar/application/Offers/practice/experiments/"
-                "operations/originals/time zones/keyboard/late responses at 1440/375 passed"
+                "operations removed/originals/time zones/keyboard/late responses at 1440/375 passed"
             )
         finally:
             server.should_exit = True
@@ -165,9 +165,7 @@ def prepare(client, engine, uid, token):
 def connect(page, port, token, route):
     page.goto(f"http://127.0.0.1:{port}/app/#{route}")
     page.locator("#ui-locale").select_option("en-US")
-    page.locator("#connect").click()
-    page.locator("#token").fill(token)
-    page.get_by_role("button", name="Connect", exact=True).click()
+    connect_browser(page, token)
 
 
 def audit(page):
@@ -219,6 +217,16 @@ def check_width(browser, port, token, width, records):
         expect(page.locator("#v4-result .learning-path")).to_have_count(2)
         expect(page.locator("#v4-result h2").first).to_be_focused()
         audit(page)
+        scenario.locator('button[value="jobs"]').click()
+        expect(page.locator("#v4-result h2").first).to_be_visible()
+        page.locator("#v4-teach [name=attempt]").fill("本人针对固定题目的合成思路")
+        page.locator("#v4-teach button").click()
+        expect(page.locator("#v4-result")).not_to_be_empty()
+        page.locator("[data-v4-snapshot]").first.locator("..").evaluate("n=>n.open=true")
+        page.locator("[data-v4-snapshot]").first.click()
+        expect(page.locator("#matching-history [data-matching-snapshot]")).to_have_count(1)
+        page.locator("#v4-result [data-v4-replay]").click()
+        expect(page.locator("#v4-result h2").first).to_be_visible()
         trend = page.locator("#v4-trend")
         trend.get_by_label("Keyword", exact=True).fill("Python")
         trend.locator('[type="checkbox"]').check()
@@ -247,7 +255,12 @@ def check_width(browser, port, token, width, records):
         expect(page.locator("#v4-translation")).to_be_attached()
         expect(page.locator("#v4-translation")).to_contain_text(records["original"])
         audit(page)
-        brand = page.locator(".brand-create")
+        translated = page.locator("#v4-translation")
+        translated.locator("textarea").fill("My 2 synthetic projects, confirmed by the owner")
+        translated.locator('[type="checkbox"]').check()
+        translated.locator("button").click()
+        expect(page.locator(".brand-create")).to_have_count(2)
+        brand = page.locator(".brand-create").first
         brand.get_by_label("My chosen profile title", exact=True).fill("本人主页")
         brand.locator('[name="fact_ids"]').check()
         brand.locator('input[type="checkbox"]:not([name])').check()
@@ -335,45 +348,16 @@ def check_width(browser, port, token, width, records):
         context.close()
 
 
-def check_operations(browser, port, token, reviewer_token, width):
+def check_operations_absent(browser, port, token, width):
     page = browser.new_page(viewport={"width": width, "height": 950})
     try:
         connect(page, port, token, "admin")
-        expect(page.locator("#public-catalogue-operations")).to_be_attached()
-        page.locator("#public-catalogue-operations details summary").first.click()
-        form = page.locator("#public-proposal-form")
-        expect(form.get_by_label("Public structured fields", exact=True)).to_be_visible()
-        form.get_by_label("Select public entry", exact=True).select_option("python")
-        expect(form.get_by_label("Entry ID", exact=True)).to_have_value("python")
-        original = form.get_by_label("Public structured fields", exact=True).input_value()
-        assert "Python" in original
-        audit(page)
-        form.get_by_label("Select public entry", exact=True).select_option("")
-        form.get_by_label("Entry ID", exact=True).fill(f"locale-resource-{width}")
-        form.get_by_label("Reason for change", exact=True).fill(f"本人公共变更原文 {width}")
-        form.locator('[type="checkbox"]').check()
-        form.get_by_role("button", name="Submit for independent review").click()
-        expect(
-            page.locator("[data-public-proposal]").filter(has_text=f"本人公共变更原文 {width}")
-        ).to_have_count(1)
-        peer = browser.new_page(viewport={"width": width, "height": 950})
-        try:
-            connect(peer, port, reviewer_token, "admin")
-            review = (
-                peer.locator("[data-public-proposal]")
-                .filter(has_text=f"本人公共变更原文 {width}")
-                .last
-            )
-            review.get_by_label("Review basis", exact=True).fill("独立核对来源与公共字段")
-            review.get_by_role("button", name="Confirm approval", exact=True).click()
-            peer.get_by_role("button", name="Confirm publication of reviewed change").click()
-            expect(peer.locator("#notice")).to_contain_text("Public version published")
-            audit(peer)
-        finally:
-            peer.close()
+        expect(page.locator("h1")).to_have_text("Growth dashboard")
+        expect(page.locator("#public-catalogue-operations,#public-proposal-form")).to_have_count(0)
+        expect(page.locator('nav a[href="#admin"]')).to_have_count(0)
         page.locator("#ui-locale").select_option("zh-CN")
         page.locator("#ui-locale").select_option("en-US")
-        expect(page.locator("#public-catalogue-operations")).to_be_attached()
+        expect(page.locator("#public-catalogue-operations")).to_have_count(0)
         assert not page.locator("#notice .error").count()
     finally:
         page.close()

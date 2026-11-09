@@ -12,6 +12,7 @@ from pathlib import Path
 import uvicorn
 from alembic import command
 from alembic.config import Config
+from browser_identity import connect_browser
 from playwright.sync_api import expect, sync_playwright
 
 from careerpilot.api import create_app
@@ -98,7 +99,9 @@ def main():
             sock.bind(("127.0.0.1", 0))
             port = sock.getsockname()[1]
         server = uvicorn.Server(
-            uvicorn.Config(create_app(url), host="127.0.0.1", port=port, log_level="error")
+            uvicorn.Config(
+                create_app(url, local_only=False), host="127.0.0.1", port=port, log_level="error"
+            )
         )
         thread = threading.Thread(target=server.run, daemon=True)
         processes = []
@@ -233,14 +236,7 @@ def main():
                                 ["xdotool", "windowactivate", "--sync", window], check=True
                             )
                             offset = checkpoint(reader_log)
-                            page.locator("#connect").click()
-                            expect(page.get_by_role("dialog", name=labels[0])).to_be_visible()
-                            spoken_since(reader_log, offset, labels[0], "heading 2")
-                            offset = checkpoint(reader_log)
-                            page.locator("#token").focus()
-                            spoken_since(reader_log, offset, labels[1], "password")
-                            page.locator("#token").fill(token)
-                            page.locator("#account-form button[type=submit]").click()
+                            connect_browser(page, token)
                             expect(page.locator("#profile-form")).to_be_visible()
                             page.wait_for_load_state("networkidle")
                             time.sleep(1)
@@ -315,7 +311,7 @@ def main():
                             key("Return")
                             spoken_since(reader_log, offset, labels[9], "button")
                             print(
-                                f"Orca {locale}: dialog/password, required fields, native Tab, "
+                                f"Orca {locale}: required profile fields, native Tab, "
                                 "select, checkbox/state, live status, preview heading, "
                                 "confirm/cancel focus and real synthesized audio passed",
                                 flush=True,

@@ -11,6 +11,7 @@ from pathlib import Path
 import uvicorn
 from alembic import command
 from alembic.config import Config
+from browser_identity import connect_browser
 from browser_v4_locale import MISMARKED
 from fastapi.testclient import TestClient
 from playwright.sync_api import expect, sync_playwright
@@ -35,7 +36,9 @@ def main():
             sock.bind(("127.0.0.1", 0))
             port = sock.getsockname()[1]
         server = uvicorn.Server(
-            uvicorn.Config(create_app(url), host="127.0.0.1", port=port, log_level="error")
+            uvicorn.Config(
+                create_app(url, local_only=False), host="127.0.0.1", port=port, log_level="error"
+            )
         )
         thread = threading.Thread(target=server.run, daemon=True)
         thread.start()
@@ -45,7 +48,10 @@ def main():
                     break
                 time.sleep(0.05)
             assert server.started
-            with TestClient(create_app(url)) as client, sync_playwright() as playwright:
+            with (
+                TestClient(create_app(url, local_only=False)) as client,
+                sync_playwright() as playwright,
+            ):
                 browser = playwright.chromium.launch()
                 try:
                     for width in (1440, 375):
@@ -172,9 +178,7 @@ def check_width(browser, port, token, width, records, engine, client, scratch):
     try:
         page.goto(f"http://127.0.0.1:{port}/app/#recruiting")
         page.locator("#ui-locale").select_option("en-US")
-        page.locator("#connect").click()
-        page.locator("#token").fill(token)
-        page.locator("#account-form").get_by_role("button", name="Connect", exact=True).click()
+        connect_browser(page, token)
         expect(page.locator("#interview-create-form")).to_be_attached()
         form = page.locator("#resume-form")
         expect(form.get_by_label("Choose resume", exact=True)).to_be_attached()
@@ -414,6 +418,35 @@ def check_width(browser, port, token, width, records, engine, client, scratch):
         page.unroute(pattern)
         expect(page.locator("#interview-answer-form")).to_be_visible()
         expect(page.locator("#interview-review-form")).to_have_count(0)
+        page.locator("[data-refresh-interview]").click()
+        expect(page.locator("#interview-answer-form")).to_have_attribute(
+            "data-question-id", alternative["current_question"]["id"]
+        )
+        page.locator("[data-abandon-interview]").locator("..").evaluate("n=>n.open=true")
+        page.locator("[data-abandon-interview]").click()
+        expect(page.locator("#interview-answer-form")).to_have_count(0)
+        page.locator(f'[data-open-interview="{session["id"]}"]').click()
+        review = page.locator("#interview-review-form")
+        review.locator('[type="checkbox"]').last.check()
+        review.locator('button[value="withdrawn"]').click()
+        expect(page.locator("#notice")).to_contain_text("Review saved")
+        reminder = post(
+            f"/applications/{application['id']}/reminders",
+            {
+                "kind": "follow_up",
+                "local_time": "2030-06-01T10:00",
+                "timezone": "America/New_York",
+                "quiet_start": 0,
+                "quiet_end": 0,
+                "confirmed": True,
+            },
+            key="button-cancel-reminder",
+        )
+        page.locator("#ui-locale").select_option("zh-CN")
+        page.locator("#ui-locale").select_option("en-US")
+        cancel = page.locator(f'[data-reminder-action="{reminder["id"]}"][data-status="cancelled"]')
+        cancel.click()
+        expect(page.locator("#hiring-notices")).to_contain_text("Cancelled")
         assert not errors, errors
     finally:
         context.close()

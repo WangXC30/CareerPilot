@@ -16,6 +16,7 @@ import httpx
 import uvicorn
 from alembic import command
 from alembic.config import Config
+from browser_identity import connect_browser
 from hiring_contract import create_hiring
 from interview_contract import create_practice, verify_practice
 from playwright.sync_api import expect, sync_playwright
@@ -43,15 +44,17 @@ def run(output=None):
         engine = make_engine(url)
         seed(engine)
         _, token = provision(engine, "Synthetic progress student")
-        _, operator_token = provision(engine, "Synthetic public editor", role="operator")
-        _, admin_token = provision(engine, "Synthetic public reviewer", role="admin")
         with socket.socket() as sock:
             sock.bind(("127.0.0.1", 0))
             port = sock.getsockname()[1]
         base = f"http://127.0.0.1:{port}"
         server = uvicorn.Server(
             uvicorn.Config(
-                create_app(url), host="127.0.0.1", port=port, log_level="error", access_log=False
+                create_app(url, local_only=False),
+                host="127.0.0.1",
+                port=port,
+                log_level="error",
+                access_log=False,
             )
         )
         thread = threading.Thread(target=server.run, daemon=True)
@@ -154,9 +157,7 @@ def run(output=None):
 
                     def login(page, credential, route):
                         page.goto(base + f"/app/?session={time.monotonic_ns()}#" + route)
-                        page.get_by_role("button", name="连接我的账号", exact=True).click()
-                        page.locator("#token").fill(credential)
-                        page.locator("#account-form button[type=submit]").click()
+                        connect_browser(page, credential)
 
                     login(page, token, "progress")
                     expect(page.locator("#period-report-result")).to_contain_text("0 分钟")
@@ -231,66 +232,6 @@ def run(output=None):
                     if output:
                         page.screenshot(path=output / "report-mobile.png", animations="disabled")
                     page.set_viewport_size({"width": 1440, "height": 1050})
-                    login(page, operator_token, "admin")
-                    expect(page.locator("#public-catalogue-operations")).to_be_visible()
-                    page.locator("#public-catalogue-operations details").first.locator(
-                        "summary"
-                    ).click()
-                    pf = page.locator("#public-proposal-form")
-                    pf.locator('[name="target"]').select_option("resource-python")
-                    fields = json.loads(pf.locator('[name="payload"]').input_value())
-                    original_title = fields["title"]
-                    fields["title"] = "合成审核后发布的 Python 入口"
-                    pf.locator('[name="payload"]').fill(json.dumps(fields, ensure_ascii=False))
-                    pf.locator('[name="note"]').fill("合成公共资源维护")
-                    pf.locator('[type="checkbox"]').check()
-                    pf.get_by_role("button", name="提交独立审核").click()
-                    expect(page.locator("[data-public-proposal]")).to_contain_text("待独立审核")
-                    login(page, admin_token, "admin")
-                    review_form = page.locator(".public-review-form").first
-                    review_form.locator('[name="note"]').fill("独立核对合成字段")
-                    review_form.get_by_role("button", name="确认审核通过").click()
-                    publish = page.get_by_role("button", name="确认发布已审核变更")
-                    expect(publish).to_be_visible()
-                    publish.click()
-                    expect(page.locator("#notice")).to_contain_text("公共版本已发布")
-                    assert (
-                        next(
-                            r
-                            for r in client.get("/catalogue/resource").json()
-                            if r["id"] == "resource-python"
-                        )["version"]
-                        == 2
-                    )
-                    login(page, operator_token, "admin")
-                    page.locator("#public-catalogue-operations details").filter(
-                        has=page.locator("#public-rollback-form")
-                    ).locator("summary").first.click()
-                    rf = page.locator("#public-rollback-form")
-                    rf.locator('[name="entry_id"]').select_option("resource-python")
-                    rf.locator('[name="target_version"]').fill("1")
-                    rf.locator('[name="note"]').fill("恢复原公共标题")
-                    rf.get_by_role("button", name="创建回滚审核单").click()
-                    expect(page.locator("[data-public-proposal]").first).to_contain_text(
-                        "待独立审核"
-                    )
-                    login(page, admin_token, "admin")
-                    review_form = page.locator(".public-review-form").first
-                    review_form.locator('[name="note"]').fill("独立核对回滚版本")
-                    review_form.get_by_role("button", name="确认审核通过").click()
-                    page.get_by_role("button", name="确认发布已审核变更").click()
-                    expect(page.locator("#notice")).to_contain_text("公共版本已发布")
-                    restored = next(
-                        r
-                        for r in client.get("/catalogue/resource").json()
-                        if r["id"] == "resource-python"
-                    )
-                    assert restored["version"] == 3 and restored["title"] == original_title
-                    if output:
-                        page.locator("#public-catalogue-operations").scroll_into_view_if_needed()
-                        page.screenshot(
-                            path=output / "operations-desktop.png", animations="disabled"
-                        )
                     assert not errors, errors
                     browser.close()
                 result = {
@@ -298,7 +239,6 @@ def run(output=None):
                     "same_cohort_funnel": True,
                     "separate_worker_report_delivery_with_due_clock_fixture": True,
                     "three_step_review_and_explicit_plan_acceptance": True,
-                    "independent_public_review_publish_and_rollback": True,
                     "raw_ticket_sharing": False,
                     "mobile_width": 375,
                     "js_errors": errors,

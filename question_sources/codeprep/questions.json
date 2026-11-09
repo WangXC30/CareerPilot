@@ -1,0 +1,2731 @@
+{
+  "$schema": "../schema.json",
+  "name": "codeprep-open-interview-questions",
+  "version": "1.0.0",
+  "license": "CC-BY-4.0",
+  "attribution": "CodePrep — https://codeprep.dev",
+  "source": "https://codeprep.dev",
+  "description": "A free, curated sample of software-engineering interview questions with answers and explanations, drawn from the CodePrep bank.",
+  "questionCount": 110,
+  "technologies": [
+    {
+      "slug": "javascript",
+      "name": "JavaScript",
+      "count": 10
+    },
+    {
+      "slug": "typescript",
+      "name": "TypeScript",
+      "count": 10
+    },
+    {
+      "slug": "react",
+      "name": "React",
+      "count": 10
+    },
+    {
+      "slug": "web-platform",
+      "name": "Web Platform",
+      "count": 10
+    },
+    {
+      "slug": "css",
+      "name": "CSS",
+      "count": 10
+    },
+    {
+      "slug": "nodejs",
+      "name": "Node.js",
+      "count": 10
+    },
+    {
+      "slug": "http-apis",
+      "name": "HTTP & APIs",
+      "count": 10
+    },
+    {
+      "slug": "databases-sql",
+      "name": "Databases & SQL",
+      "count": 10
+    },
+    {
+      "slug": "system-design",
+      "name": "System Design",
+      "count": 10
+    },
+    {
+      "slug": "ai-engineering",
+      "name": "AI Engineering",
+      "count": 10
+    },
+    {
+      "slug": "python",
+      "name": "Python",
+      "count": 10
+    }
+  ],
+  "types": [
+    {
+      "type": "MCQ_SINGLE",
+      "count": 27
+    },
+    {
+      "type": "MCQ_MULTI",
+      "count": 7
+    },
+    {
+      "type": "TRUE_FALSE",
+      "count": 16
+    },
+    {
+      "type": "CODE_OUTPUT",
+      "count": 11
+    },
+    {
+      "type": "FIND_THE_BUG",
+      "count": 15
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "count": 18
+    },
+    {
+      "type": "FLASHCARD",
+      "count": 16
+    }
+  ],
+  "questions": [
+    {
+      "id": "js-bug-loop-off-by-one",
+      "technology": "javascript",
+      "technologyName": "JavaScript",
+      "difficulty": 2,
+      "difficultyLabel": "easy",
+      "type": "FIND_THE_BUG",
+      "tags": [
+        "array-methods"
+      ],
+      "prompt": "This function should sum an array but returns `NaN`. Which line has the bug?",
+      "answer": {
+        "code": "function sum(arr) {\n  let total = 0;\n  for (let i = 0; i <= arr.length; i++) {\n    total += arr[i];\n  }\n  return total;\n}",
+        "language": "javascript",
+        "buggyLines": [
+          3
+        ]
+      },
+      "explanation": "`i <= arr.length` reads one index past the end. `arr[arr.length]` is `undefined`, and `total + undefined` is `NaN`. The condition should be `i < arr.length`."
+    },
+    {
+      "id": "js-fc-nullish-vs-or",
+      "technology": "javascript",
+      "technologyName": "JavaScript",
+      "difficulty": 2,
+      "difficultyLabel": "easy",
+      "type": "FLASHCARD",
+      "tags": [
+        "optional-chaining",
+        "type-coercion"
+      ],
+      "prompt": "How does the nullish-coalescing operator `??` differ from the logical OR `||` for defaults?",
+      "answer": {
+        "back": "`||` falls back whenever the left side is falsy — including `0`, `''`, `NaN`, and `false`. `??` falls back only when the left side is `null` or `undefined`, so valid falsy values like `0` or `''` are preserved."
+      },
+      "explanation": "Use `??` when `0`/`''`/`false` are legitimate values you want to keep; `||` would wrongly replace them with the default because it triggers on any falsy value."
+    },
+    {
+      "id": "js-tf-async-returns-promise",
+      "technology": "javascript",
+      "technologyName": "JavaScript",
+      "difficulty": 2,
+      "difficultyLabel": "easy",
+      "type": "TRUE_FALSE",
+      "tags": [
+        "async-await"
+      ],
+      "prompt": "An `async` function always returns a Promise, even if its body returns a plain value like `return 5`.",
+      "answer": {
+        "value": true
+      },
+      "explanation": "An `async` function wraps its result in a Promise. `return 5` resolves the returned Promise with `5`; throwing rejects it. To read the value you must `await` it or use `.then`."
+    },
+    {
+      "id": "js-fc-reduce-signature",
+      "technology": "javascript",
+      "technologyName": "JavaScript",
+      "difficulty": 3,
+      "difficultyLabel": "medium",
+      "type": "FLASHCARD",
+      "tags": [
+        "reduce"
+      ],
+      "prompt": "What are the arguments to the `Array.prototype.reduce` callback, and what does the optional second argument to `reduce` do?",
+      "answer": {
+        "back": "The callback receives `(accumulator, currentValue, currentIndex, array)`. The second argument to `reduce` is the initial accumulator value; if omitted, the first element seeds the accumulator and iteration starts at index 1 (and an empty array with no initial value throws)."
+      },
+      "explanation": "Knowing the accumulator/initial-value semantics is the crux of `reduce`: omitting the seed both changes the starting index and makes an empty array throw."
+    },
+    {
+      "id": "js-out-destructuring-default-swap",
+      "technology": "javascript",
+      "technologyName": "JavaScript",
+      "difficulty": 3,
+      "difficultyLabel": "medium",
+      "type": "CODE_OUTPUT",
+      "tags": [
+        "destructuring",
+        "default-params"
+      ],
+      "prompt": "What does this log?",
+      "answer": {
+        "code": "const { a = 5, b = 7 } = { a: undefined, b: null };\nconsole.log(a, b);",
+        "language": "javascript",
+        "expectedOutput": "5 null"
+      },
+      "explanation": "Destructuring defaults, like parameter defaults, apply only when the matched value is `undefined`. `a` is `undefined`, so it falls back to `5`; `b` is `null`, which is a defined value, so the default is skipped and `b` stays `null`."
+    },
+    {
+      "id": "js-tf-promise-all-rejects-fast",
+      "technology": "javascript",
+      "technologyName": "JavaScript",
+      "difficulty": 3,
+      "difficultyLabel": "medium",
+      "type": "TRUE_FALSE",
+      "tags": [
+        "promise-combinators"
+      ],
+      "prompt": "`Promise.all([...])` rejects as soon as any input promise rejects, without waiting for the others to settle.",
+      "answer": {
+        "value": true
+      },
+      "explanation": "`Promise.all` short-circuits on the first rejection and rejects immediately with that reason; the other promises keep running but their results are ignored. Use `Promise.allSettled` when you need every outcome regardless of failures."
+    },
+    {
+      "id": "js-bug-async-missing-await-trycatch",
+      "technology": "javascript",
+      "technologyName": "JavaScript",
+      "difficulty": 4,
+      "difficultyLabel": "hard",
+      "type": "FIND_THE_BUG",
+      "tags": [
+        "async-error-handling",
+        "async-await"
+      ],
+      "prompt": "This is meant to catch a failure from `fetchData()`, but the rejection escapes the `try/catch` as an unhandled rejection. What is the bug?",
+      "answer": {
+        "code": "async function load() {\n  try {\n    return fetchData();\n  } catch (err) {\n    console.error('failed', err);\n  }\n}",
+        "language": "javascript",
+        "options": [
+          {
+            "id": "a",
+            "text": "`return fetchData()` is not awaited, so the rejection settles outside the `try`"
+          },
+          {
+            "id": "b",
+            "text": "`catch` must declare the error as `(error)` not `(err)`"
+          },
+          {
+            "id": "c",
+            "text": "`try/catch` cannot be used inside an `async` function"
+          },
+          {
+            "id": "d",
+            "text": "`console.error` swallows the error and must be `throw err`"
+          }
+        ],
+        "correctOptionId": "a"
+      },
+      "explanation": "Returning a promise without `await` hands the still-pending promise to the caller; it rejects later, after the `try` block has already exited, so the `catch` never sees it. Use `return await fetchData()` so the rejection is thrown inside the `try`."
+    },
+    {
+      "id": "js-multi-class-inheritance-facts",
+      "technology": "javascript",
+      "technologyName": "JavaScript",
+      "difficulty": 4,
+      "difficultyLabel": "hard",
+      "type": "MCQ_MULTI",
+      "tags": [
+        "inheritance",
+        "prototype-chain"
+      ],
+      "prompt": "Given `class B extends A { ... }`, which statements about subclassing are true?",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "A subclass constructor must call `super()` before using `this`"
+          },
+          {
+            "id": "b",
+            "text": "`super.method()` calls the parent's method with the current `this`"
+          },
+          {
+            "id": "c",
+            "text": "Instances of `B` have `A.prototype` in their prototype chain"
+          },
+          {
+            "id": "d",
+            "text": "Methods defined in `class A {}` are copied onto each instance"
+          },
+          {
+            "id": "e",
+            "text": "`extends` works only with other `class` declarations, never with functions"
+          }
+        ],
+        "correctOptionIds": [
+          "a",
+          "b",
+          "c"
+        ]
+      },
+      "explanation": "In a derived constructor `this` is uninitialized until `super()` runs ('a'). `super.method()` dispatches to the parent method bound to the current instance ('b'), and `A.prototype` sits on `B.prototype`'s chain ('c'). Methods live on the prototype, not on each instance ('d' false), and `extends` accepts any constructor including plain functions ('e' false)."
+    },
+    {
+      "id": "js-out-event-loop-order",
+      "technology": "javascript",
+      "technologyName": "JavaScript",
+      "difficulty": 5,
+      "difficultyLabel": "expert",
+      "type": "CODE_OUTPUT",
+      "tags": [
+        "promise-ordering"
+      ],
+      "prompt": "In what order are the four values logged?",
+      "answer": {
+        "code": "console.log('a');\nsetTimeout(() => console.log('b'), 0);\nPromise.resolve().then(() => console.log('c'));\nconsole.log('d');",
+        "language": "javascript",
+        "expectedOutput": "a\nd\nc\nb"
+      },
+      "explanation": "Synchronous code runs first (`a`, `d`). The microtask queue (the resolved Promise's `.then`) drains before the next macrotask, so `c` logs before the `setTimeout` callback `b`."
+    },
+    {
+      "id": "js-out-microtask-chain-order",
+      "technology": "javascript",
+      "technologyName": "JavaScript",
+      "difficulty": 5,
+      "difficultyLabel": "expert",
+      "type": "CODE_OUTPUT",
+      "tags": [
+        "microtasks",
+        "promise-ordering"
+      ],
+      "prompt": "What is logged, one value per line?",
+      "answer": {
+        "code": "Promise.resolve().then(() => console.log(1)).then(() => console.log(3));\nPromise.resolve().then(() => console.log(2)).then(() => console.log(4));",
+        "language": "javascript",
+        "expectedOutput": "1\n2\n3\n4"
+      },
+      "explanation": "Both first `.then` callbacks are queued as microtasks before either runs, so `1` then `2` log first. Each only schedules its next `.then` when it completes, so `3` and `4` are queued afterward and run in the next microtask pass, giving `1, 2, 3, 4`."
+    },
+    {
+      "id": "ts-fc-union-vs-intersection",
+      "technology": "typescript",
+      "technologyName": "TypeScript",
+      "difficulty": 1,
+      "difficultyLabel": "intro",
+      "type": "FLASHCARD",
+      "tags": [
+        "union-intersection"
+      ],
+      "prompt": "What is the difference between `A | B` and `A & B`?",
+      "answer": {
+        "back": "`A | B` (union) is a value that is *either* `A` or `B`. `A & B` (intersection) is a value that is *both* `A` and `B` at once — for object types it combines all their members."
+      },
+      "explanation": "Union widens the set of allowed values (either type); intersection narrows it (must satisfy both). For object types, intersection merges members; for disjoint primitives it collapses to `never`."
+    },
+    {
+      "id": "ts-mcq-union-type-meaning",
+      "technology": "typescript",
+      "technologyName": "TypeScript",
+      "difficulty": 1,
+      "difficultyLabel": "intro",
+      "type": "MCQ_SINGLE",
+      "tags": [
+        "union-intersection"
+      ],
+      "prompt": "What does the type `string | number` mean for a variable?",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "Its value may be a `string` OR a `number` at any given time"
+          },
+          {
+            "id": "b",
+            "text": "Its value must be both a `string` and a `number` simultaneously"
+          },
+          {
+            "id": "c",
+            "text": "It is an array containing strings and numbers"
+          },
+          {
+            "id": "d",
+            "text": "It is a `string` that can be converted to a `number`"
+          }
+        ],
+        "correctOptionId": "a"
+      },
+      "explanation": "A union type `A | B` means the value is one of the constituent types at any moment. To use type-specific members you must first narrow it (e.g. with `typeof`). An intersection (`A & B`) would require both at once."
+    },
+    {
+      "id": "ts-mcq-dts-purpose",
+      "technology": "typescript",
+      "technologyName": "TypeScript",
+      "difficulty": 2,
+      "difficultyLabel": "easy",
+      "type": "MCQ_SINGLE",
+      "tags": [
+        "declaration-files"
+      ],
+      "prompt": "What is a `.d.ts` declaration file?",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "A file containing only type declarations — no runtime code — that lets the compiler type-check usage of a library implemented in plain JavaScript"
+          },
+          {
+            "id": "b",
+            "text": "A compiled bundle that packages a library's JavaScript implementation together with its types in one file"
+          },
+          {
+            "id": "c",
+            "text": "A per-package configuration file that tells the compiler which strict checks to apply to that dependency"
+          },
+          {
+            "id": "d",
+            "text": "An incremental-build cache the compiler writes to speed up subsequent compilations"
+          }
+        ],
+        "correctOptionId": "a"
+      },
+      "explanation": "A `.d.ts` file holds *ambient* declarations (`declare …`): pure type information with no executable code, so it contributes nothing to the emitted JavaScript. It describes the shape of values that exist elsewhere — typically a plain-JS library — so the checker can verify your usage. Publishing a `.d.ts` next to compiled JS (referenced from the package's `types` field) is how packages ship their own types. The build cache is `.tsbuildinfo`, not `.d.ts`."
+    },
+    {
+      "id": "ts-out-generic-first",
+      "technology": "typescript",
+      "technologyName": "TypeScript",
+      "difficulty": 2,
+      "difficultyLabel": "easy",
+      "type": "CODE_OUTPUT",
+      "tags": [
+        "generic-functions"
+      ],
+      "prompt": "What does this log?",
+      "answer": {
+        "code": "function first<T>(arr: T[]): T | undefined {\n  return arr[0];\n}\nconsole.log(first([10, 20, 30]));",
+        "language": "typescript",
+        "expectedOutput": "10"
+      },
+      "explanation": "The generic `first` infers `T = number` from the argument and returns `arr[0]`, which is `10`. Types are erased at runtime; the behaviour is just plain array indexing."
+    },
+    {
+      "id": "ts-mcq-optional-chaining-type",
+      "technology": "typescript",
+      "technologyName": "TypeScript",
+      "difficulty": 3,
+      "difficultyLabel": "medium",
+      "type": "MCQ_SINGLE",
+      "tags": [
+        "type-guards"
+      ],
+      "prompt": "For `const u: { name?: string } = {}`, what is the type of `u.name?.toUpperCase()`?",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "`string | undefined`"
+          },
+          {
+            "id": "b",
+            "text": "`string`"
+          },
+          {
+            "id": "c",
+            "text": "`undefined`"
+          },
+          {
+            "id": "d",
+            "text": "It is a compile error because `name` may be undefined"
+          }
+        ],
+        "correctOptionId": "a"
+      },
+      "explanation": "Optional chaining short-circuits to `undefined` when `u.name` is `undefined`, otherwise it yields the `string` result of `.toUpperCase()`. The overall type is therefore `string | undefined`."
+    },
+    {
+      "id": "ts-tf-structural-assignability",
+      "technology": "typescript",
+      "technologyName": "TypeScript",
+      "difficulty": 3,
+      "difficultyLabel": "medium",
+      "type": "TRUE_FALSE",
+      "tags": [
+        "structural-typing"
+      ],
+      "prompt": "Given `type UserId = { id: number }` and `type OrderId = { id: number }`, a value typed `UserId` is assignable to `OrderId` (and vice versa), even though they were declared independently.",
+      "answer": {
+        "value": true
+      },
+      "explanation": "TypeScript compatibility is structural: two types with the same shape are mutually assignable regardless of their names or where they were declared (unlike nominal systems such as Java or C#). The one wrinkle is that a *fresh object literal* assigned directly to a typed target additionally undergoes excess property checking. To make same-shaped ids distinct, add a brand, e.g. `type UserId = { id: number; __brand: 'user' }`."
+    },
+    {
+      "id": "ts-sa-discriminated-union",
+      "technology": "typescript",
+      "technologyName": "TypeScript",
+      "difficulty": 4,
+      "difficultyLabel": "hard",
+      "type": "SHORT_ANSWER",
+      "tags": [
+        "discriminated-unions"
+      ],
+      "prompt": "What is a discriminated union and why is it useful?",
+      "answer": {
+        "sampleAnswer": "A discriminated (tagged) union is a union of object types that share a common literal property — the discriminant. Switching on that property lets TypeScript narrow the value to one exact member, so you can handle each case type-safely and get exhaustiveness checking for free."
+      },
+      "explanation": "The shared literal field (e.g. `type: 'circle' | 'square'`) is what lets the compiler narrow inside a `switch`. Adding a `never` default then enforces that every member is handled."
+    },
+    {
+      "id": "ts-tf-interface-merging",
+      "technology": "typescript",
+      "technologyName": "TypeScript",
+      "difficulty": 4,
+      "difficultyLabel": "hard",
+      "type": "TRUE_FALSE",
+      "tags": [
+        "declaration-merging"
+      ],
+      "prompt": "Two `interface Box {}` declarations with the same name in the same scope merge into a single interface combining their members.",
+      "answer": {
+        "value": true
+      },
+      "explanation": "Declaration merging: multiple interface declarations of the same name in the same scope are combined into one. This is how ambient types like `Window` are augmented. Type aliases do not merge — a duplicate `type` name is an error."
+    },
+    {
+      "id": "ts-fc-conditional-type",
+      "technology": "typescript",
+      "technologyName": "TypeScript",
+      "difficulty": 5,
+      "difficultyLabel": "expert",
+      "type": "FLASHCARD",
+      "tags": [
+        "conditional-types"
+      ],
+      "prompt": "What is a conditional type, and what is the syntax?",
+      "answer": {
+        "back": "A type that selects between two types based on an assignability test: `T extends U ? X : Y` resolves to `X` when `T` is assignable to `U`, otherwise `Y`. Built-ins like `Exclude` and `NonNullable` use it."
+      },
+      "explanation": "Conditional types power most of the advanced utility types. Combined with `infer`, they can also extract parts of a type (e.g. an array's element type or a function's return type)."
+    },
+    {
+      "id": "ts-mcq-standard-decorator-signature",
+      "technology": "typescript",
+      "technologyName": "TypeScript",
+      "difficulty": 5,
+      "difficultyLabel": "expert",
+      "type": "MCQ_SINGLE",
+      "tags": [
+        "standard-decorators"
+      ],
+      "prompt": "How does a TypeScript 5.0 standard (TC39 Stage 3) decorator differ from a legacy `experimentalDecorators` one?",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "A standard decorator is called as `(value, context)` where `context` carries `kind`, `name`, `addInitializer`, etc.; it has no parameter-index form and no built-in metadata argument, unlike the legacy `(target, key, descriptor)` shape"
+          },
+          {
+            "id": "b",
+            "text": "Standard decorators still use `(target, propertyKey, descriptor)` but rename the third argument to `context`"
+          },
+          {
+            "id": "c",
+            "text": "Standard decorators can only be applied to classes, never to methods or fields"
+          },
+          {
+            "id": "d",
+            "text": "Standard and legacy decorators are byte-for-byte identical; the 5.0 change was purely internal to the compiler"
+          }
+        ],
+        "correctOptionId": "a"
+      },
+      "explanation": "TS 5.0 implemented the TC39 Stage 3 decorator proposal. A standard decorator receives two arguments: the decorated `value` (the method, the class, an accessor pair, etc.) and a `context` object describing it (`kind`, `name`, `static`, `private`, `addInitializer`, and accessors). This differs from the legacy `experimentalDecorators` form `(target, propertyKey, descriptor)`. Standard decorators have no parameter decorators (parameter decorators stay legacy-only) and no built-in `reflect-metadata` argument — the `emitDecoratorMetadata` mechanism belongs to the legacy implementation."
+    },
+    {
+      "id": "react-fc-lifting-state-up",
+      "technology": "react",
+      "technologyName": "React",
+      "difficulty": 2,
+      "difficultyLabel": "easy",
+      "type": "FLASHCARD",
+      "tags": [
+        "lifting-state"
+      ],
+      "prompt": "What does \"lifting state up\" mean and when do you do it?",
+      "answer": {
+        "back": "When two or more components need to share or stay in sync with the same data, you move that state up to their closest common ancestor and pass it down as props (along with setters as callbacks). The ancestor becomes the single source of truth, keeping the children consistent."
+      },
+      "explanation": "Shared state belongs at the lowest common parent. The children become controlled by props, and changes flow up through callbacks and back down as new props."
+    },
+    {
+      "id": "react-mcq-useeffect-empty-deps",
+      "technology": "react",
+      "technologyName": "React",
+      "difficulty": 2,
+      "difficultyLabel": "easy",
+      "type": "MCQ_SINGLE",
+      "tags": [
+        "useeffect-deps"
+      ],
+      "prompt": "When does the effect in `useEffect(fn, [])` run?",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "After the first render (on mount), and never again"
+          },
+          {
+            "id": "b",
+            "text": "After every render"
+          },
+          {
+            "id": "c",
+            "text": "Synchronously before the first render"
+          },
+          {
+            "id": "d",
+            "text": "Only when the component unmounts"
+          }
+        ],
+        "correctOptionId": "a"
+      },
+      "explanation": "An empty dependency array means the effect has no dependencies that change, so it runs once after mount. Its optional cleanup runs on unmount."
+    },
+    {
+      "id": "react-multi-rules-of-hooks",
+      "technology": "react",
+      "technologyName": "React",
+      "difficulty": 2,
+      "difficultyLabel": "easy",
+      "type": "MCQ_MULTI",
+      "tags": [
+        "rules-of-hooks"
+      ],
+      "prompt": "Which are actual Rules of Hooks?",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "Only call hooks at the top level of a component or hook"
+          },
+          {
+            "id": "b",
+            "text": "Only call hooks from React function components or custom hooks"
+          },
+          {
+            "id": "c",
+            "text": "Hooks may be called conditionally inside an `if`"
+          },
+          {
+            "id": "d",
+            "text": "Hooks may be called inside a `for` loop"
+          }
+        ],
+        "correctOptionIds": [
+          "a",
+          "b"
+        ]
+      },
+      "explanation": "Hooks must run in the same order on every render, so they cannot be placed inside conditions or loops, and they may only be called from React functions or custom hooks."
+    },
+    {
+      "id": "react-fc-hooks-call-order",
+      "technology": "react",
+      "technologyName": "React",
+      "difficulty": 3,
+      "difficultyLabel": "medium",
+      "type": "FLASHCARD",
+      "tags": [
+        "rules-of-hooks"
+      ],
+      "prompt": "Why can't hooks be called conditionally or inside loops?",
+      "answer": {
+        "back": "React identifies each hook by its call order on every render. Calling them conditionally changes that order between renders, so React would associate state with the wrong hook."
+      },
+      "explanation": "The fixed call order is how `useState`/`useEffect` map to their stored slots. The eslint-plugin-react-hooks rule enforces this at lint time."
+    },
+    {
+      "id": "react-mcq-usestate-async-batching",
+      "technology": "react",
+      "technologyName": "React",
+      "difficulty": 3,
+      "difficultyLabel": "medium",
+      "type": "MCQ_SINGLE",
+      "tags": [
+        "usestate"
+      ],
+      "prompt": "Immediately after calling `setCount(count + 1)`, what does reading `count` on the next line return (within the same event handler)?",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "The old value — the state variable does not change until the next render"
+          },
+          {
+            "id": "b",
+            "text": "The new value, because `setCount` updates `count` synchronously"
+          },
+          {
+            "id": "c",
+            "text": "`undefined`, because state is cleared during the update"
+          },
+          {
+            "id": "d",
+            "text": "It depends on whether the component is wrapped in `React.memo`"
+          }
+        ],
+        "correctOptionId": "a"
+      },
+      "explanation": "State setters schedule a re-render; they do not mutate the existing `count` binding. Within the same render/handler `count` keeps its current value, and the updated value is only visible in the next render. This is why updater functions are needed for sequential updates."
+    },
+    {
+      "id": "react-tf-ref-mutation-no-rerender",
+      "technology": "react",
+      "technologyName": "React",
+      "difficulty": 3,
+      "difficultyLabel": "medium",
+      "type": "TRUE_FALSE",
+      "tags": [
+        "useref"
+      ],
+      "prompt": "Assigning a new value to a ref's `.current` (e.g. `ref.current = 5`) does not trigger a re-render.",
+      "answer": {
+        "value": true
+      },
+      "explanation": "A ref is a mutable container whose `.current` you can read and write without React tracking it, so mutating it never schedules a render. That is exactly why refs suit values you want to persist across renders without causing one (timer ids, DOM nodes, previous values)."
+    },
+    {
+      "id": "react-bug-conditional-hook-early-return",
+      "technology": "react",
+      "technologyName": "React",
+      "difficulty": 4,
+      "difficultyLabel": "hard",
+      "type": "FIND_THE_BUG",
+      "tags": [
+        "rules-of-hooks"
+      ],
+      "prompt": "React throws \"Rendered fewer hooks than expected\" when `user` is null. Which line causes it?",
+      "answer": {
+        "code": "function Profile({ user }) {\n  if (!user) {\n    return <p>Loading…</p>;\n  }\n  const [tab, setTab] = useState('info');\n  return <Tabs active={tab} onChange={setTab} user={user} />;\n}",
+        "language": "tsx",
+        "buggyLines": [
+          5
+        ]
+      },
+      "explanation": "The early `return` on line 3 means `useState` on line 5 is skipped whenever `user` is null, so the hook count changes between renders — a Rules-of-Hooks violation. Move the `useState` above any conditional return so hooks always run in the same order."
+    },
+    {
+      "id": "react-mcq-useactionstate-purpose",
+      "technology": "react",
+      "technologyName": "React",
+      "difficulty": 4,
+      "difficultyLabel": "hard",
+      "type": "MCQ_SINGLE",
+      "tags": [
+        "form-actions"
+      ],
+      "prompt": "What does `const [state, formAction, isPending] = useActionState(action, initialState)` give you?",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "It memoizes `action` so its identity is stable across renders, like `useCallback`"
+          },
+          {
+            "id": "b",
+            "text": "It wraps an async action so React tracks the pending flag and the value the action returns, exposing both as state plus a `formAction` to wire to a `<form>`"
+          },
+          {
+            "id": "c",
+            "text": "It registers a global reducer that every component in the tree can dispatch to"
+          },
+          {
+            "id": "d",
+            "text": "It runs `action` once on mount and caches the result for the component's lifetime"
+          }
+        ],
+        "correctOptionId": "b"
+      },
+      "explanation": "`useActionState` is built for form/action UX: you give it an action `(previousState, formData) => newState` and an initial state, and it returns the latest returned state, a wrapped `formAction` to pass to `<form action={…}>` (or a button `formAction`), and an `isPending` boolean while the action runs. That removes the boilerplate of a separate `useState` for the result plus a `useState`/`useTransition` for the pending flag. It is not a memoizer (`useCallback`), not a global store, and it does not run once-and-cache."
+    },
+    {
+      "id": "react-bug-effect-race-no-guard",
+      "technology": "react",
+      "technologyName": "React",
+      "difficulty": 5,
+      "difficultyLabel": "expert",
+      "type": "FIND_THE_BUG",
+      "tags": [
+        "effect-races"
+      ],
+      "prompt": "`query` changes as the user types. Results sometimes show stale data from an earlier query. What is the underlying problem?",
+      "answer": {
+        "code": "function Search({ query }) {\n  const [results, setResults] = useState([]);\n  useEffect(() => {\n    fetch(`/api?q=${query}`)\n      .then((r) => r.json())\n      .then(setResults);\n  }, [query]);\n  return <List items={results} />;\n}",
+        "language": "tsx",
+        "options": [
+          {
+            "id": "a",
+            "text": "There is no cleanup to ignore in-flight responses, so a slower earlier request can resolve after a newer one and overwrite it (race condition)"
+          },
+          {
+            "id": "b",
+            "text": "`query` should not be in the dependency array"
+          },
+          {
+            "id": "c",
+            "text": "`useState([])` cannot hold an array"
+          },
+          {
+            "id": "d",
+            "text": "`fetch` must be awaited at the top level of the effect"
+          }
+        ],
+        "correctOptionId": "a"
+      },
+      "explanation": "Each keystroke starts a new request, but responses can arrive out of order; without a cleanup that sets an `ignore` flag (or aborts via `AbortController`), an older, slower response can call `setResults` after the newer one and win. The deps are correct — the missing cleanup is the bug."
+    },
+    {
+      "id": "react-multi-compiler-manual-memo",
+      "technology": "react",
+      "technologyName": "React",
+      "difficulty": 5,
+      "difficultyLabel": "expert",
+      "type": "MCQ_MULTI",
+      "tags": [
+        "react-compiler"
+      ],
+      "prompt": "Your project has the React Compiler enabled, so most components are auto-memoized. In which situations might you STILL reach for manual `useMemo`/`useCallback` (or otherwise can't rely on the compiler)?",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "A value or callback that crosses out of React — e.g. passed to a non-React library, a `useEffect` dependency you need referentially stable, or an external subscription"
+          },
+          {
+            "id": "b",
+            "text": "A component the compiler skips because it can't prove the code follows the Rules of React (e.g. it mutates props or reads a ref during render)"
+          },
+          {
+            "id": "c",
+            "text": "Every component, always — the compiler only memoizes components wrapped in `React.memo`"
+          },
+          {
+            "id": "d",
+            "text": "A genuinely expensive computation where you want to guarantee it is cached, rather than trust the compiler's heuristics about what's worth memoizing"
+          }
+        ],
+        "correctOptionIds": [
+          "a",
+          "b",
+          "d"
+        ]
+      },
+      "explanation": "The compiler removes the *routine* memoization burden, but manual memoization still has a role at the edges. (a) When a value leaves React's world — feeding a non-React library, anchoring a `useEffect` dependency, or driving an external store — you may want an explicit stability guarantee rather than relying on compiled output. (b) The compiler only optimizes code it can prove is safe; a component that breaks the Rules of React (mutating props/state during render, reading refs in render) is skipped, so its children re-render as before. (d) For a known-expensive computation you may still memoize explicitly to guarantee caching rather than depend on the compiler's cost heuristics. Option (c) is false: the compiler memoizes ordinary components automatically and does not require a `React.memo` wrapper."
+    },
+    {
+      "id": "web-mcq-queryselector-first",
+      "technology": "web-platform",
+      "technologyName": "Web Platform",
+      "difficulty": 1,
+      "difficultyLabel": "intro",
+      "type": "MCQ_SINGLE",
+      "tags": [
+        "dom-traversal"
+      ],
+      "prompt": "Given several `<button class=\"btn\">` elements, what does `document.querySelector(\".btn\")` return?",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "The first matching element, or `null` if none match"
+          },
+          {
+            "id": "b",
+            "text": "A live `HTMLCollection` of all matching elements"
+          },
+          {
+            "id": "c",
+            "text": "A static `NodeList` of all matching elements"
+          },
+          {
+            "id": "d",
+            "text": "An array of all matching elements"
+          }
+        ],
+        "correctOptionId": "a"
+      },
+      "explanation": "`querySelector` returns only the first element matching the CSS selector (in document order), or `null` if there are no matches. To get all matches use `querySelectorAll`, which returns a static `NodeList`."
+    },
+    {
+      "id": "web-bug-popover-missing-attribute",
+      "technology": "web-platform",
+      "technologyName": "Web Platform",
+      "difficulty": 2,
+      "difficultyLabel": "easy",
+      "type": "FIND_THE_BUG",
+      "tags": [
+        "popover-api"
+      ],
+      "prompt": "Clicking the button should open the menu using the Popover API, but nothing happens (and no error is thrown). Why?",
+      "answer": {
+        "code": "<button popovertarget=\"menu\">Open menu</button>\n<div id=\"menu\" class=\"menu\" hidden>\n  <a href=\"/profile\">Profile</a>\n</div>",
+        "language": "html",
+        "options": [
+          {
+            "id": "a",
+            "text": "The `<div>` is missing the `popover` attribute, so it isn't a popover and `popovertarget` has nothing to control"
+          },
+          {
+            "id": "b",
+            "text": "`popovertarget` must reference the element by class, not `id`"
+          },
+          {
+            "id": "c",
+            "text": "A `<button>` cannot be a popover invoker; it must be an `<a>`"
+          },
+          {
+            "id": "d",
+            "text": "Popovers require `type=\"button\"` or the form submits instead"
+          }
+        ],
+        "correctOptionId": "a"
+      },
+      "explanation": "`popovertarget` only does something when its target is an actual popover — i.e. the element carries the `popover` attribute. Here the `<div>` has `hidden` but not `popover`, so the button controls nothing and the click is a silent no-op. Fix: `<div id=\"menu\" popover>` (and drop the manual `hidden`/`display:none` — a popover is hidden by default and the browser manages its visibility in the top layer). `popovertarget` correctly references the `id`, a `<button>` is a valid invoker, and popover invoker buttons don't submit forms."
+    },
+    {
+      "id": "web-mcq-popover-invoker-attribute",
+      "technology": "web-platform",
+      "technologyName": "Web Platform",
+      "difficulty": 2,
+      "difficultyLabel": "easy",
+      "type": "MCQ_SINGLE",
+      "tags": [
+        "popover-api"
+      ],
+      "prompt": "You have `<div id=\"menu\" popover>…</div>`. Using only HTML (no JavaScript), how do you make a `<button>` toggle it open and closed?",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "`<button popovertarget=\"menu\">Toggle</button>`"
+          },
+          {
+            "id": "b",
+            "text": "`<button popover=\"menu\">Toggle</button>`"
+          },
+          {
+            "id": "c",
+            "text": "`<button for=\"menu\">Toggle</button>`"
+          },
+          {
+            "id": "d",
+            "text": "`<button aria-controls=\"menu\">Toggle</button>`"
+          }
+        ],
+        "correctOptionId": "a"
+      },
+      "explanation": "A control button declares the popover it operates with `popovertarget=\"<id>\"`; by default the action is `toggle`, so the same button shows and hides it with no script. You can narrow the action with `popovertargetaction=\"show\"` or `\"hide\"`. `popover` is the attribute on the popover element itself (not the button), `for` is for `<label>`, and `aria-controls` only describes the relationship for assistive tech — it wires up no behavior."
+    },
+    {
+      "id": "web-tf-sessionstorage-not-shared-across-tabs",
+      "technology": "web-platform",
+      "technologyName": "Web Platform",
+      "difficulty": 2,
+      "difficultyLabel": "easy",
+      "type": "TRUE_FALSE",
+      "tags": [
+        "storage-apis"
+      ],
+      "prompt": "Data written to `sessionStorage` in one tab is automatically visible in another tab open to the same origin.",
+      "answer": {
+        "value": false
+      },
+      "explanation": "`sessionStorage` is scoped to a single tab/browsing context and is cleared when that tab closes, so other tabs cannot see it. `localStorage` is the one shared across all tabs of the same origin and persists until explicitly cleared."
+    },
+    {
+      "id": "web-bug-backdrop-close-bubbling",
+      "technology": "web-platform",
+      "technologyName": "Web Platform",
+      "difficulty": 3,
+      "difficultyLabel": "medium",
+      "type": "FIND_THE_BUG",
+      "tags": [
+        "event-bubbling"
+      ],
+      "prompt": "Clicking the dim backdrop should close the modal, but clicking *inside* the modal content closes it too. The listener is on the backdrop element. Which line is wrong?",
+      "answer": {
+        "code": "backdrop.addEventListener('click', (e) => {\n  closeModal();\n});\n// modalContent is a child of backdrop",
+        "language": "javascript",
+        "buggyLines": [
+          2
+        ]
+      },
+      "explanation": "A click inside `modalContent` bubbles up to the backdrop, firing this listener. The handler closes unconditionally, so inner clicks close the modal too. Guard it with the originating element, e.g. `if (e.target === e.currentTarget) closeModal();`, so only clicks directly on the backdrop close it."
+    },
+    {
+      "id": "web-mcq-pushstate",
+      "technology": "web-platform",
+      "technologyName": "Web Platform",
+      "difficulty": 3,
+      "difficultyLabel": "medium",
+      "type": "MCQ_SINGLE",
+      "tags": [
+        "history-api"
+      ],
+      "prompt": "In a single-page app router, what happens immediately when you call `history.pushState(state, \"\", \"/profile\")`?",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "The browser navigates to `/profile`, requesting it from the server like a normal link click, and the single-page app reloads from scratch"
+          },
+          {
+            "id": "b",
+            "text": "A `popstate` event fires right away, which is how the router knows to render the new route"
+          },
+          {
+            "id": "c",
+            "text": "The address bar changes to `/profile` and a new history entry is pushed — no navigation, no server request, and no `popstate`; `popstate` only fires later on back/forward"
+          },
+          {
+            "id": "d",
+            "text": "Nothing visible changes until the next reload; the URL update is deferred"
+          }
+        ],
+        "correctOptionId": "c"
+      },
+      "explanation": "`pushState` is purely a history/URL mutation: the address bar updates and an entry is pushed, but the document stays put — no unload, no network request, and no History-API event fires, so the router must render the new view itself right after calling it (the newer Navigation API's `navigate` event is the one exception that does fire). `popstate` fires only on history *traversal* (back/forward, `history.back()`), not on `pushState`/`replaceState`. Because the server never sees these client-side URLs, deep-linking or refreshing on `/profile` hits the server cold — which is why SPA hosting needs a catch-all rewrite to `index.html`."
+    },
+    {
+      "id": "web-multi-popover-auto-behaviors",
+      "technology": "web-platform",
+      "technologyName": "Web Platform",
+      "difficulty": 3,
+      "difficultyLabel": "medium",
+      "type": "MCQ_MULTI",
+      "tags": [
+        "popover-api"
+      ],
+      "prompt": "Which behaviors does an element with `popover` (i.e. `popover=\"auto\"`) get from the browser for free, that a plain absolutely-positioned `<div>` does not?",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "It is promoted to the top layer, so it paints above all other content regardless of `z-index`, ancestor `overflow`, or stacking context"
+          },
+          {
+            "id": "b",
+            "text": "Light dismiss — clicking outside it or pressing Esc closes it"
+          },
+          {
+            "id": "c",
+            "text": "Opening another `auto` popover (that isn't its ancestor) automatically closes it"
+          },
+          {
+            "id": "d",
+            "text": "It traps keyboard focus and makes the rest of the page inert while open, like a modal `<dialog>`"
+          }
+        ],
+        "correctOptionIds": [
+          "a",
+          "b",
+          "c"
+        ]
+      },
+      "explanation": "An `auto` popover renders in the top layer (escaping `z-index`/`overflow`/clipping traps that plague hand-rolled menus), gets light-dismiss for free (outside click or Esc), and participates in a one-at-a-time stack so opening an unrelated `auto` popover closes the others. What it deliberately does NOT do is trap focus or make the background inert — popovers are non-modal by design. If you need a modal that blocks the rest of the page, that's `<dialog>.showModal()`, not a popover."
+    },
+    {
+      "id": "web-bug-innerhtml-xss",
+      "technology": "web-platform",
+      "technologyName": "Web Platform",
+      "difficulty": 4,
+      "difficultyLabel": "hard",
+      "type": "FIND_THE_BUG",
+      "tags": [
+        "xss"
+      ],
+      "prompt": "This renders a username from the URL into the page. What is the security flaw?",
+      "answer": {
+        "code": "const name = new URLSearchParams(location.search).get('name');\ndocument.getElementById('greeting').innerHTML = 'Hello, ' + name;",
+        "language": "javascript",
+        "options": [
+          {
+            "id": "a",
+            "text": "Assigning untrusted input to `innerHTML` lets an attacker inject HTML/script (XSS)"
+          },
+          {
+            "id": "b",
+            "text": "`URLSearchParams` cannot read the query string"
+          },
+          {
+            "id": "c",
+            "text": "`getElementById` returns a collection, so `.innerHTML` is undefined"
+          },
+          {
+            "id": "d",
+            "text": "String concatenation with `+` throws when `name` is `null`"
+          }
+        ],
+        "correctOptionId": "a"
+      },
+      "explanation": "`name` is attacker-controllable via the URL, and writing it into `innerHTML` parses it as HTML — a payload like `<img src=x onerror=alert(1)>` executes. This is a DOM-based XSS sink. Use `textContent` (which never parses HTML) for untrusted text, or sanitize before any HTML insertion."
+    },
+    {
+      "id": "web-tf-view-transition-progressive",
+      "technology": "web-platform",
+      "technologyName": "Web Platform",
+      "difficulty": 4,
+      "difficultyLabel": "hard",
+      "type": "TRUE_FALSE",
+      "tags": [
+        "view-transitions"
+      ],
+      "prompt": "Wrapping a same-document DOM update in `document.startViewTransition(() => updateDOM())` will silently break the update in browsers that don't support the View Transitions API.",
+      "answer": {
+        "value": false
+      },
+      "explanation": "It does not break, but you must guard it: `document.startViewTransition` is simply `undefined` in unsupporting browsers, so calling it throws. The standard pattern feature-detects — `if (!document.startViewTransition) { updateDOM(); return; } document.startViewTransition(updateDOM);` — so the DOM still updates everywhere, just without the animation where it isn't supported. That's progressive enhancement: the transition is a visual upgrade, never a requirement for the content to change."
+    },
+    {
+      "id": "web-sa-view-transition-why-callback",
+      "technology": "web-platform",
+      "technologyName": "Web Platform",
+      "difficulty": 5,
+      "difficultyLabel": "expert",
+      "type": "SHORT_ANSWER",
+      "tags": [
+        "view-transitions"
+      ],
+      "prompt": "Why does the same-document View Transitions API require you to make the DOM change *inside* the callback passed to `startViewTransition`, rather than updating the DOM yourself and then calling it?",
+      "answer": {
+        "sampleAnswer": "Because the API needs to capture both the before and after states, and the callback is its hook for the moment in between. When you call `startViewTransition(cb)`, the browser first snapshots the current (old) visual state, then runs your callback to mutate the DOM, then snapshots the new state, and animates from old to new. If you mutated the DOM first and only then called `startViewTransition`, the 'old' snapshot would already be the new layout — there'd be nothing to animate from, so you'd get no transition (or a broken one). Putting the mutation in the callback is what lets the browser bracket it with the two snapshots."
+      },
+      "explanation": "The callback is a synchronization point, not just a convenience. The browser must own the timing so it can sandwich the DOM mutation between an old-state capture and a new-state capture; surrendering that ordering (mutating outside) destroys the 'from' state the animation interpolates out of. This is also why the callback can return a promise — the browser waits for the new state to settle before capturing it."
+    },
+    {
+      "id": "css-flash-min-width-media-query",
+      "technology": "css",
+      "technologyName": "CSS",
+      "difficulty": 1,
+      "difficultyLabel": "intro",
+      "type": "FLASHCARD",
+      "tags": [
+        "media-queries"
+      ],
+      "prompt": "In a mobile-first stylesheet, does `@media (min-width: 768px) { ... }` apply on screens narrower or wider than 768px?",
+      "answer": {
+        "back": "Wider (or equal). `min-width` is a floor: the rules apply when the viewport is at least 768px. Mobile-first stylesheets write the base styles for small screens, then layer on `min-width` queries to enhance progressively larger viewports."
+      },
+      "explanation": "`min-width` sets a minimum threshold, so the query matches viewports that are that wide or wider. This is the mobile-first pattern: small-screen styles are the default and `min-width` breakpoints add to them as the screen grows."
+    },
+    {
+      "id": "css-flash-transition-shorthand-order",
+      "technology": "css",
+      "technologyName": "CSS",
+      "difficulty": 2,
+      "difficultyLabel": "easy",
+      "type": "FLASHCARD",
+      "tags": [
+        "transitions"
+      ],
+      "prompt": "In `transition: 1s 2s`, which time is the duration and which is the delay?",
+      "answer": {
+        "back": "The first time is the duration (1s) and the second is the delay (2s). In the `transition` shorthand, the first time value is always `transition-duration` and the second is `transition-delay`."
+      },
+      "explanation": "When the `transition` shorthand has two time values, order disambiguates them: the first is the duration and the second is the delay. So `transition: 1s 2s` waits 2s, then animates over 1s."
+    },
+    {
+      "id": "css-mcq-inline-width-ignored",
+      "technology": "css",
+      "technologyName": "CSS",
+      "difficulty": 2,
+      "difficultyLabel": "easy",
+      "type": "MCQ_SINGLE",
+      "tags": [
+        "display-values"
+      ],
+      "prompt": "A badge is styled with explicit dimensions, but renders at its text's natural size:\n\n```css\nspan.badge {\n  width: 200px;\n  height: 40px;\n}\n```\n\nWhy do `width` and `height` have no effect here?",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "`width` and `height` only apply to elements with a `position` other than `static`"
+          },
+          {
+            "id": "b",
+            "text": "A `<span>` is `display: inline`, and inline boxes are sized by their content — `width` and `height` don't apply until the display changes (e.g. to `inline-block` or `block`)"
+          },
+          {
+            "id": "c",
+            "text": "The browser's user-agent stylesheet overrides author-specified dimensions on `<span>` elements"
+          },
+          {
+            "id": "d",
+            "text": "`width` on a `<span>` only takes effect when `box-sizing: border-box` is set"
+          }
+        ],
+        "correctOptionId": "b"
+      },
+      "explanation": "Non-replaced inline boxes are sized by the text and line boxes they generate: `width`, `height`, and vertical margins simply do not apply to them. The fix is to change the display — `inline-block` keeps the badge flowing in text while making it respect explicit dimensions, and `block` works if it should stand on its own line. Positioning is irrelevant (`width` works fine on static block elements), the UA stylesheet doesn't override author declarations this way, and `box-sizing` only changes what `width` *measures*, not whether it applies."
+    },
+    {
+      "id": "css-tf-vh-includes-mobile-bars",
+      "technology": "css",
+      "technologyName": "CSS",
+      "difficulty": 2,
+      "difficultyLabel": "easy",
+      "type": "TRUE_FALSE",
+      "tags": [
+        "units"
+      ],
+      "prompt": "`1vh` is equal to 1% of the viewport's height.",
+      "answer": {
+        "value": true
+      },
+      "explanation": "`vh` is a viewport-percentage unit: `1vh` equals 1% of the viewport height, so `100vh` is the full viewport height. (On mobile, `vh` is sized to the *large* viewport and can sit behind the browser's collapsing toolbars, which is why the newer `svh`/`lvh`/`dvh` units exist — but the 1%-of-viewport-height definition still holds.)"
+    },
+    {
+      "id": "css-bug-absolute-missing-position",
+      "technology": "css",
+      "technologyName": "CSS",
+      "difficulty": 3,
+      "difficultyLabel": "medium",
+      "type": "FIND_THE_BUG",
+      "tags": [
+        "positioning"
+      ],
+      "prompt": "The `.badge` should sit in the top-right corner of `.card`, but it stays at the top-left and ignores the offsets. Which line has the bug?",
+      "answer": {
+        "code": ".card {\n  position: relative;\n}\n.badge {\n  position: static;\n  top: 8px;\n  right: 8px;\n}",
+        "language": "css",
+        "buggyLines": [
+          5
+        ]
+      },
+      "explanation": "The `top` and `right` offsets only take effect on a positioned element. `.badge` is `position: static` (the initial value), so the offsets are ignored. It should be `position: absolute` so it anchors to the `position: relative` `.card`."
+    },
+    {
+      "id": "css-sa-oklch-theming-advantage",
+      "technology": "css",
+      "technologyName": "CSS",
+      "difficulty": 3,
+      "difficultyLabel": "medium",
+      "type": "SHORT_ANSWER",
+      "tags": [
+        "modern-color"
+      ],
+      "prompt": "Why might you prefer `oklch()` (or `oklab()`) over `hsl()` or hex when building a design system's color palette and generating tints/shades programmatically?",
+      "answer": {
+        "sampleAnswer": "oklch is perceptually uniform: its lightness channel tracks how bright a color actually looks, and equal numeric steps look like equal visual steps, so you can derive consistent tints and shades by nudging one channel and trust them to read evenly. hsl's lightness is not perceptually even — the same lightness value looks much brighter for yellow than for blue — so palettes generated from it come out lopsided. oklch also addresses the wider Display-P3 gamut, letting you specify more vivid colors than sRGB hex can express, and mixing/interpolating in it avoids the muddy midpoints sRGB produces."
+      },
+      "explanation": "oklch/oklab are perceptually uniform spaces where the `L` channel corresponds to perceived brightness and equal numeric changes produce equal perceived changes. That makes algorithmic palette generation reliable: a single lightness scale yields tints and shades that look evenly spaced across every hue, which hsl can't promise because its lightness is wildly non-uniform between hues. They also reach the wider P3 gamut for more saturated colors than sRGB hex, and interpolation/mixing in oklch produces natural-looking gradients without the dark or grayish midpoints sRGB interpolation suffers from."
+    },
+    {
+      "id": "css-sa-stacking-context-formation",
+      "technology": "css",
+      "technologyName": "CSS",
+      "difficulty": 4,
+      "difficultyLabel": "hard",
+      "type": "SHORT_ANSWER",
+      "tags": [
+        "stacking-contexts"
+      ],
+      "prompt": "Two elements overlap. Walk through the model the browser uses to decide which one paints in front: what kinds of properties create a stacking context, how a stacking context's contents are painted relative to elements outside it, and which other elements a given `z-index` value is actually compared against.",
+      "answer": {
+        "sampleAnswer": "A stacking context is created by a positioned element with a non-`auto` `z-index`, and unconditionally by properties like `opacity` below 1, `transform`, `filter`, `isolation: isolate`, and `position: fixed`/`sticky` (flex and grid items also get one from a non-`auto` `z-index` alone). Each stacking context is painted atomically: all of its descendants are flattened and sandwiched together as one unit, so an element from outside the context can never be drawn between two elements inside it. Within a context, children are layered by their `z-index` (negative levels behind, then the normal-flow content, then positive levels in front). Crucially, that comparison is local: an element's `z-index` only competes with the other children of its nearest ancestor stacking context, and where that whole group sits on the page is decided by the ancestor's own stacking level among *its* siblings — which is why a huge `z-index` deep in the tree can still lose to a modest one higher up."
+      },
+      "explanation": "Paint order is resolved per stacking context, not globally. A context is formed by a positioned element with non-`auto` `z-index` and unconditionally by `opacity < 1`, `transform`, `filter`, `isolation: isolate`, `position: fixed`/`sticky`, and friends. The browser paints each context as an atomic unit — its descendants are sandwiched together, and nothing from outside can interleave between them. A `z-index` therefore only ranks an element against the other children of its nearest ancestor stacking context; that ancestor's own level decides where the whole unit sits one tier up. This local-competition rule is the root cause of every \"my z-index: 9999 is ignored\" bug."
+    },
+    {
+      "id": "css-tf-zindex-flex-grid-items",
+      "technology": "css",
+      "technologyName": "CSS",
+      "difficulty": 4,
+      "difficultyLabel": "hard",
+      "type": "TRUE_FALSE",
+      "tags": [
+        "stacking-contexts"
+      ],
+      "prompt": "`z-index` only has an effect on elements whose `position` is something other than `static`.",
+      "answer": {
+        "value": false
+      },
+      "explanation": "This was true in the original CSS 2 model, but the Flexbox and Grid specs added an exception: flex items and grid items respect `z-index` even when their `position` is `static`. A non-`auto` `z-index` on a flex or grid item changes its paint order against overlapping siblings and creates a stacking context, exactly as it would on a positioned element. So overlapping grid items (e.g. stacked in the same grid area) can be reordered with `z-index` alone — no `position: relative` needed. Outside flex/grid layout, the old rule still holds: on a static block element, `z-index` is ignored."
+    },
+    {
+      "id": "css-sa-cascade-resolution-flow",
+      "technology": "css",
+      "technologyName": "CSS",
+      "difficulty": 5,
+      "difficultyLabel": "expert",
+      "type": "SHORT_ANSWER",
+      "tags": [
+        "cascade-specificity"
+      ],
+      "prompt": "A button's `color` is declared in two places: a heavy `#app .btn.primary` rule inside `@layer components`, and a plain `button` rule in the page's stylesheet outside any layer — and the browser's built-in (user-agent) stylesheet sets its own value too. The plain `button` rule wins, and selector weight had nothing to do with it. Walk through, in order, the full sequence of checks the cascade runs to pick a winning declaration, and explain why comparing specificity is one of the LAST things the browser does — what gets consulted before specificity ever comes into play, and where do `!important` and source order fit?",
+      "answer": {
+        "sampleAnswer": "The cascade is a pipeline, and specificity sits in the middle of it, not at the top. Step 1 is origin and importance: declarations are bucketed by where they come from — the browser's user-agent stylesheet, user styles, and author (page) styles. For normal declarations, author beats user beats user-agent; for `!important` declarations that ranking REVERSES, which is why a user-agent `!important` rule can never be overridden by a page. Step 2, within the author origin, is cascade layers: `@layer` blocks are ranked by declaration order, with later layers beating earlier ones for normal declarations (reversed again under `!important`), and crucially, for normal declarations unlayered author styles beat every layered one (under `!important` this also reverses: an important layered declaration beats an important unlayered one). That's exactly why the plain `button` rule wins here — it's unlayered, the `#app .btn.primary` rule lives inside a layer, and the comparison ends before any selector is examined. Step 3, only between declarations that survive with the same origin and layer standing, is specificity (with inline `style=\"\"` ranking above all selectors). Step 4, the final tiebreaker when specificity is equal, is source order — the later declaration wins."
+      },
+      "explanation": "The mental model most people carry — \"highest specificity wins, plus !important as a trump card\" — describes only the middle of the algorithm. The cascade actually filters in this order: (1) origin & importance — user-agent < user < author for normal declarations, with the order reversed for `!important` ones, so UA `!important` outranks everything a page can write; (2) cascade layers within the author origin — later-declared layers beat earlier ones for normal declarations (reversed under `!important`), and unlayered author styles beat all layered styles for normal declarations — under `!important` that flips too, with layered important declarations winning. This is the whole design point of `@layer`: a framework shipped in a layer can never out-muscle the consuming app's plain CSS no matter how specific its selectors are; (3) specificity — only consulted between declarations that tied on origin and layer, with inline `style` attributes ranking above any selector; (4) source order as the last tiebreaker. In the scenario, the layered `#app .btn.primary` rule loses to the unlayered `button` rule at step 2, so its three-part selector weight is never even counted. Interviewers ask this because `@layer` made the pre-specificity stages practically relevant: debugging \"why does my high-specificity rule lose?\" now requires knowing the pipeline, not just the ID/class/type columns."
+    },
+    {
+      "id": "css-sa-specificity-algorithm",
+      "technology": "css",
+      "technologyName": "CSS",
+      "difficulty": 5,
+      "difficultyLabel": "expert",
+      "type": "SHORT_ANSWER",
+      "tags": [
+        "cascade-specificity"
+      ],
+      "prompt": "Explain how the browser uses specificity to decide which conflicting rule wins, and where `!important` and source order fit in.",
+      "answer": {
+        "sampleAnswer": "Specificity is scored in three columns — IDs, then classes/attributes/pseudo-classes, then element types/pseudo-elements — and the columns are compared left to right, so a higher column beats any number of lower ones (inline styles rank above all selectors). The most specific rule wins; only when specificity ties does source order decide, with the last declaration winning. `!important` is separate: it lifts a declaration into a higher-priority layer that overrides normal declarations regardless of specificity."
+      },
+      "explanation": "The cascade resolves conflicts by: importance (`!important` vs normal), then specificity, then source order. Specificity is an (inline, id, class, type) tuple compared column by column; a higher column wins outright. Ties fall through to whichever matching rule appears last in the source."
+    },
+    {
+      "id": "node-mcq-process-env-type",
+      "technology": "nodejs",
+      "technologyName": "Node.js",
+      "difficulty": 1,
+      "difficultyLabel": "intro",
+      "type": "MCQ_SINGLE",
+      "tags": [
+        "process-env"
+      ],
+      "prompt": "What is the type of a value read from `process.env.PORT`?",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "`string` (or `undefined` if unset)"
+          },
+          {
+            "id": "b",
+            "text": "`number`"
+          },
+          {
+            "id": "c",
+            "text": "`string | number` depending on the value"
+          },
+          {
+            "id": "d",
+            "text": "Always `undefined` until you call `dotenv.config()`"
+          }
+        ],
+        "correctOptionId": "a"
+      },
+      "explanation": "Every value on `process.env` is a string (or `undefined` when the variable is not set). Numeric-looking values like `\"3000\"` are still strings, so you must convert with `Number(process.env.PORT)` before using them as numbers."
+    },
+    {
+      "id": "node-out-buffer-tostring",
+      "technology": "nodejs",
+      "technologyName": "Node.js",
+      "difficulty": 1,
+      "difficultyLabel": "intro",
+      "type": "CODE_OUTPUT",
+      "tags": [
+        "buffers"
+      ],
+      "prompt": "What does this log?",
+      "answer": {
+        "code": "const buf = Buffer.from([0x48, 0x69]);\nconsole.log(buf.toString());",
+        "language": "javascript",
+        "expectedOutput": "Hi"
+      },
+      "explanation": "`Buffer.from([0x48, 0x69])` builds a 2-byte buffer from the byte values `72` and `105`. `Buffer.prototype.toString()` defaults to UTF-8, decoding those bytes to the characters `H` and `i`."
+    },
+    {
+      "id": "node-bug-path-string-concat",
+      "technology": "nodejs",
+      "technologyName": "Node.js",
+      "difficulty": 2,
+      "difficultyLabel": "easy",
+      "type": "FIND_THE_BUG",
+      "tags": [
+        "path-module"
+      ],
+      "prompt": "This builds a file path by hand and breaks on Windows (and with a trailing slash). Which line is the bug?",
+      "answer": {
+        "code": "const path = require('path');\nfunction configPath(dir) {\n  return dir + '/' + 'config.json';\n}\nmodule.exports = { configPath };",
+        "language": "javascript",
+        "buggyLines": [
+          3
+        ]
+      },
+      "explanation": "Hard-coding `'/'` assumes a POSIX separator and double-slashes if `dir` already ends in one. Use `path.join(dir, 'config.json')`, which inserts the correct platform separator and normalizes redundant slashes."
+    },
+    {
+      "id": "node-mcq-dirname-commonjs",
+      "technology": "nodejs",
+      "technologyName": "Node.js",
+      "difficulty": 2,
+      "difficultyLabel": "easy",
+      "type": "MCQ_SINGLE",
+      "tags": [
+        "commonjs"
+      ],
+      "prompt": "In a CommonJS module (a `.js` file loaded with `require`), which of these is a real, module-scoped variable Node injects automatically?",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "`__dirname`"
+          },
+          {
+            "id": "b",
+            "text": "`import.meta.url`"
+          },
+          {
+            "id": "c",
+            "text": "`globalThis.module`"
+          },
+          {
+            "id": "d",
+            "text": "`window`"
+          }
+        ],
+        "correctOptionId": "a"
+      },
+      "explanation": "Node wraps every CommonJS module in a function that receives `exports`, `require`, `module`, `__filename`, and `__dirname` as parameters, so `__dirname` is available without importing anything. `import.meta` only exists in ES modules; `window` is a browser global."
+    },
+    {
+      "id": "node-mcq-stream-serve-large-file",
+      "technology": "nodejs",
+      "technologyName": "Node.js",
+      "difficulty": 3,
+      "difficultyLabel": "medium",
+      "type": "MCQ_SINGLE",
+      "tags": [
+        "streams",
+        "backpressure"
+      ],
+      "prompt": "An HTTP handler must send a 2 GB video file to the client. Which approach avoids holding the entire file in memory at once?",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "`res.end(fs.readFileSync(path))` — read the whole file synchronously, then send it in one write"
+          },
+          {
+            "id": "b",
+            "text": "`res.end(await fs.promises.readFile(path))` — read the whole file asynchronously, then send it"
+          },
+          {
+            "id": "c",
+            "text": "`fs.createReadStream(path).pipe(res)` — stream the file to the response in chunks"
+          },
+          {
+            "id": "d",
+            "text": "`res.end(Buffer.alloc(2 ** 31))` — preallocate one buffer the size of the file, then send it"
+          }
+        ],
+        "correctOptionId": "c"
+      },
+      "explanation": "`createReadStream(...).pipe(res)` reads the file in fixed-size chunks (default ~64 KB) and writes each to the response as it arrives, so resident memory stays at roughly one chunk regardless of file size. `readFile`/`readFileSync` materialize all 2 GB as a single Buffer before sending. `pipe` also wires up backpressure, pausing the read when the socket can't keep up."
+    },
+    {
+      "id": "node-tf-unhandled-rejection-exit",
+      "technology": "nodejs",
+      "technologyName": "Node.js",
+      "difficulty": 3,
+      "difficultyLabel": "medium",
+      "type": "TRUE_FALSE",
+      "tags": [
+        "unhandled-rejections"
+      ],
+      "prompt": "On current Node.js LTS, an unhandled promise rejection that is never caught will, by default, crash the process (non-zero exit).",
+      "answer": {
+        "value": true
+      },
+      "explanation": "Since Node 15 the default `--unhandled-rejections` mode is `throw`: an unhandled rejection is treated like an uncaught exception and terminates the process with a non-zero exit code. Earlier versions only printed a warning. Always attach a `.catch` or handle rejections in `async` code."
+    },
+    {
+      "id": "node-mcq-require-resolution-order",
+      "technology": "nodejs",
+      "technologyName": "Node.js",
+      "difficulty": 4,
+      "difficultyLabel": "hard",
+      "type": "MCQ_SINGLE",
+      "tags": [
+        "module-resolution-node"
+      ],
+      "prompt": "When you call `require(\"lodash\")` (a bare specifier, not a relative path), where does Node look first?",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "In `node_modules` starting in the current directory, then walking up the parent directories"
+          },
+          {
+            "id": "b",
+            "text": "Only in the global npm install directory"
+          },
+          {
+            "id": "c",
+            "text": "In the current directory as a relative file `./lodash`"
+          },
+          {
+            "id": "d",
+            "text": "In `process.env.NODE_PATH` exclusively"
+          }
+        ],
+        "correctOptionId": "a"
+      },
+      "explanation": "For a bare specifier, Node searches `./node_modules`, then `../node_modules`, then up the directory tree to the filesystem root, using the package's `main`/`exports` to pick the entry file. Global installs and `NODE_PATH` are only consulted after this local walk fails."
+    },
+    {
+      "id": "node-mcq-write-returns-false",
+      "technology": "nodejs",
+      "technologyName": "Node.js",
+      "difficulty": 4,
+      "difficultyLabel": "hard",
+      "type": "MCQ_SINGLE",
+      "tags": [
+        "backpressure",
+        "streams"
+      ],
+      "prompt": "While writing to a writable stream, `stream.write(chunk)` returns `false`. What does that mean, and what should a careful producer do?",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "The write failed and the chunk was discarded; immediately re-send that same chunk on the next tick"
+          },
+          {
+            "id": "b",
+            "text": "The internal buffer is past its `highWaterMark`; pause writing and wait for the `'drain'` event before continuing"
+          },
+          {
+            "id": "c",
+            "text": "The stream has already ended; call `stream.end()` and discard any remaining chunks you meant to write"
+          },
+          {
+            "id": "d",
+            "text": "Nothing actionable — the return value is purely advisory and the stream safely buffers everything regardless of volume"
+          }
+        ],
+        "correctOptionId": "b"
+      },
+      "explanation": "A `false` return does not mean the write failed — the chunk is still accepted and queued. It signals that buffered data has exceeded `highWaterMark`, i.e. backpressure: keep writing and the buffer (and memory) grow unbounded. The correct response is to stop writing until the stream emits `'drain'`, then resume."
+    },
+    {
+      "id": "node-out-immediate-vs-timeout-in-io",
+      "technology": "nodejs",
+      "technologyName": "Node.js",
+      "difficulty": 5,
+      "difficultyLabel": "expert",
+      "type": "CODE_OUTPUT",
+      "tags": [
+        "node-event-loop"
+      ],
+      "prompt": "What is the guaranteed log order? (Both callbacks are scheduled from inside an I/O callback.)",
+      "answer": {
+        "code": "const fs = require('fs');\nfs.readFile(__filename, () => {\n  setTimeout(() => console.log('timeout'), 0);\n  setImmediate(() => console.log('immediate'));\n});",
+        "language": "javascript",
+        "expectedOutput": "immediate\ntimeout"
+      },
+      "explanation": "Scheduled from within an I/O (poll-phase) callback, `setImmediate` always fires before `setTimeout(…, 0)`: after the poll phase the loop goes straight to the check phase (`setImmediate`), and only reaches the timers phase on the next iteration. At the top level this ordering is not guaranteed, but inside an I/O callback it is."
+    },
+    {
+      "id": "node-out-nexttick-vs-promise",
+      "technology": "nodejs",
+      "technologyName": "Node.js",
+      "difficulty": 5,
+      "difficultyLabel": "expert",
+      "type": "CODE_OUTPUT",
+      "tags": [
+        "node-event-loop"
+      ],
+      "prompt": "In what order does Node log these four lines?",
+      "answer": {
+        "code": "console.log('sync');\nsetTimeout(() => console.log('timeout'), 0);\nPromise.resolve().then(() => console.log('promise'));\nprocess.nextTick(() => console.log('nextTick'));",
+        "language": "javascript",
+        "expectedOutput": "sync\nnextTick\npromise\ntimeout"
+      },
+      "explanation": "Synchronous code runs first (`sync`). Before the event loop advances to any phase, Node drains the `process.nextTick` queue, then the promise microtask queue — so `nextTick` precedes `promise`. The `setTimeout` callback is a timers-phase macrotask and runs last."
+    },
+    {
+      "id": "http-flash-location-header",
+      "technology": "http-apis",
+      "technologyName": "HTTP & APIs",
+      "difficulty": 1,
+      "difficultyLabel": "intro",
+      "type": "FLASHCARD",
+      "tags": [
+        "headers"
+      ],
+      "prompt": "What is the `Location` response header used for?",
+      "answer": {
+        "back": "`Location` tells the client a URL related to the response. On a `3xx` redirect it is the URL to follow next; on a `201 Created` it is the URL of the newly created resource. Browsers automatically navigate to it for redirects."
+      },
+      "explanation": "`Location` serves two roles: the redirect target for `3xx` responses and the address of the created resource for `201 Created`. Including it after a creation lets the client fetch or link to the new resource without guessing its URL."
+    },
+    {
+      "id": "http-tf-500-is-client-error",
+      "technology": "http-apis",
+      "technologyName": "HTTP & APIs",
+      "difficulty": 1,
+      "difficultyLabel": "intro",
+      "type": "TRUE_FALSE",
+      "tags": [
+        "status-codes"
+      ],
+      "prompt": "A `500 Internal Server Error` status code indicates a problem on the client side.",
+      "answer": {
+        "value": false
+      },
+      "explanation": "`5xx` codes are server errors — the server failed to fulfil an apparently valid request (RFC 9110 §15.6). Client-side mistakes are reported with `4xx` codes such as `400`, `401`, `403`, and `404`."
+    },
+    {
+      "id": "http-tf-get-no-side-effects",
+      "technology": "http-apis",
+      "technologyName": "HTTP & APIs",
+      "difficulty": 1,
+      "difficultyLabel": "intro",
+      "type": "TRUE_FALSE",
+      "tags": [
+        "http-methods"
+      ],
+      "prompt": "A `GET` request is intended to retrieve data without changing server state.",
+      "answer": {
+        "value": true
+      },
+      "explanation": "`GET` is a safe method: it is meant to be read-only with no intended side effects (RFC 9110 §9.3.1). This is why intermediaries are free to cache, prefetch, and retry `GET` requests — behaviour that would be unsafe for `POST`."
+    },
+    {
+      "id": "http-bug-created-returns-200",
+      "technology": "http-apis",
+      "technologyName": "HTTP & APIs",
+      "difficulty": 2,
+      "difficultyLabel": "easy",
+      "type": "FIND_THE_BUG",
+      "tags": [
+        "status-codes"
+      ],
+      "prompt": "This Express handler creates a new user. From an HTTP-semantics standpoint, what is wrong with the response?",
+      "answer": {
+        "code": "app.post(\"/users\", async (req, res) => {\n  const user = await db.users.create(req.body);\n  res.status(200).json(user);\n});",
+        "language": "javascript",
+        "options": [
+          {
+            "id": "a",
+            "text": "It should respond `201 Created` (ideally with a `Location` header), not `200 OK`, because a new resource was created"
+          },
+          {
+            "id": "b",
+            "text": "`POST` cannot create resources; it must use `PUT`"
+          },
+          {
+            "id": "c",
+            "text": "The response must not include the created user in the body"
+          },
+          {
+            "id": "d",
+            "text": "Creation responses must always return `204 No Content`"
+          }
+        ],
+        "correctOptionId": "a"
+      },
+      "explanation": "When a request creates a new resource the correct status is `201 Created`, and best practice is to include a `Location` header (e.g. `/users/{id}`) pointing at it (RFC 9110 §15.3.2). `POST` is a perfectly valid way to create a subordinate resource, returning the representation in the body is fine, and `204` would be wrong because there is a body to send."
+    },
+    {
+      "id": "http-flash-httponly-cookie",
+      "technology": "http-apis",
+      "technologyName": "HTTP & APIs",
+      "difficulty": 2,
+      "difficultyLabel": "easy",
+      "type": "FLASHCARD",
+      "tags": [
+        "cookies-sessions"
+      ],
+      "prompt": "What does the `HttpOnly` attribute on a `Set-Cookie` header do, and why use it for session cookies?",
+      "answer": {
+        "back": "`HttpOnly` makes the cookie inaccessible to client-side JavaScript (`document.cookie`); it is only sent automatically on HTTP requests. Setting it on a session cookie blunts XSS attacks, because injected script cannot read or exfiltrate the session token. Pair it with `Secure` (HTTPS only) and `SameSite` (CSRF mitigation)."
+      },
+      "explanation": "`HttpOnly` is a core defence for session cookies: even if an attacker injects script via XSS, they cannot steal the cookie through the DOM. It does not prevent the cookie from being *sent*, so `SameSite` and CSRF tokens remain necessary for cross-site request protection."
+    },
+    {
+      "id": "http-auth-sa-cookie-session-login-flow",
+      "technology": "http-apis",
+      "technologyName": "HTTP & APIs",
+      "difficulty": 3,
+      "difficultyLabel": "medium",
+      "type": "SHORT_ANSWER",
+      "tags": [
+        "cookies-sessions"
+      ],
+      "prompt": "Walk through a classic cookie-based session login end to end, from the user submitting credentials to a later authenticated request and then logout.",
+      "answer": {
+        "sampleAnswer": "The client POSTs the username and password over HTTPS. The server verifies them, typically by comparing against a stored password hash. On success it creates a server-side session record — an opaque session id mapped to the user — in its store (memory, Redis, or a database). It returns that id to the browser in a `Set-Cookie` header marked `HttpOnly; Secure; SameSite`. The browser stores the cookie and automatically attaches it on every subsequent same-site request. On each request the server looks the session id up in its store to identify the user, so no credentials are re-sent — the auth state is stateful and lives on the server. At logout the server deletes the session record from the store and clears the cookie, so the next request is anonymous."
+      },
+      "explanation": "This is the stateful cookie-session lifecycle: credentials are exchanged once for an opaque server-side session id, the browser ambiently re-presents that id on each request, and the server dereferences it against its store to recover the user. It is deliberately the inverse of the stateless JWT model — the source of truth is the server record, which is why logout works by deleting that record, and why these sessions are trivially revocable where a stateless token is not."
+    },
+    {
+      "id": "http-bug-verb-in-uri",
+      "technology": "http-apis",
+      "technologyName": "HTTP & APIs",
+      "difficulty": 3,
+      "difficultyLabel": "medium",
+      "type": "FIND_THE_BUG",
+      "tags": [
+        "resource-design"
+      ],
+      "prompt": "These routes are meant to follow RESTful resource-design conventions. Which line breaks them?",
+      "answer": {
+        "code": "router.get(\"/users\", listUsers);\nrouter.get(\"/users/:id\", getUser);\nrouter.post(\"/createUser\", createUser);\nrouter.delete(\"/users/:id\", deleteUser);",
+        "language": "javascript",
+        "buggyLines": [
+          3
+        ]
+      },
+      "explanation": "REST URLs should name *resources* (nouns), with the HTTP method supplying the verb. `POST /createUser` puts the action in the URL; it should be `POST /users` — the `POST` already conveys \"create\", and the collection resource is `/users`. The other three correctly use the noun `/users` with `GET`/`DELETE` carrying the intent."
+    },
+    {
+      "id": "http-flash-websocket-handshake",
+      "technology": "http-apis",
+      "technologyName": "HTTP & APIs",
+      "difficulty": 4,
+      "difficultyLabel": "hard",
+      "type": "FLASHCARD",
+      "tags": [
+        "websockets"
+      ],
+      "prompt": "How does a WebSocket connection start, and how does it differ from normal HTTP request/response?",
+      "answer": {
+        "back": "A WebSocket starts as an HTTP/1.1 `GET` with `Upgrade: websocket` and `Connection: Upgrade` headers; the server replies `101 Switching Protocols` and the same TCP connection is then upgraded to the WebSocket protocol. Unlike HTTP's one-request-one-response model, the result is a persistent, full-duplex channel where server and client can each send messages at any time without re-establishing a connection."
+      },
+      "explanation": "The WebSocket handshake (RFC 6455) reuses HTTP only to bootstrap, then leaves the request/response model entirely. The persistent full-duplex channel is what makes WebSockets suited to chat, live dashboards, and multiplayer — use cases where HTTP polling would be wasteful and high-latency."
+    },
+    {
+      "id": "http-sa-cache-control-revalidation",
+      "technology": "http-apis",
+      "technologyName": "HTTP & APIs",
+      "difficulty": 4,
+      "difficultyLabel": "hard",
+      "type": "SHORT_ANSWER",
+      "tags": [
+        "http-caching"
+      ],
+      "prompt": "How do `Cache-Control: max-age` and an `ETag` work together to control HTTP caching?",
+      "answer": {
+        "sampleAnswer": "`Cache-Control: max-age` sets the freshness lifetime: while a cached response is within `max-age` it can be served directly with no network round trip. Once it goes stale, the cache revalidates using the `ETag` validator — it sends `If-None-Match` with the stored ETag, and the server replies `304 Not Modified` (reuse the cached copy) or `200` with fresh content. So `max-age` avoids requests entirely and the ETag makes the eventual revalidation cheap."
+      },
+      "explanation": "Freshness (`max-age`/`Expires`) decides when a cached response can be used without contacting the origin; validators (`ETag`/`Last-Modified`) decide what happens when it expires. Together they minimize both the number of requests and the bytes transferred on the requests that do happen (RFC 9111 §4.2, §4.3)."
+    },
+    {
+      "id": "http-mcq-cache-no-store-vs-no-cache",
+      "technology": "http-apis",
+      "technologyName": "HTTP & APIs",
+      "difficulty": 5,
+      "difficultyLabel": "expert",
+      "type": "MCQ_SINGLE",
+      "tags": [
+        "http-caching"
+      ],
+      "prompt": "Which `Cache-Control` directive guarantees that a response is **never written to any cache** (e.g. for a page showing private banking data)?",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "no-cache"
+          },
+          {
+            "id": "b",
+            "text": "no-store"
+          },
+          {
+            "id": "c",
+            "text": "max-age=0"
+          },
+          {
+            "id": "d",
+            "text": "must-revalidate"
+          }
+        ],
+        "correctOptionId": "b"
+      },
+      "explanation": "`no-store` forbids any cache from storing the request or response at all (RFC 9111 §5.2.2.5). `no-cache` *does* allow storage but requires revalidation with the origin before reuse; `max-age=0` makes a stored response immediately stale (still revalidatable); `must-revalidate` only forbids serving stale responses once they expire."
+    },
+    {
+      "id": "sql-fc-fk-cascade",
+      "technology": "databases-sql",
+      "technologyName": "Databases & SQL",
+      "difficulty": 1,
+      "difficultyLabel": "intro",
+      "type": "FLASHCARD",
+      "tags": [
+        "foreign-keys"
+      ],
+      "prompt": "What does `ON DELETE CASCADE` on a foreign key do?",
+      "answer": {
+        "back": "When a referenced parent row is deleted, the database automatically deletes the child rows that reference it, instead of blocking the delete or leaving orphaned rows. It is one of the referential actions (others include `RESTRICT`, `SET NULL`, and `NO ACTION`)."
+      },
+      "explanation": "`ON DELETE CASCADE` keeps referential integrity by propagating a parent delete down to its children automatically. Use it deliberately — a cascade can remove far more data than intended; `SET NULL` or `RESTRICT` are safer when children should outlive or block the parent's deletion."
+    },
+    {
+      "id": "sql-mcq-select-distinct",
+      "technology": "databases-sql",
+      "technologyName": "Databases & SQL",
+      "difficulty": 1,
+      "difficultyLabel": "intro",
+      "type": "MCQ_SINGLE",
+      "tags": [
+        "select-basics"
+      ],
+      "prompt": "Which keyword removes duplicate rows from a `SELECT` result set?",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "`DISTINCT`"
+          },
+          {
+            "id": "b",
+            "text": "`UNIQUE`"
+          },
+          {
+            "id": "c",
+            "text": "`GROUP`"
+          },
+          {
+            "id": "d",
+            "text": "`DEDUPE`"
+          }
+        ],
+        "correctOptionId": "a"
+      },
+      "explanation": "`SELECT DISTINCT` collapses rows that are identical across all selected columns into one. `UNIQUE` is a column/table constraint, not a query keyword, and `GROUP BY` aggregates rather than simply de-duplicating."
+    },
+    {
+      "id": "sql-tf-3nf-transitive",
+      "technology": "databases-sql",
+      "technologyName": "Databases & SQL",
+      "difficulty": 2,
+      "difficultyLabel": "easy",
+      "type": "TRUE_FALSE",
+      "tags": [
+        "normalization"
+      ],
+      "prompt": "Third normal form (3NF) requires that no non-key column depends on another non-key column (no transitive dependencies on the primary key).",
+      "answer": {
+        "value": true
+      },
+      "explanation": "3NF builds on 2NF and additionally forbids transitive dependencies: every non-key attribute must depend on the key, the whole key, and nothing but the key. Storing a `zip_code` and a `city` that is functionally determined by the `zip_code` in the same table is the classic 3NF violation, since `city` depends on `zip_code` rather than directly on the primary key."
+    },
+    {
+      "id": "sql-tf-inner-join-order",
+      "technology": "databases-sql",
+      "technologyName": "Databases & SQL",
+      "difficulty": 2,
+      "difficultyLabel": "easy",
+      "type": "TRUE_FALSE",
+      "tags": [
+        "joins"
+      ],
+      "prompt": "For an `INNER JOIN`, swapping which table is written first (`A JOIN B` vs `B JOIN A`) changes which rows appear in the result.",
+      "answer": {
+        "value": false
+      },
+      "explanation": "`INNER JOIN` is commutative with respect to its result set: `A INNER JOIN B ON …` and `B INNER JOIN A ON …` return the same rows (column ordering aside). This is not true for outer joins — `LEFT JOIN` and `RIGHT JOIN` keep different unmatched sides."
+    },
+    {
+      "id": "sql-bug-n-plus-one-loop",
+      "technology": "databases-sql",
+      "technologyName": "Databases & SQL",
+      "difficulty": 3,
+      "difficultyLabel": "medium",
+      "type": "FIND_THE_BUG",
+      "tags": [
+        "n-plus-one"
+      ],
+      "prompt": "This pseudocode renders a list of posts with their author names but is slow on large lists. What is the performance bug?",
+      "answer": {
+        "code": "posts = db.query(\"SELECT id, author_id, title FROM posts\")\nfor post in posts:\n    author = db.query(\n        \"SELECT name FROM authors WHERE id = ?\", post.author_id)\n    render(post.title, author.name)",
+        "language": "sql",
+        "options": [
+          {
+            "id": "a",
+            "text": "It is an N+1 query: 1 query for the posts plus one extra query per post to fetch its author"
+          },
+          {
+            "id": "b",
+            "text": "The posts query is missing a `WHERE` clause and returns too many columns"
+          },
+          {
+            "id": "c",
+            "text": "`SELECT name` should be `SELECT *` so the author loads fully"
+          },
+          {
+            "id": "d",
+            "text": "The loop should run the author query before the posts query"
+          }
+        ],
+        "correctOptionId": "a"
+      },
+      "explanation": "This is the N+1 query problem: one query loads N posts, then the loop fires one additional query per post to fetch its author — N+1 round trips total. Replace it with a single `JOIN` (or a batched `WHERE id IN (...)` over the collected author ids) so the database returns posts and author names in one round trip."
+    },
+    {
+      "id": "sql-sa-normalization-purpose",
+      "technology": "databases-sql",
+      "technologyName": "Databases & SQL",
+      "difficulty": 3,
+      "difficultyLabel": "medium",
+      "type": "SHORT_ANSWER",
+      "tags": [
+        "normalization"
+      ],
+      "prompt": "What is database normalization, and what problem does it solve?",
+      "answer": {
+        "sampleAnswer": "Normalization is the process of structuring tables to reduce data redundancy and avoid update anomalies, typically by splitting data into related tables linked by keys so each fact is stored in exactly one place. Storing a value once means you update it once, so the data cannot become inconsistent across duplicated copies."
+      },
+      "explanation": "Normalization removes redundancy so each piece of data lives in one place, which eliminates insertion, update, and deletion anomalies. The trade-off is that highly normalized schemas need more joins to reassemble data, which is why read-heavy systems sometimes deliberately denormalize."
+    },
+    {
+      "id": "sql-mcq-pgvector-knn",
+      "technology": "databases-sql",
+      "technologyName": "Databases & SQL",
+      "difficulty": 4,
+      "difficultyLabel": "hard",
+      "type": "MCQ_SINGLE",
+      "tags": [
+        "vector-search-sql"
+      ],
+      "prompt": "Using the pgvector extension, which query returns the 5 rows whose `embedding` is most similar to `$1` by L2 (Euclidean) distance?",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "`SELECT * FROM items ORDER BY embedding <-> $1 LIMIT 5`"
+          },
+          {
+            "id": "b",
+            "text": "`SELECT * FROM items WHERE embedding = $1 LIMIT 5`"
+          },
+          {
+            "id": "c",
+            "text": "`SELECT * FROM items ORDER BY embedding DESC LIMIT 5`"
+          },
+          {
+            "id": "d",
+            "text": "`SELECT * FROM items GROUP BY embedding HAVING embedding <-> $1 LIMIT 5`"
+          }
+        ],
+        "correctOptionId": "a"
+      },
+      "explanation": "pgvector adds a `vector` column type and distance operators: `<->` is L2/Euclidean distance, `<=>` is cosine distance, and `<#>` is negative inner product. A k-nearest-neighbour search is expressed as `ORDER BY embedding <-> $query LIMIT k` — order by the chosen distance ascending and cap the result. With no index this is an exact sequential scan computing every distance; adding an approximate index (HNSW or IVFFlat) lets the same `ORDER BY ... LIMIT` query trade a little recall for a large speed-up. Equality (`=`), plain `DESC` ordering, and `GROUP BY` do not express nearest-neighbour search."
+    },
+    {
+      "id": "sql-sa-connection-pooling",
+      "technology": "databases-sql",
+      "technologyName": "Databases & SQL",
+      "difficulty": 4,
+      "difficultyLabel": "hard",
+      "type": "SHORT_ANSWER",
+      "tags": [
+        "connection-pooling"
+      ],
+      "prompt": "A web app opens a fresh database connection for every incoming request and closes it after the response. Under load it slows down and the database hits its connection limit. What technique fixes this, and how does it work?",
+      "answer": {
+        "sampleAnswer": "A connection pool fixes it: the app keeps a fixed set of already-open connections and hands one to each request, returning it to the pool when the request finishes instead of closing it. That removes the per-request cost of opening a connection (TCP handshake, TLS negotiation, authentication) and caps the number of concurrent connections to the database, so it is never overwhelmed even when requests spike."
+      },
+      "explanation": "Opening a connection is expensive (handshake, TLS, auth) and the database tolerates only a bounded number of them. A connection pool keeps a set of live connections, lends them to requests, and reclaims them on completion — eliminating per-request setup cost and bounding total concurrency. The pool size becomes the real concurrency limit, which is why it's tuned to what the database can handle rather than the number of app instances."
+    },
+    {
+      "id": "sql-mcq-isolation-phantom",
+      "technology": "databases-sql",
+      "technologyName": "Databases & SQL",
+      "difficulty": 5,
+      "difficultyLabel": "expert",
+      "type": "MCQ_SINGLE",
+      "tags": [
+        "isolation-levels"
+      ],
+      "prompt": "Under the SQL standard, which is the lowest isolation level that prevents phantom reads?",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "`SERIALIZABLE`"
+          },
+          {
+            "id": "b",
+            "text": "`REPEATABLE READ`"
+          },
+          {
+            "id": "c",
+            "text": "`READ COMMITTED`"
+          },
+          {
+            "id": "d",
+            "text": "`READ UNCOMMITTED`"
+          }
+        ],
+        "correctOptionId": "a"
+      },
+      "explanation": "By the ANSI SQL definitions, `READ UNCOMMITTED` allows dirty reads, `READ COMMITTED` prevents those but allows non-repeatable reads, `REPEATABLE READ` prevents non-repeatable reads but still permits phantoms, and only `SERIALIZABLE` forbids phantom reads. (PostgreSQL's `REPEATABLE READ` is stronger than the standard and happens to block phantoms too, but the standard's guarantee starts at `SERIALIZABLE`.)"
+    },
+    {
+      "id": "sql-sa-query-execution-flow",
+      "technology": "databases-sql",
+      "technologyName": "Databases & SQL",
+      "difficulty": 5,
+      "difficultyLabel": "expert",
+      "type": "SHORT_ANSWER",
+      "tags": [
+        "query-planning"
+      ],
+      "prompt": "Trace what a relational database does between receiving a `SELECT` as raw text and returning rows. Name the main stages in order.",
+      "answer": {
+        "sampleAnswer": "First it parses the SQL text into a syntax tree and validates the names and types against the catalog. Then the optimizer (planner) enumerates candidate execution plans — which indexes to use, join order and join methods — and picks the one with the lowest estimated cost. Finally the executor runs that chosen plan, reading from tables and indexes and streaming the result rows back to the client."
+      },
+      "explanation": "The pipeline is parse → plan/optimize → execute. Parsing turns text into a validated tree; the optimizer chooses among possible plans by estimated cost (index vs sequential scan, join order/method); the executor then runs the winning plan and returns rows. `EXPLAIN` shows the plan the optimizer picked at the middle stage, which is why reading it is the first move when a query is slow."
+    },
+    {
+      "id": "sd-mcq-stateless-horizontal-scale",
+      "technology": "system-design",
+      "technologyName": "System Design",
+      "difficulty": 2,
+      "difficultyLabel": "easy",
+      "type": "MCQ_SINGLE",
+      "tags": [
+        "horizontal-vertical",
+        "scalability"
+      ],
+      "prompt": "Your API runs on a fleet behind a round-robin load balancer, but users intermittently get logged out as requests land on different nodes. The team stores session state in each node's local memory. What is the **single most important** change to enable safe horizontal scaling?",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "Move session state out of the app process into a shared store (e.g. Redis) so any node can serve any request"
+          },
+          {
+            "id": "b",
+            "text": "Enable sticky sessions on the load balancer and keep state in local memory"
+          },
+          {
+            "id": "c",
+            "text": "Scale each node vertically with more RAM so sessions never get evicted"
+          },
+          {
+            "id": "d",
+            "text": "Add a CDN in front of the API to cache the session responses"
+          }
+        ],
+        "correctOptionId": "a"
+      },
+      "explanation": "The root problem is that the app nodes are **stateful**: each holds session data only it can see. Externalising state to a shared store makes the nodes interchangeable, which is the precondition for horizontal scaling and for free rolling deploys and failover. Sticky sessions are a workaround, not a fix — they pin users to a node, so a deploy or crash still drops their session and they defeat even load distribution. Vertical scaling (more RAM) raises the ceiling but keeps the state trapped on one box, so the cross-node inconsistency remains. A CDN caches public, cacheable responses; per-user session data is neither, so it does nothing here."
+    },
+    {
+      "id": "sd-multi-cdn-edge-caching",
+      "technology": "system-design",
+      "technologyName": "System Design",
+      "difficulty": 2,
+      "difficultyLabel": "easy",
+      "type": "MCQ_MULTI",
+      "tags": [
+        "cdn-edge",
+        "caching-strategies"
+      ],
+      "prompt": "Your global app serves large static assets (images, JS bundles, video) and origin egress plus latency are hurting. You put a **CDN / edge cache** in front. Which outcomes are correct expectations of this change?",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "Cached assets are served from edge PoPs close to users, cutting round-trip latency"
+          },
+          {
+            "id": "b",
+            "text": "Origin load and egress drop because the CDN absorbs repeat requests for cacheable content"
+          },
+          {
+            "id": "c",
+            "text": "Cache-Control / TTL headers govern how long edges serve content before revalidating with origin"
+          },
+          {
+            "id": "d",
+            "text": "Highly personalized, per-user dynamic API responses become trivially cacheable at the edge"
+          },
+          {
+            "id": "e",
+            "text": "A bad deploy is harmless because edges instantly reflect every origin change with no invalidation needed"
+          }
+        ],
+        "correctOptionIds": [
+          "a",
+          "b",
+          "c"
+        ]
+      },
+      "explanation": "A CDN caches content at **edge points of presence** near users (a), so it lowers latency and offloads repeat requests from the origin, cutting load and egress (b), with freshness controlled by `Cache-Control`/TTL and revalidation (c). The wrong options are classic edge-caching traps. **Personalized, per-user dynamic responses** are generally not cacheable at a shared edge (d) — caching them risks leaking one user's data to another, so they need private/no-store handling or edge-compute personalization, not naive caching. And edges do **not** instantly reflect origin changes (e): cached objects live until their TTL or an explicit **purge/invalidation**, which is precisely why a bad asset deploy can keep serving stale content until you invalidate the cache or bust the URL."
+    },
+    {
+      "id": "sd-sa-horizontal-vertical-scaling",
+      "technology": "system-design",
+      "technologyName": "System Design",
+      "difficulty": 2,
+      "difficultyLabel": "easy",
+      "type": "SHORT_ANSWER",
+      "tags": [
+        "horizontal-vertical"
+      ],
+      "prompt": "Contrast **horizontal** and **vertical** scaling, and describe when each hits a wall.",
+      "answer": {
+        "sampleAnswer": "Vertical scaling (scaling up) means giving one machine more CPU, memory, or disk; it is simple and needs no application changes, but it hits a wall at the largest available machine size and leaves you with a single point of failure. Horizontal scaling (scaling out) means adding more machines behind a load balancer; it scales far beyond one box and improves availability, but it hits a wall when shared state gets in the way — you need stateless services, a way to coordinate or shard data, and you take on distributed-systems complexity. Most large systems scale out the stateless tier and reserve scale-up for the database until sharding becomes necessary."
+      },
+      "explanation": "**Vertical** scaling (up) adds resources to one node — easy and transparent to the app, but bounded by the biggest machine and exposed to a single point of failure. **Horizontal** scaling (out) adds nodes behind a load balancer — effectively unbounded and more available, but it forces statelessness, data partitioning/replication, and distributed coordination. The pragmatic pattern is a stateless app tier that scales out freely, with the harder-to-distribute data layer scaled up first and sharded only when forced."
+    },
+    {
+      "id": "sd-fc-queue-decoupling",
+      "technology": "system-design",
+      "technologyName": "System Design",
+      "difficulty": 3,
+      "difficultyLabel": "medium",
+      "type": "FLASHCARD",
+      "tags": [
+        "message-queues"
+      ],
+      "prompt": "What benefits does putting a **message queue** between a producer and a slow consumer provide?",
+      "answer": {
+        "back": "A queue **decouples** producer and consumer in time and rate. It absorbs traffic spikes by buffering (load levelling / backpressure), so a burst doesn't overwhelm a slow downstream; it lets consumers scale independently and process at their own pace; it improves resilience because a consumer outage just lets the backlog grow instead of dropping work; and it enables async, fire-and-forget workflows so the producer returns quickly. The cost is added latency, at-least-once delivery semantics (requiring idempotent consumers), and operational complexity."
+      },
+      "explanation": "Queues turn a synchronous, tightly-coupled call into an asynchronous pipeline, which is how you keep a user-facing request fast while heavy work (emails, video transcoding, billing) happens out of band. The key correctness caveat is delivery semantics: most queues guarantee at-least-once, so consumers must dedupe or be idempotent."
+    },
+    {
+      "id": "sd-mcq-token-bucket-vs-leaky",
+      "technology": "system-design",
+      "technologyName": "System Design",
+      "difficulty": 3,
+      "difficultyLabel": "medium",
+      "type": "MCQ_SINGLE",
+      "tags": [
+        "rate-limiting"
+      ],
+      "prompt": "An API must allow clients a sustained rate of 10 req/s but also tolerate **short bursts** (e.g. a client firing 50 requests after being idle). Which rate-limiting algorithm naturally supports this?",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "Token bucket"
+          },
+          {
+            "id": "b",
+            "text": "Leaky bucket (as a queue with a fixed drain rate)"
+          },
+          {
+            "id": "c",
+            "text": "Fixed window counter"
+          },
+          {
+            "id": "d",
+            "text": "A hard concurrency semaphore of 1"
+          }
+        ],
+        "correctOptionId": "a"
+      },
+      "explanation": "**Token bucket** refills tokens at the sustained rate and lets unused tokens accumulate up to the bucket size, so an idle client banks capacity and can spend it in a burst — exactly the behaviour required. A **leaky bucket** smooths output to a fixed drain rate, deliberately flattening bursts, which is the opposite of what we want. A **fixed window counter** is bursty in the wrong way: it permits double the limit across a window boundary while still rejecting legitimate bursts inside a window. A concurrency semaphore of 1 limits parallelism, not request rate, and would serialise the client rather than rate-limit it."
+    },
+    {
+      "id": "sd-sa-circuit-breaker",
+      "technology": "system-design",
+      "technologyName": "System Design",
+      "difficulty": 3,
+      "difficultyLabel": "medium",
+      "type": "SHORT_ANSWER",
+      "tags": [
+        "circuit-breaker"
+      ],
+      "prompt": "What is a **circuit breaker**, and what problem does it prevent?",
+      "answer": {
+        "sampleAnswer": "A circuit breaker wraps calls to a downstream dependency and trips open after a threshold of failures, so subsequent calls fail fast instead of waiting on a doomed request. This prevents a cascading failure: without it, a slow or down dependency would tie up threads and connections in the caller, exhaust its resources, and propagate the outage upstream. After a cooldown the breaker moves to half-open and lets a probe request through; if it succeeds the breaker closes and normal traffic resumes, otherwise it re-opens."
+      },
+      "explanation": "A **circuit breaker** monitors failures to a dependency and, past a threshold, opens to make calls **fail fast** rather than block. This stops a single unhealthy downstream from exhausting the caller's threads/connections and cascading the failure system-wide. Its three states — closed (normal), open (short-circuiting), half-open (trial requests) — let it recover automatically, and it is typically paired with timeouts, retries with backoff, and a fallback response."
+    },
+    {
+      "id": "sd-fc-slo-error-budget",
+      "technology": "system-design",
+      "technologyName": "System Design",
+      "difficulty": 4,
+      "difficultyLabel": "hard",
+      "type": "FLASHCARD",
+      "tags": [
+        "observability-sd"
+      ],
+      "prompt": "In observability/SRE terms, what is an **SLO** and how does an **error budget** derive from it?",
+      "answer": {
+        "back": "An **SLO** (Service Level Objective) is a target for a reliability metric over a window — e.g. 99.9% of requests succeed in 30 days. The **error budget** is the inverse: the allowed amount of failure — here 0.1% of requests (or, if the SLI is time-based uptime instead, ~43 minutes/month of unavailability; pick one SLI, don't equate the two). Teams spend the budget on risk — shipping features, running experiments — and when it is exhausted they freeze risky changes and prioritise reliability. It turns 'how reliable is reliable enough' into a measurable, negotiable contract instead of chasing unattainable 100%."
+      },
+      "explanation": "Error budgets reframe reliability as a resource to be managed rather than maximised, aligning product velocity and operational stability. They depend on good observability — the SLIs (latency, error rate, availability) must be measured from the user's perspective for the SLO and budget to mean anything."
+    },
+    {
+      "id": "sd-tf-circuit-breaker-half-open",
+      "technology": "system-design",
+      "technologyName": "System Design",
+      "difficulty": 4,
+      "difficultyLabel": "hard",
+      "type": "TRUE_FALSE",
+      "tags": [
+        "circuit-breaker"
+      ],
+      "prompt": "An open circuit breaker stays open permanently until an operator manually resets it.",
+      "answer": {
+        "value": false
+      },
+      "explanation": "A circuit breaker is self-healing. After the open timeout elapses it transitions to **half-open**, allowing a limited number of trial requests through. If those succeed it closes and resumes normal traffic; if they fail it re-opens and waits again. This automatic probing is the whole point — it lets the system recover without human intervention while still shielding a struggling downstream from a thundering herd."
+    },
+    {
+      "id": "sd-fc-consistent-hashing",
+      "technology": "system-design",
+      "technologyName": "System Design",
+      "difficulty": 5,
+      "difficultyLabel": "expert",
+      "type": "FLASHCARD",
+      "tags": [
+        "sharding"
+      ],
+      "prompt": "What problem does **consistent hashing** solve when sharding data across nodes, and how do virtual nodes help?",
+      "answer": {
+        "back": "Naive sharding with `hash(key) % N` remaps almost every key when `N` changes, forcing a massive reshuffle whenever you add or remove a node. Consistent hashing places nodes and keys on a hash ring so that adding/removing a node only moves the keys in one adjacent arc — roughly `1/N` of the data — rather than nearly all of it. **Virtual nodes** (many ring positions per physical node) smooth out the uneven key distribution and let you weight heterogeneous machines, avoiding hot shards."
+      },
+      "explanation": "Consistent hashing is foundational to distributed caches and databases (Dynamo, Cassandra, memcached clients) precisely because it minimises rebalancing churn during scaling and failure events. Without virtual nodes a small ring produces lopsided load; with them, distribution converges to near-uniform."
+    },
+    {
+      "id": "sd-mcq-traces-vs-logs-metrics",
+      "technology": "system-design",
+      "technologyName": "System Design",
+      "difficulty": 5,
+      "difficultyLabel": "expert",
+      "type": "MCQ_SINGLE",
+      "tags": [
+        "observability-sd"
+      ],
+      "prompt": "A request that fans out across six microservices is intermittently slow, and per-service dashboards each look healthy in isolation. Which observability signal is **purpose-built** to locate where the latency is spent across that single request's path?",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "Distributed tracing with a propagated trace/span context across all services"
+          },
+          {
+            "id": "b",
+            "text": "Per-service aggregate latency metrics (p50/p95 counters)"
+          },
+          {
+            "id": "c",
+            "text": "Structured logs grepped independently on each service"
+          },
+          {
+            "id": "d",
+            "text": "An uptime health-check endpoint polled every 30 seconds"
+          }
+        ],
+        "correctOptionId": "a"
+      },
+      "explanation": "**Distributed tracing** stitches together the spans of one request as it crosses service boundaries via a propagated trace context, so you can see exactly which hop consumed the time — the precise need when each service looks fine on its own. Aggregate **metrics** tell you *that* p95 is high but average away the individual slow request and cannot attribute latency across the chain. **Logs** are per-service and unordered relative to each other; without a shared trace id you cannot reliably reconstruct one request's journey across all six. A **health check** only answers up/down liveness and says nothing about per-request latency distribution. Metrics, logs, and traces are complementary, but tracing is the one built for cross-service request attribution."
+    },
+    {
+      "id": "ai-out-greedy-argmax",
+      "technology": "ai-engineering",
+      "technologyName": "AI Engineering",
+      "difficulty": 2,
+      "difficultyLabel": "easy",
+      "type": "CODE_OUTPUT",
+      "tags": [
+        "sampling-temperature"
+      ],
+      "prompt": "At `temperature = 0` a model decodes greedily — it always emits the highest-probability token. This simulates that single step over a tiny set of next-token logits. What does it print?",
+      "answer": {
+        "code": "const logits = { cat: 2.1, dog: 0.7, bird: 1.4 };\n\nconst next = Object.entries(logits).reduce((best, cur) =>\n  cur[1] > best[1] ? cur : best\n)[0];\n\nconsole.log(next);",
+        "language": "typescript",
+        "expectedOutput": "cat"
+      },
+      "explanation": "Greedy decoding (the effective behaviour at `temperature = 0`) takes the `argmax` over the logits, ignoring the rest of the distribution. The largest score is `2.1` for `cat`, so that token is chosen. This is why `temperature = 0` makes a model approximately deterministic for a fixed prompt and model version — it removes the sampling step. It is not a true RNG seed though: ties, hardware/kernel non-determinism, and provider-side changes can still cause drift."
+    },
+    {
+      "id": "ai-out-token-estimate",
+      "technology": "ai-engineering",
+      "technologyName": "AI Engineering",
+      "difficulty": 2,
+      "difficultyLabel": "easy",
+      "type": "CODE_OUTPUT",
+      "tags": [
+        "tokens-context",
+        "latency-cost"
+      ],
+      "prompt": "A common back-of-the-envelope rule for English text is roughly 4 characters per token. This estimates the token count of a string using that heuristic. What does it print?",
+      "answer": {
+        "code": "import math\n\ntext = \"The quick brown fox jumps over the lazy dog today\"\nestimate = math.ceil(len(text) / 4)\nprint(estimate)",
+        "language": "python",
+        "expectedOutput": "13"
+      },
+      "explanation": "The string is 49 characters; `ceil(49 / 4) = ceil(12.25) = 13`. The `~4 chars/token` rule is a quick estimate for budgeting context windows and cost, not an exact count — real tokenizers (BPE) split on sub-word units, so whitespace, punctuation, code, and non-English text all change the ratio. For anything that must be exact (e.g. enforcing a hard context limit) you should call the model's real tokenizer rather than rely on this heuristic."
+    },
+    {
+      "id": "ai-sa-streaming-why",
+      "technology": "ai-engineering",
+      "technologyName": "AI Engineering",
+      "difficulty": 2,
+      "difficultyLabel": "easy",
+      "type": "SHORT_ANSWER",
+      "tags": [
+        "streaming",
+        "latency-cost"
+      ],
+      "prompt": "Why do production chat UIs stream tokens, and what does streaming improve versus what it does not?",
+      "answer": {
+        "sampleAnswer": "Streaming sends tokens to the client as they're generated rather than waiting for the full completion, which dramatically lowers perceived latency — the user sees the first token (time-to-first-token) in a fraction of a second instead of staring at a spinner for the whole response. What it does not change is the total time to finish or the total cost: the same number of tokens are generated and billed, so streaming improves perceived responsiveness, not throughput or price."
+      },
+      "explanation": "Streaming is purely a latency-perception win: tokens are flushed incrementally so the user gets immediate feedback (low time-to-first-token), which matters a lot for long generations. It does not reduce total generation time, total tokens, or cost — those are fixed by the output length. It does add engineering cost: you must handle partial output, parse incrementally, and deal with mid-stream errors and cancellation."
+    },
+    {
+      "id": "ai-bug-json-parse-no-trycatch",
+      "technology": "ai-engineering",
+      "technologyName": "AI Engineering",
+      "difficulty": 3,
+      "difficultyLabel": "medium",
+      "type": "FIND_THE_BUG",
+      "tags": [
+        "structured-output",
+        "guardrails"
+      ],
+      "prompt": "This extracts structured data from a model reply and crashes intermittently in production. Which line is the bug?",
+      "answer": {
+        "code": "async function extract(text: string) {\n  const res = await client.chat.completions.create({\n    model,\n    messages: [{ role: \"user\", content: \"Return JSON with a 'name' field for: \" + text }],\n  });\n  const raw = res.choices[0].message.content;\n  const data = JSON.parse(raw);\n  return data.name;\n}",
+        "language": "typescript",
+        "buggyLines": [
+          7
+        ]
+      },
+      "explanation": "Line 7 calls `JSON.parse` directly on free-form model output. LLM text output is **not guaranteed to be valid JSON** — the model can wrap it in a ```json code fence, add a prose preamble, truncate on a token limit, or emit `null` — and any of those throws a `SyntaxError` that takes down the request. The robust pattern is to request a structured/JSON output mode (or a tool/function-call schema), then still wrap the parse in `try/catch`, validate the shape against a schema (e.g. Zod), and retry or fail gracefully. Trusting raw output to parse is the most common cause of flaky extraction pipelines."
+    },
+    {
+      "id": "ai-mcq-tool-calling-flow",
+      "technology": "ai-engineering",
+      "technologyName": "AI Engineering",
+      "difficulty": 3,
+      "difficultyLabel": "medium",
+      "type": "MCQ_SINGLE",
+      "tags": [
+        "tool-calling"
+      ],
+      "prompt": "When an LLM \"calls a tool\" (function calling), what does the model itself actually produce in the API response?",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "The model executes the function on the provider's servers and returns the result"
+          },
+          {
+            "id": "b",
+            "text": "A structured request naming the tool and its arguments; your application runs it and feeds the result back"
+          },
+          {
+            "id": "c",
+            "text": "Raw Python that your runtime must `eval` to get the answer"
+          },
+          {
+            "id": "d",
+            "text": "A natural-language description of the function it wishes existed"
+          }
+        ],
+        "correctOptionId": "b"
+      },
+      "explanation": "Function/tool calling is a protocol, not remote execution: given your tool definitions (name, description, JSON-Schema parameters), the model decides *whether* to call one and emits a structured tool-call with arguments. **Your** code executes the tool, then sends the result back as a tool/function message so the model can use it in its next turn. The provider does not run your code (a) — it has no access to your database or APIs. The model returns structured arguments, not executable code to `eval` (c); `eval`-ing model output would be a serious injection risk. And it is a concrete, parseable call, not a vague wish (d)."
+    },
+    {
+      "id": "ai-sa-prompt-caching",
+      "technology": "ai-engineering",
+      "technologyName": "AI Engineering",
+      "difficulty": 3,
+      "difficultyLabel": "medium",
+      "type": "SHORT_ANSWER",
+      "tags": [
+        "llm-caching",
+        "latency-cost"
+      ],
+      "prompt": "What is prompt caching, and how should you structure a prompt to benefit from it?",
+      "answer": {
+        "sampleAnswer": "Prompt caching lets the provider reuse the computed attention state for a large, stable prefix of your prompt (system instructions, few-shot examples, a long document) across requests, so repeated calls are cheaper and lower latency because the cached prefix is billed at a reduced rate and skips recomputation. To benefit, put the stable, reused content at the front of the prompt and the variable, per-request content (the user's question) at the end — caching keys off the longest matching prefix."
+      },
+      "explanation": "Caching works on a prefix match: the provider stores the key/value attention state for an unchanged leading span and reuses it on subsequent calls, cutting both cost and time-to-first-token. The practical rule is order-dependent — keep the big invariant blob (system prompt, tool definitions, long context document, few-shot exemplars) at the start and anything that changes per request at the tail, otherwise the cache misses on every call."
+    },
+    {
+      "id": "ai-fc-llm-as-judge",
+      "technology": "ai-engineering",
+      "technologyName": "AI Engineering",
+      "difficulty": 4,
+      "difficultyLabel": "hard",
+      "type": "FLASHCARD",
+      "tags": [
+        "llm-eval"
+      ],
+      "prompt": "What is \"LLM-as-judge\" evaluation, and what are its main pitfalls?",
+      "answer": {
+        "back": "**LLM-as-judge** uses a (usually strong) model to score or compare outputs against a rubric — e.g. rating faithfulness, relevance, or picking the better of two responses — so you can evaluate open-ended generations at scale where exact-match metrics fail. Pitfalls: **positional/verbosity/self-preference bias** (favoring the first option, longer answers, or its own family), **rubric ambiguity** producing noisy scores, **cost/latency** of judging at scale, and **drift** when the judge model changes. Mitigate with clear rubrics and few-shot anchors, randomized option order, pairwise comparisons over absolute scores, and calibrating the judge against a human-labeled gold set."
+      },
+      "explanation": "LLM-as-judge unlocks scalable evaluation of subjective/open-ended outputs, but it's a measurement instrument that must itself be validated against human labels and de-biased — otherwise you optimize toward the judge's quirks rather than real quality."
+    },
+    {
+      "id": "ai-multi-prompt-injection-mitigations",
+      "technology": "ai-engineering",
+      "technologyName": "AI Engineering",
+      "difficulty": 4,
+      "difficultyLabel": "hard",
+      "type": "MCQ_MULTI",
+      "tags": [
+        "prompt-injection"
+      ],
+      "prompt": "Your agent reads untrusted web content and has tools that can read files and call internal APIs. Which of the following are **genuine, meaningful mitigations** against prompt injection?",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "Apply least privilege to tools and require human approval (or hard policy checks) for high-impact actions"
+          },
+          {
+            "id": "b",
+            "text": "Clearly delimit untrusted content and instruct the model to treat it as data, not instructions"
+          },
+          {
+            "id": "c",
+            "text": "Raise the temperature so the model is less predictable to attackers"
+          },
+          {
+            "id": "d",
+            "text": "Validate and constrain tool outputs/arguments before executing them (allow-lists, schemas, sandboxing)"
+          },
+          {
+            "id": "e",
+            "text": "Trust the system prompt to always win because it appears first"
+          }
+        ],
+        "correctOptionIds": [
+          "a",
+          "b",
+          "d"
+        ]
+      },
+      "explanation": "Effective defenses are layered and architectural. Least privilege plus human-in-the-loop for dangerous actions (a) limits blast radius even when an injection succeeds. Delimiting untrusted text and labeling it as data (b) helps the model resist hijacking — it is necessary but not sufficient on its own. Validating/sandboxing what tools receive and do (d) stops a hijacked call from causing real damage. Raising temperature (c) does nothing for safety; it just adds randomness and can make the system less reliable. \"The system prompt always wins\" (e) is false — there is no hard precedence boundary in the token stream, and crafted injections routinely override prepended instructions, which is exactly why you cannot rely on prompt ordering alone."
+    },
+    {
+      "id": "ai-sa-agentic-rag-tradeoffs",
+      "technology": "ai-engineering",
+      "technologyName": "AI Engineering",
+      "difficulty": 5,
+      "difficultyLabel": "expert",
+      "type": "SHORT_ANSWER",
+      "tags": [
+        "agentic-rag",
+        "agent-loops"
+      ],
+      "prompt": "What does 'agentic RAG' add over a classic retrieve-then-generate pipeline, and what does that flexibility cost?",
+      "answer": {
+        "sampleAnswer": "Agentic RAG makes retrieval a tool that an LLM agent controls rather than a fixed first step. The agent can decide whether to retrieve at all, reformulate or decompose the query, retrieve iteratively for multi-hop questions, choose among multiple sources or indexes, and judge whether the retrieved context is sufficient before answering — re-querying when it is not. That handles ambiguous and multi-hop queries a single static top-k retrieval gets wrong. The cost is more LLM calls per question, so higher latency and token cost, more non-determinism, and harder evaluation and tracing; it can also loop or over-retrieve. So you reach for it when query complexity justifies the overhead, and keep static RAG for simple single-fact lookups."
+      },
+      "explanation": "The win is model-controlled, iterative, multi-source retrieval that adapts to the query — deciding whether to retrieve, reformulating, decomposing, and re-querying until the context is sufficient. The price is extra LLM round-trips: latency, token cost, non-determinism, and harder eval/tracing, with a risk of looping. Match the architecture to query complexity; static retrieve-then-generate stays the right default for simple lookups."
+    },
+    {
+      "id": "ai-sa-decompose-rag-eval",
+      "technology": "ai-engineering",
+      "technologyName": "AI Engineering",
+      "difficulty": 5,
+      "difficultyLabel": "expert",
+      "type": "SHORT_ANSWER",
+      "tags": [
+        "rag-eval-metrics",
+        "retrieval-quality"
+      ],
+      "prompt": "Why do RAG evaluation frameworks (e.g. RAGAS) score the retrieval stage and the generation stage with separate metrics instead of one end-to-end answer-quality score?",
+      "answer": {
+        "sampleAnswer": "Because a single end-to-end score tells you the answer was bad but not why, and the two stages fail for different reasons with different fixes. Retrieval metrics like context recall and context precision check whether the right, relevant passages were fetched at all; generation metrics like faithfulness and answer relevance check whether the model grounded its answer in that context and actually addressed the question. Decomposing localizes the fault: if context recall is low, the needed passage was never retrieved, so you fix chunking, the embedding model, or reranking; if recall is fine but faithfulness is low, the evidence was present but the model ignored or contradicted it, so you fix the prompt or the model. Separate metrics turn 'the answer is wrong' into an actionable diagnosis."
+      },
+      "explanation": "A blended score can't separate 'we never fetched the right evidence' (retrieval — low context recall) from 'we had the evidence and still got it wrong' (generation — low faithfulness). Those have different fixes — chunking/embeddings/reranking versus prompt/model — so component metrics convert a failing answer into a specific stage you can act on."
+    },
+    {
+      "id": "py-bug-integer-division",
+      "technology": "python",
+      "technologyName": "Python",
+      "difficulty": 2,
+      "difficultyLabel": "easy",
+      "type": "FIND_THE_BUG",
+      "tags": [
+        "numeric-model"
+      ],
+      "prompt": "`average([1, 2])` should return `1.5` but returns `1`. Which line is wrong?",
+      "answer": {
+        "code": "def average(nums):\n    return sum(nums) // len(nums)\n\nprint(average([1, 2]))  # prints 1, want 1.5",
+        "language": "python",
+        "buggyLines": [
+          2
+        ]
+      },
+      "explanation": "`//` is floor division, which discards the fractional part and yields an `int`. Use true division `/` for a float average: `return sum(nums) / len(nums)`."
+    },
+    {
+      "id": "py-multi-falsy-values",
+      "technology": "python",
+      "technologyName": "Python",
+      "difficulty": 2,
+      "difficultyLabel": "easy",
+      "type": "MCQ_MULTI",
+      "tags": [
+        "truthiness",
+        "none-handling"
+      ],
+      "prompt": "Which of these values are falsy (i.e. `bool(value)` is `False`)? Select all that apply.",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "`[]`"
+          },
+          {
+            "id": "b",
+            "text": "`0`"
+          },
+          {
+            "id": "c",
+            "text": "`\"\"`"
+          },
+          {
+            "id": "d",
+            "text": "`\"0\"`"
+          },
+          {
+            "id": "e",
+            "text": "`[0]`"
+          }
+        ],
+        "correctOptionIds": [
+          "a",
+          "b",
+          "c"
+        ]
+      },
+      "explanation": "Empty containers (`[]`), the number zero (`0`), and the empty string (`\"\"`) are all falsy. The string `\"0\"` is a non-empty string and the list `[0]` is a non-empty list — both are truthy, because truthiness depends on emptiness, not on the contents being zero-like."
+    },
+    {
+      "id": "py-tf-dict-insertion-order",
+      "technology": "python",
+      "technologyName": "Python",
+      "difficulty": 2,
+      "difficultyLabel": "easy",
+      "type": "TRUE_FALSE",
+      "tags": [
+        "dict-set",
+        "iteration"
+      ],
+      "prompt": "As of Python 3.7, a regular `dict` preserves insertion order when iterated.",
+      "answer": {
+        "value": true
+      },
+      "explanation": "Ordered iteration by insertion became a guaranteed language feature in Python 3.7 (it was a CPython implementation detail in 3.6). Iterating a `dict`, its `keys()`, `values()`, or `items()` yields entries in the order they were first inserted, so `OrderedDict` is now needed only for its extra ordering methods."
+    },
+    {
+      "id": "py-bug-dict-missing-key",
+      "technology": "python",
+      "technologyName": "Python",
+      "difficulty": 3,
+      "difficultyLabel": "medium",
+      "type": "FIND_THE_BUG",
+      "tags": [
+        "dict-set",
+        "collections"
+      ],
+      "prompt": "This word-counter raises `KeyError: 'a'` on the very first word. What is the fix?",
+      "answer": {
+        "code": "def counts(words):\n    d = {}\n    for w in words:\n        d[w] += 1\n    return d\n\nprint(counts(['a', 'a', 'b']))",
+        "language": "python",
+        "options": [
+          {
+            "id": "a",
+            "text": "Seed each key first, e.g. `d[w] = d.get(w, 0) + 1` (or use `collections.Counter`)"
+          },
+          {
+            "id": "b",
+            "text": "Iterate with `for w in d:` instead of `for w in words:`"
+          },
+          {
+            "id": "c",
+            "text": "Initialise `d = dict()` rather than `d = {}`"
+          },
+          {
+            "id": "d",
+            "text": "Return inside the loop with `return d` at each step"
+          }
+        ],
+        "correctOptionId": "a"
+      },
+      "explanation": "`d[w] += 1` expands to `d[w] = d[w] + 1`, which reads `d[w]` before it exists and raises `KeyError`. Use `d.get(w, 0) + 1`, a `defaultdict(int)`, or `collections.Counter`."
+    },
+    {
+      "id": "py-mcq-bool-is-int-subclass",
+      "technology": "python",
+      "technologyName": "Python",
+      "difficulty": 3,
+      "difficultyLabel": "medium",
+      "type": "MCQ_SINGLE",
+      "tags": [
+        "numeric-model",
+        "truthiness"
+      ],
+      "prompt": "What does `isinstance(True, int)` return, and why?",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "`True` — `bool` is a subclass of `int`, so `True` behaves as `1` and `False` as `0`"
+          },
+          {
+            "id": "b",
+            "text": "`False` — `bool` and `int` are unrelated types"
+          },
+          {
+            "id": "c",
+            "text": "`False` — `int` is a subclass of `bool`, not the other way around"
+          },
+          {
+            "id": "d",
+            "text": "It raises a `TypeError` because `True` is not a class instance"
+          }
+        ],
+        "correctOptionId": "a"
+      },
+      "explanation": "`bool` is defined as a subclass of `int` in Python, so `isinstance(True, int)` is `True` and booleans participate in arithmetic — `True + True` is `2`. This is why `isinstance(x, int)` accidentally accepts booleans, and why summing a list of bools counts the `True` values."
+    },
+    {
+      "id": "py-mcq-classmethod-vs-staticmethod",
+      "technology": "python",
+      "technologyName": "Python",
+      "difficulty": 3,
+      "difficultyLabel": "medium",
+      "type": "MCQ_SINGLE",
+      "tags": [
+        "classmethod-staticmethod"
+      ],
+      "prompt": "What distinguishes a `@classmethod` from a `@staticmethod`?",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "A classmethod receives the class as an implicit first argument (`cls`); a staticmethod receives no implicit first argument at all"
+          },
+          {
+            "id": "b",
+            "text": "A staticmethod receives the instance (`self`); a classmethod receives nothing"
+          },
+          {
+            "id": "c",
+            "text": "A classmethod can be called on the class but a staticmethod can only be called on an instance"
+          },
+          {
+            "id": "d",
+            "text": "There is no difference; the two decorators are aliases"
+          }
+        ],
+        "correctOptionId": "a"
+      },
+      "explanation": "`@classmethod` binds the class to an implicit first parameter `cls`, which is why it can reference class attributes or act as an alternate constructor and respects subclassing. `@staticmethod` gets no implicit argument — it is just a plain function namespaced on the class. Both can be called via the class or an instance."
+    },
+    {
+      "id": "py-out-try-else-finally-return",
+      "technology": "python",
+      "technologyName": "Python",
+      "difficulty": 4,
+      "difficultyLabel": "hard",
+      "type": "CODE_OUTPUT",
+      "tags": [
+        "try-except-else-finally",
+        "exceptions"
+      ],
+      "prompt": "What does this print, one value per line?",
+      "answer": {
+        "code": "def f():\n    try:\n        print(\"try\")\n        return \"result\"\n    except Exception:\n        print(\"except\")\n    else:\n        print(\"else\")\n    finally:\n        print(\"finally\")\n\nprint(f())",
+        "language": "python",
+        "expectedOutput": "try\nfinally\nresult"
+      },
+      "explanation": "The `try` block prints `try` and hits `return`. The `else` clause runs only when the `try` block completes *without* returning or raising, so the `return` skips it entirely. `finally` always runs before the function actually exits, printing `finally`, and then the pending return value `\"result\"` is delivered."
+    },
+    {
+      "id": "py-short-gil",
+      "technology": "python",
+      "technologyName": "Python",
+      "difficulty": 4,
+      "difficultyLabel": "hard",
+      "type": "SHORT_ANSWER",
+      "tags": [
+        "gil",
+        "threading-multiprocessing"
+      ],
+      "prompt": "What is the GIL, and what does it mean for CPU-bound versus I/O-bound work using threads?",
+      "answer": {
+        "sampleAnswer": "The Global Interpreter Lock is a mutex in CPython that lets only one thread execute Python bytecode at a time. For CPU-bound work, threads can't run in parallel on multiple cores, so you reach for multiprocessing (separate interpreters) instead. For I/O-bound work the lock is released while a thread waits on the network or disk, so threads still overlap usefully and give real concurrency."
+      },
+      "explanation": "The GIL serialises Python bytecode execution per process, so CPU-bound threads don't scale across cores — use multiprocessing for those. I/O-bound threads still help because the GIL is released during blocking I/O, letting other threads run."
+    },
+    {
+      "id": "py-mcq-mro-c3",
+      "technology": "python",
+      "technologyName": "Python",
+      "difficulty": 5,
+      "difficultyLabel": "expert",
+      "type": "MCQ_SINGLE",
+      "tags": [
+        "mro",
+        "classes"
+      ],
+      "prompt": "Given this diamond, what does `D().who()` return?\n\n```python\nclass A:\n    def who(self): return \"A\"\nclass B(A):\n    def who(self): return \"B\"\nclass C(A):\n    def who(self): return \"C\"\nclass D(B, C):\n    pass\n```",
+      "answer": {
+        "options": [
+          {
+            "id": "a",
+            "text": "`\"B\"`"
+          },
+          {
+            "id": "b",
+            "text": "`\"C\"`"
+          },
+          {
+            "id": "c",
+            "text": "`\"A\"`"
+          },
+          {
+            "id": "d",
+            "text": "It raises a `TypeError` for ambiguous inheritance"
+          }
+        ],
+        "correctOptionId": "a"
+      },
+      "explanation": "Python resolves attributes along the C3-linearized method resolution order, which for `D(B, C)` is `D -> B -> C -> A -> object`. The first class on that chain defining `who` is `B`, so `D().who()` returns `\"B\"`. The MRO is what makes cooperative `super()` calls work without re-running shared bases."
+    },
+    {
+      "id": "py-out-late-binding-closure",
+      "technology": "python",
+      "technologyName": "Python",
+      "difficulty": 5,
+      "difficultyLabel": "expert",
+      "type": "CODE_OUTPUT",
+      "tags": [
+        "legb-scope",
+        "comprehensions"
+      ],
+      "prompt": "What does this print?",
+      "answer": {
+        "code": "funcs = [lambda: i for i in range(3)]\nprint([f() for f in funcs])",
+        "language": "python",
+        "expectedOutput": "[2, 2, 2]"
+      },
+      "explanation": "Each lambda closes over the *variable* `i`, not its value at creation time (late binding). By the time the lambdas are called, the comprehension has finished and `i` holds its final value `2`, so all three return `2`. To capture the per-iteration value, bind it as a default argument: `lambda i=i: i`."
+    }
+  ]
+}

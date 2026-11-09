@@ -50,7 +50,11 @@ def main():
         port = sock.getsockname()[1]
     server = uvicorn.Server(
         uvicorn.Config(
-            create_app(url), host="127.0.0.1", port=port, log_level="error", access_log=False
+            create_app(url, local_only=False),
+            host="127.0.0.1",
+            port=port,
+            log_level="error",
+            access_log=False,
         )
     )
     thread = threading.Thread(target=server.run, daemon=True)

@@ -128,6 +128,11 @@ def store(db, principal, payload, trace):
 
 def import_document(db, principal, args, trace):
     growth.authorize_import(db, principal)
+    return store(db, principal, document_payload(args), trace)
+
+
+def document_payload(args):
+    """Shared validation for imports and confirmed revisions of owned references."""
     args = {**args, "url": reference_url(args["url"])}
     scan_upload(growth.dump(args).encode(), "source-reference.json")
     if not args["url"] and not args["text"]:
@@ -140,21 +145,16 @@ def import_document(db, principal, args, trace):
         if claim["end"] > len(args["text"]) or claim["start"] >= claim["end"]:
             raise DomainError("INVALID_QUOTE", "观点引用需指向本次摘录中的原文范围", 422)
         claim["quote"] = args["text"][claim["start"] : claim["end"]]
-    return store(
-        db,
-        principal,
-        {
-            **args,
-            "platform": platform(args["url"]),
-            "access_mode": "user_import",
-            "rights_basis": "user_confirmed_local_processing",
-            "imported_at": growth.utc_now(),
-            "retrieved_at": None,
-            "source_type": "user_declared_" + args["declared_type"],
-            "verification": "本人提交与标注，尚未独立读取或核实原文",
-        },
-        trace,
-    )
+    return {
+        **args,
+        "platform": platform(args["url"]),
+        "access_mode": "user_import",
+        "rights_basis": "user_confirmed_local_processing",
+        "imported_at": growth.utc_now(),
+        "retrieved_at": None,
+        "source_type": "user_declared_" + args["declared_type"],
+        "verification": "本人提交与标注，尚未独立读取或核实原文",
+    }
 
 
 def delete_document(db, principal, source_id, expected, trace):

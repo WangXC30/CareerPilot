@@ -243,6 +243,9 @@ def register_growth(app, session_dependency, identity):
         db.flush()
         db.execute(delete(GrowthRevision).where(GrowthRevision.record_id == row.id))
         db.delete(row)
+        from careerpilot.workflows import invalidate_checkpoints
+
+        invalidate_checkpoints(db, principal, request.state.trace_id)
         audit(db, principal, memory_id, "memory.deleted", version + 1, request.state.trace_id)
         db.commit()
 

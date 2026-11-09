@@ -10,6 +10,7 @@ from pathlib import Path
 import uvicorn
 from alembic import command
 from alembic.config import Config
+from browser_identity import connect_browser
 from fastapi.testclient import TestClient
 from playwright.sync_api import expect, sync_playwright
 from sqlalchemy.orm import Session
@@ -37,7 +38,7 @@ def main():
         seed(engine)
         uid, token = provision(engine, "Synthetic remaining tasks")
         headers = {"Authorization": "Bearer " + token}
-        with TestClient(create_app(url)) as client:
+        with TestClient(create_app(url, local_only=False)) as client:
             fact = checked(
                 client.post(
                     "/api/v1/resume-facts",
@@ -98,7 +99,9 @@ def main():
             sock.bind(("127.0.0.1", 0))
             port = sock.getsockname()[1]
         server = uvicorn.Server(
-            uvicorn.Config(create_app(url), host="127.0.0.1", port=port, log_level="error")
+            uvicorn.Config(
+                create_app(url, local_only=False), host="127.0.0.1", port=port, log_level="error"
+            )
         )
         thread = threading.Thread(target=server.run, daemon=True)
         thread.start()
@@ -116,9 +119,7 @@ def main():
                         errors = []
                         page.on("pageerror", lambda e: errors.append(str(e)))
                         page.goto(f"http://127.0.0.1:{port}/app/#local-tools")
-                        page.locator("#connect").click()
-                        page.locator("#token").fill(token)
-                        page.locator("#account-form button[type=submit]").click()
+                        connect_browser(page, token)
                         expect(page.locator("#practice-add")).to_be_visible()
                         form = page.locator("#practice-add")
                         title = f"本人算法练习 {width}"

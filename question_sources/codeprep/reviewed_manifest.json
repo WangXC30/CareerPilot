@@ -1,0 +1,65 @@
+{
+  "source_commit": "1bc3a641cabdcef8bec6771bded34761911a60f5",
+  "items": [
+    {
+      "id": "ts-mcq-union-type-meaning",
+      "topic": "TypeScript",
+      "fingerprint": "a2f6b2f47821e57b93276d9f5de8563bb64e8430382ceef7b1c95c9a0fe943bb",
+      "reference": "https://www.typescriptlang.org/docs/handbook/unions-and-intersections.html"
+    },
+    {
+      "id": "react-mcq-usestate-async-batching",
+      "topic": "React",
+      "fingerprint": "28b521ecca5619ab30b405d59e268adb3a08b4738a83686ec835a8d3a06c0a68",
+      "reference": "https://react.dev/learn/state-as-a-snapshot"
+    },
+    {
+      "id": "web-mcq-queryselector-first",
+      "topic": "Web API",
+      "fingerprint": "274f6c25b65226efc5e558a081d6402312e6339d9514b8b8751b4927678b946b",
+      "reference": "https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector"
+    },
+    {
+      "id": "web-mcq-popover-invoker-attribute",
+      "topic": "Web API",
+      "fingerprint": "19462d5cc604a0d5a4530291cd5c8640c562663ac55bf536450fb7a5ca6f64d6",
+      "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/button#popovertarget"
+    },
+    {
+      "id": "node-mcq-process-env-type",
+      "topic": "Node.js",
+      "fingerprint": "ae6331f6c51260e49f70c65321278e5af34408bd8940894123f6ffd68339caed",
+      "reference": "https://nodejs.org/api/process.html#processenv"
+    },
+    {
+      "id": "node-mcq-dirname-commonjs",
+      "topic": "Node.js",
+      "fingerprint": "0420a0ef9a138a5e5c4e619adcb2cdbc8c6685c9b8000da8d66771c54ba35847",
+      "reference": "https://nodejs.org/api/modules.html#the-module-wrapper"
+    },
+    {
+      "id": "sql-mcq-pgvector-knn",
+      "topic": "SQL",
+      "fingerprint": "992480f63553d50c2e6a0ef7948b02d0f580a17feb475723c53891d2a3233016",
+      "reference": "https://github.com/pgvector/pgvector#querying"
+    },
+    {
+      "id": "py-mcq-bool-is-int-subclass",
+      "topic": "Python",
+      "fingerprint": "1393702b6c1884318c6c8e210e39d08207d6155afef4f921cfd675a3b82df47f",
+      "reference": "https://docs.python.org/3/library/stdtypes.html#boolean-type-bool"
+    },
+    {
+      "id": "py-mcq-classmethod-vs-staticmethod",
+      "topic": "Python",
+      "fingerprint": "b836c99b7511442630bf3802fe875db641cd040ae008f8099e7dd173e1bc6076",
+      "reference": "https://docs.python.org/3/library/functions.html#classmethod"
+    },
+    {
+      "id": "py-mcq-mro-c3",
+      "topic": "Python",
+      "fingerprint": "edce522911c3a8874628e510d8fa4c269e62a9802ad6b1abd56c13fd0dffb6b8",
+      "reference": "https://docs.python.org/3/howto/mro.html"
+    }
+  ]
+}

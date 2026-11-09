@@ -50,7 +50,7 @@ def drill():
         engine.dispose()
         headers = {"Authorization": "Bearer " + token, "Idempotency-Key": "drill-goal"}
         times = []
-        with TestClient(create_app(url)) as client:
+        with TestClient(create_app(url, local_only=False)) as client:
             assert (
                 client.post(
                     "/api/v1/career-goals", headers=headers, json={"title": "Synthetic goal"}
@@ -99,7 +99,7 @@ def drill():
             scored = client.post(
                 f"/api/v1/assessments/{exam.json()['id']}/submit",
                 headers={**headers, "If-Match": '"1"'},
-                json={"answers": [0, 0, 0]},
+                json={"answers": [0] * len(exam.json()["questions"])},
             )
             assert scored.status_code == 200
             evidence_id = scored.json()["evidence"]["id"]
@@ -200,7 +200,7 @@ def drill():
             assert db.execute("PRAGMA integrity_check").fetchone()[0] == "ok"
         recovered_url = f"sqlite:///{restored.as_posix()}"
         recovered_engine = make_engine(recovered_url)
-        with TestClient(create_app(recovered_url)) as client:
+        with TestClient(create_app(recovered_url, local_only=False)) as client:
             assert client.get("/health/ready").status_code == 200
             verify_v4(client, recovered_engine, v4_state)
             assert any(

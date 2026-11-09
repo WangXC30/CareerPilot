@@ -140,6 +140,7 @@ def test_review_queue_wrong_questions_retake_revoke_and_owner_isolation(system):
     queue = ok(client.get("/api/v1/study-reviews", headers=alice))
     assert queue["items"][0]["assessment_id"] == created["id"]
     assert len(queue["items"][0]["wrong_questions"]) == 2
+    assert queue["items"][0]["wrong_questions"][0]["question"]["prompt"]
     assert ok(client.get("/api/v1/study-reviews", headers=bob))["items"] == []
     _, response = exam(client, alice)
     passed = ok(response)

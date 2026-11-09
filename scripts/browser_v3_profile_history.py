@@ -12,6 +12,7 @@ from urllib.parse import parse_qs, urlencode, urlsplit
 import uvicorn
 from alembic import command
 from alembic.config import Config
+from browser_identity import connect_browser
 from browser_v4_locale import MISMARKED
 from cryptography.fernet import Fernet
 from fastapi.testclient import TestClient
@@ -50,7 +51,7 @@ def run(locale="zh-CN"):
         seed(engine)
         _, token = provision(engine, "Timeline student")
         headers = {"Authorization": "Bearer " + token}
-        with TestClient(create_app(url)) as client:
+        with TestClient(create_app(url, local_only=False)) as client:
             ok(client.put("/api/v1/profile", headers=version(headers, 0), json=PROFILE))
             ok(
                 client.put(
@@ -79,7 +80,7 @@ def run(locale="zh-CN"):
         with patch.dict(os.environ, env), patch.object(github_binding, "remote", fake):
             server = uvicorn.Server(
                 uvicorn.Config(
-                    create_app(url),
+                    create_app(url, local_only=False),
                     host="127.0.0.1",
                     port=port,
                     log_level="error",
@@ -120,9 +121,7 @@ def run(locale="zh-CN"):
                     page.goto(base + "/app/#settings")
                     if locale == "en-US":
                         page.locator("#ui-locale").select_option(locale)
-                    page.locator("#connect").click()
-                    page.locator("#token").fill(token)
-                    page.locator("#account-form button[type=submit]").click()
+                    connect_browser(page, token)
                     expect(page.locator("#github-start")).to_be_enabled()
                     page.locator("#timeline-more").click()
                     expect(page.locator("#timeline-events")).to_contain_text("weekly_minutes")
@@ -160,7 +159,7 @@ def run(locale="zh-CN"):
                     assert fake.calls[-1][1] == "DELETE"
                     if locale == "en-US":
                         assert page.evaluate(MISMARKED) == [], page.evaluate(MISMARKED)
-                        expect(page.locator("#account-sessions")).to_contain_text("Unknown device")
+                        expect(page.locator("#account-sessions")).to_have_count(0)
                         callback = context.new_page()
                         callback.goto(base + "/app/github-callback.html?code=synthetic-removed")
                         expect(callback.locator("html")).to_have_attribute("lang", "en-US")
@@ -169,31 +168,13 @@ def run(locale="zh-CN"):
                         )
                         assert "code=" not in callback.url
                         callback.close()
-                        pending = []
-                        page.route(
-                            "**/api/v1/account/sessions/*", lambda route: pending.append(route)
-                        )
-                        with page.expect_request("**/api/v1/account/sessions/*"):
-                            page.locator('[data-current-session="true"]').click()
-                        page.evaluate("location.hash='portfolio'")
-                        expect(page.locator("#project-recommend")).to_be_attached()
-                        request = pending.pop()
-                        request.fulfill(response=request.fetch())
-                        page.unroute("**/api/v1/account/sessions/*")
-                    else:
-                        page.locator('[data-current-session="true"]').click()
-                    expect(page.locator("#connect")).to_have_text(
-                        "Connect my account" if locale == "en-US" else "连接我的账号"
-                    )
-                    if locale == "en-US":
-                        expect(page.locator("#project-recommend")).to_have_count(0)
-                    revoked = page.request.get(base + "/api/v1/account/export", headers=headers)
-                    assert revoked.status == 401
+                    exported = page.request.get(base + "/api/v1/account/export", headers=headers)
+                    assert exported.status == 200
                     assert not errors, errors
                     browser.close()
                 print(
                     "Chromium: timeline, OAuth popup/PKCE callback, public-only sync, "
-                    f"unbind, session revocation, 375px passed ({locale}); provider simulated"
+                    f"unbind, local data controls, 375px passed ({locale}); provider simulated"
                 )
             finally:
                 server.should_exit = True

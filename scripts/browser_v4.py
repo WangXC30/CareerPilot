@@ -9,6 +9,7 @@ from pathlib import Path
 import uvicorn
 from alembic import command
 from alembic.config import Config
+from browser_identity import connect_browser
 from fastapi.testclient import TestClient
 from playwright.sync_api import expect, sync_playwright
 from sqlalchemy.orm import Session
@@ -45,7 +46,7 @@ def main():
                 "browser",
             )
             db.commit()
-        with TestClient(create_app(url)) as client:
+        with TestClient(create_app(url, local_only=False)) as client:
             fact_response = client.post(
                 "/api/v1/resume-facts",
                 headers=headers,
@@ -76,7 +77,9 @@ def main():
             sock.bind(("127.0.0.1", 0))
             port = sock.getsockname()[1]
         server = uvicorn.Server(
-            uvicorn.Config(create_app(url), host="127.0.0.1", port=port, log_level="error")
+            uvicorn.Config(
+                create_app(url, local_only=False), host="127.0.0.1", port=port, log_level="error"
+            )
         )
         thread = threading.Thread(target=server.run, daemon=True)
         thread.start()
@@ -94,10 +97,7 @@ def main():
                         errors = []
                         page.on("pageerror", lambda error: errors.append(str(error)))
                         page.goto(f"http://127.0.0.1:{port}/app/")
-                        page.locator("#connect").click()
-                        page.locator("#token").fill(token)
-                        page.locator("#account-form button[type=submit]").click()
-                        expect(page.locator("#account-dialog")).not_to_be_visible()
+                        connect_browser(page, token)
                         if width == 375:
                             assert page.locator("#sidebar").evaluate("element=>element.inert")
                             page.locator("#menu").focus()
@@ -173,6 +173,15 @@ def main():
                         page.goto(f"http://127.0.0.1:{port}/app/#local-tools")
                         page.get_by_text("查看本地对照与步骤回放").click()
                         expect(page.get_by_text("extractor：find risk terms")).to_be_visible()
+                        page.locator("[data-experiment-replay]").first.locator("..").evaluate(
+                            "n=>n.open=true"
+                        )
+                        page.locator("[data-experiment-replay]").first.click()
+                        expect(page.locator("#tool-result")).to_contain_text("重算一致")
+                        review = page.locator(".experiment-review").first
+                        review.locator("[name=note]").fill("本人检查固定规则与冻结结果")
+                        review.locator("button").click()
+                        expect(page.locator("#tool-result")).to_contain_text("复核已保存")
                         assert page.evaluate(
                             "document.documentElement.scrollWidth <= window.innerWidth + 2"
                         ), width
@@ -189,7 +198,7 @@ def main():
                     expect(page.locator("#shared-content")).to_contain_text("onerror")
                     assert page.evaluate("window.__unsafe !== true")
                     assert page.evaluate("location.hash === ''")
-                    with TestClient(create_app(url)) as client:
+                    with TestClient(create_app(url, local_only=False)) as client:
                         assert (
                             client.delete(
                                 "/api/v1/object-shares/" + public_share["id"],

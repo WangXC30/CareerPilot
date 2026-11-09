@@ -109,7 +109,8 @@ def recommend(db, principal, job_id):
     if job.get("status") in {"closed", "merged"}:
         raise DomainError("JOB_UNAVAILABLE", "请选择当前有效岗位", 409)
     skills = {s["skill_id"] for s in job["skills"]}
-    profile = learning.profile_context(db, principal)
+    active = learning.active_plan(db, principal)
+    profile = learning.profile_context(db, principal, growth.data(active) if active else None)
     return (
         [
             {

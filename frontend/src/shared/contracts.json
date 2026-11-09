@@ -1,0 +1,5768 @@
+{
+  "AdaptiveAnswer": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "choice": {
+        "type": "integer",
+        "maximum": 2.0,
+        "minimum": 0.0,
+        "title": "Choice"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "choice"
+    ],
+    "title": "AdaptiveAnswer"
+  },
+  "AdaptiveInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "skill_ids": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 8,
+        "minItems": 1,
+        "title": "Skill Ids"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "skill_ids"
+    ],
+    "title": "AdaptiveInput"
+  },
+  "AnalyticsInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "event": {
+        "type": "string",
+        "enum": [
+          "learning_completed",
+          "assessment_completed",
+          "project_completed",
+          "application_recorded"
+        ],
+        "title": "Event"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "event"
+    ],
+    "title": "AnalyticsInput"
+  },
+  "AnswerInput": {
+    "properties": {
+      "question_id": {
+        "type": "string",
+        "maxLength": 100,
+        "minLength": 1,
+        "title": "Question Id"
+      },
+      "text": {
+        "type": "string",
+        "maxLength": 6000,
+        "title": "Text",
+        "default": ""
+      },
+      "choice": {
+        "anyOf": [
+          {
+            "type": "integer",
+            "maximum": 2.0,
+            "minimum": 0.0
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Choice"
+      },
+      "skipped": {
+        "type": "boolean",
+        "title": "Skipped",
+        "default": false
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "question_id"
+    ],
+    "title": "AnswerInput"
+  },
+  "AnswersInput": {
+    "properties": {
+      "answers": {
+        "items": {
+          "type": "integer",
+          "maximum": 3.0,
+          "minimum": 0.0
+        },
+        "type": "array",
+        "maxItems": 30,
+        "minItems": 1,
+        "title": "Answers"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "answers"
+    ],
+    "title": "AnswersInput"
+  },
+  "AppealInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "text": {
+        "type": "string",
+        "maxLength": 2000,
+        "minLength": 1,
+        "title": "Text"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "text"
+    ],
+    "title": "AppealInput"
+  },
+  "ApprovalInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "application_id": {
+        "type": "string",
+        "maxLength": 36,
+        "minLength": 36,
+        "title": "Application Id"
+      },
+      "preview_hash": {
+        "type": "string",
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Preview Hash"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "application_id",
+      "preview_hash"
+    ],
+    "title": "ApprovalInput"
+  },
+  "ArchiveRecord": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "archived": {
+        "type": "boolean",
+        "title": "Archived"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "archived"
+    ],
+    "title": "ArchiveRecord"
+  },
+  "AssetInput": {
+    "properties": {
+      "kind": {
+        "type": "string",
+        "enum": [
+          "text",
+          "github_reference"
+        ],
+        "title": "Kind"
+      },
+      "filename": {
+        "type": "string",
+        "maxLength": 110,
+        "minLength": 1,
+        "title": "Filename",
+        "default": "reference.md"
+      },
+      "content": {
+        "type": "string",
+        "maxLength": 65536,
+        "title": "Content",
+        "default": ""
+      },
+      "url": {
+        "type": "string",
+        "maxLength": 500,
+        "title": "Url",
+        "default": ""
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "kind"
+    ],
+    "title": "AssetInput"
+  },
+  "AssistantInput": {
+    "properties": {
+      "job_ids": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 20,
+        "title": "Job Ids"
+      },
+      "message": {
+        "type": "string",
+        "maxLength": 4000,
+        "minLength": 1,
+        "title": "Message"
+      },
+      "intent": {
+        "type": "string",
+        "enum": [
+          "auto",
+          "help",
+          "diagnose",
+          "plan",
+          "progress",
+          "resources",
+          "replan"
+        ],
+        "title": "Intent",
+        "default": "auto"
+      },
+      "plan_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 36
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Plan Id"
+      },
+      "conversation_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 36,
+            "minLength": 1
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Conversation Id"
+      },
+      "locale": {
+        "type": "string",
+        "enum": [
+          "zh-CN",
+          "en-US"
+        ],
+        "title": "Locale",
+        "default": "zh-CN"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "message"
+    ],
+    "title": "AssistantInput"
+  },
+  "BrandProfileInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "translation_id": {
+        "type": "string",
+        "maxLength": 36,
+        "minLength": 36,
+        "title": "Translation Id"
+      },
+      "fact_ids": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 20,
+        "minItems": 1,
+        "title": "Fact Ids"
+      },
+      "headline": {
+        "type": "string",
+        "maxLength": 120,
+        "minLength": 1,
+        "title": "Headline"
+      },
+      "privacy_reviewed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Privacy Reviewed"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "translation_id",
+      "fact_ids",
+      "headline",
+      "privacy_reviewed"
+    ],
+    "title": "BrandProfileInput"
+  },
+  "BusinessDetails": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "title": {
+        "type": "string",
+        "maxLength": 200,
+        "minLength": 1,
+        "title": "Title"
+      },
+      "note": {
+        "type": "string",
+        "maxLength": 4000,
+        "title": "Note",
+        "default": ""
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "title"
+    ],
+    "title": "BusinessDetails"
+  },
+  "CalendarEventInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "title": {
+        "type": "string",
+        "maxLength": 200,
+        "minLength": 1,
+        "title": "Title"
+      },
+      "kind": {
+        "type": "string",
+        "enum": [
+          "interview",
+          "deadline"
+        ],
+        "title": "Kind"
+      },
+      "date": {
+        "type": "string",
+        "format": "date",
+        "title": "Date"
+      },
+      "time": {
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d$"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Time"
+      },
+      "timezone": {
+        "type": "string",
+        "maxLength": 100,
+        "minLength": 1,
+        "title": "Timezone",
+        "default": "Asia/Shanghai"
+      },
+      "preparation_note": {
+        "type": "string",
+        "maxLength": 2000,
+        "title": "Preparation Note",
+        "default": ""
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "title",
+      "kind",
+      "date"
+    ],
+    "title": "CalendarEventInput"
+  },
+  "CalendarInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "event_ids": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 100,
+        "minItems": 1,
+        "title": "Event Ids"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "event_ids"
+    ],
+    "title": "CalendarInput"
+  },
+  "CallbackInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "state": {
+        "type": "string",
+        "maxLength": 128,
+        "minLength": 20,
+        "pattern": "^[A-Za-z0-9_-]+$",
+        "title": "State"
+      },
+      "code": {
+        "type": "string",
+        "maxLength": 512,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9_-]+$",
+        "title": "Code"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "state",
+      "code"
+    ],
+    "title": "CallbackInput"
+  },
+  "Case": {
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[A-Z][0-9]{2}$",
+        "title": "Id"
+      },
+      "specialist": {
+        "type": "string",
+        "enum": [
+          "career",
+          "learning",
+          "job",
+          "interview"
+        ],
+        "title": "Specialist"
+      },
+      "request": {
+        "type": "string",
+        "maxLength": 3000,
+        "minLength": 1,
+        "title": "Request"
+      },
+      "sources": {
+        "items": {
+          "$ref": "#/components/schemas/Source"
+        },
+        "type": "array",
+        "maxItems": 10,
+        "minItems": 1,
+        "title": "Sources"
+      },
+      "expected_action": {
+        "type": "string",
+        "title": "Expected Action"
+      },
+      "required_sources": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 10,
+        "minItems": 1,
+        "title": "Required Sources"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "id",
+      "specialist",
+      "request",
+      "sources",
+      "expected_action",
+      "required_sources"
+    ],
+    "title": "Case"
+  },
+  "Checklist": {
+    "properties": {
+      "facts": {
+        "type": "boolean",
+        "const": true,
+        "title": "Facts"
+      },
+      "contact": {
+        "type": "boolean",
+        "const": true,
+        "title": "Contact"
+      },
+      "requirements": {
+        "type": "boolean",
+        "const": true,
+        "title": "Requirements"
+      },
+      "privacy": {
+        "type": "boolean",
+        "const": true,
+        "title": "Privacy"
+      },
+      "source_reviewed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Source Reviewed"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "facts",
+      "contact",
+      "requirements",
+      "privacy",
+      "source_reviewed"
+    ],
+    "title": "Checklist"
+  },
+  "CodeInput": {
+    "properties": {
+      "code": {
+        "type": "string",
+        "maxLength": 32768,
+        "minLength": 1,
+        "title": "Code"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "code"
+    ],
+    "title": "CodeInput"
+  },
+  "CommentInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "text": {
+        "type": "string",
+        "maxLength": 2000,
+        "minLength": 1,
+        "title": "Text"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "text"
+    ],
+    "title": "CommentInput"
+  },
+  "ConfirmInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed"
+    ],
+    "title": "ConfirmInput"
+  },
+  "ConfirmProfile": {
+    "properties": {
+      "education": {
+        "type": "string",
+        "enum": [
+          "high_school",
+          "associate",
+          "bachelor",
+          "master",
+          "doctor",
+          "other"
+        ],
+        "title": "Education"
+      },
+      "major": {
+        "type": "string",
+        "maxLength": 100,
+        "minLength": 1,
+        "title": "Major"
+      },
+      "academic_year": {
+        "type": "string",
+        "maxLength": 40,
+        "minLength": 1,
+        "title": "Academic Year"
+      },
+      "graduation_date": {
+        "type": "string",
+        "format": "date",
+        "title": "Graduation Date"
+      },
+      "preferred_cities": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 20,
+        "minItems": 1,
+        "title": "Preferred Cities"
+      },
+      "expected_monthly_salary": {
+        "anyOf": [
+          {
+            "type": "integer",
+            "maximum": 1000000.0,
+            "minimum": 0.0
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Expected Monthly Salary"
+      },
+      "weekly_minutes": {
+        "type": "integer",
+        "maximum": 10080.0,
+        "minimum": 0.0,
+        "title": "Weekly Minutes"
+      },
+      "preferences": {
+        "type": "string",
+        "maxLength": 2000,
+        "title": "Preferences",
+        "default": ""
+      },
+      "timezone": {
+        "type": "string",
+        "title": "Timezone",
+        "default": "Asia/Shanghai"
+      },
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "education",
+      "major",
+      "academic_year",
+      "graduation_date",
+      "preferred_cities",
+      "weekly_minutes",
+      "confirmed"
+    ],
+    "title": "ConfirmProfile"
+  },
+  "ConsentInput": {
+    "properties": {
+      "granted": {
+        "type": "boolean",
+        "title": "Granted"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "granted"
+    ],
+    "title": "ConsentInput"
+  },
+  "ContentSubscriptionInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "keyword": {
+        "type": "string",
+        "maxLength": 100,
+        "minLength": 1,
+        "title": "Keyword"
+      },
+      "interval_hours": {
+        "type": "integer",
+        "enum": [
+          6,
+          24,
+          168
+        ],
+        "title": "Interval Hours",
+        "default": 24
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "keyword"
+    ],
+    "title": "ContentSubscriptionInput"
+  },
+  "ConversationInput": {
+    "properties": {
+      "title": {
+        "type": "string",
+        "maxLength": 80,
+        "title": "Title",
+        "default": ""
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "title": "ConversationInput"
+  },
+  "Dataset": {
+    "properties": {
+      "version": {
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9_.-]{1,80}$",
+        "title": "Version"
+      },
+      "source": {
+        "type": "string",
+        "enum": [
+          "synthetic",
+          "owner_authorized"
+        ],
+        "title": "Source"
+      },
+      "rights_confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Rights Confirmed"
+      },
+      "examples": {
+        "items": {
+          "$ref": "#/components/schemas/Example"
+        },
+        "type": "array",
+        "maxItems": 100,
+        "minItems": 1,
+        "title": "Examples"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "version",
+      "source",
+      "rights_confirmed",
+      "examples"
+    ],
+    "title": "Dataset"
+  },
+  "Decision": {
+    "properties": {
+      "action": {
+        "type": "string",
+        "maxLength": 60,
+        "minLength": 1,
+        "title": "Action"
+      },
+      "citations": {
+        "items": {
+          "$ref": "#/components/schemas/Reference"
+        },
+        "type": "array",
+        "maxItems": 10,
+        "minItems": 1,
+        "title": "Citations"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "action",
+      "citations"
+    ],
+    "title": "Decision"
+  },
+  "DecisionInput": {
+    "properties": {
+      "question_id": {
+        "type": "string",
+        "maxLength": 100,
+        "minLength": 1,
+        "title": "Question Id"
+      },
+      "skill_id": {
+        "type": "string",
+        "maxLength": 80,
+        "minLength": 1,
+        "title": "Skill Id"
+      },
+      "minutes": {
+        "type": "integer",
+        "maximum": 180.0,
+        "minimum": 10.0,
+        "title": "Minutes"
+      },
+      "note": {
+        "type": "string",
+        "maxLength": 2000,
+        "title": "Note",
+        "default": ""
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "question_id",
+      "skill_id",
+      "minutes"
+    ],
+    "title": "DecisionInput"
+  },
+  "DeleteInformation": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "fingerprint": {
+        "type": "string",
+        "pattern": "^[a-f0-9]{64}$",
+        "title": "Fingerprint"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "fingerprint"
+    ],
+    "title": "DeleteInformation"
+  },
+  "DeleteInput": {
+    "properties": {
+      "confirmation": {
+        "type": "string",
+        "const": "DELETE MY ACCOUNT",
+        "title": "Confirmation"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmation"
+    ],
+    "title": "DeleteInput"
+  },
+  "DirectionInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "title": {
+        "type": "string",
+        "maxLength": 100,
+        "minLength": 1,
+        "title": "Title"
+      },
+      "fact_ids": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 100,
+        "title": "Fact Ids"
+      },
+      "project_ids": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 30,
+        "title": "Project Ids"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "title"
+    ],
+    "title": "DirectionInput"
+  },
+  "DocumentInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "rights_confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Rights Confirmed"
+      },
+      "title": {
+        "type": "string",
+        "maxLength": 200,
+        "minLength": 1,
+        "title": "Title"
+      },
+      "url": {
+        "type": "string",
+        "maxLength": 2000,
+        "title": "Url",
+        "default": ""
+      },
+      "text": {
+        "type": "string",
+        "maxLength": 4000,
+        "title": "Text",
+        "default": ""
+      },
+      "kind": {
+        "type": "string",
+        "enum": [
+          "project",
+          "documentation",
+          "community",
+          "video",
+          "article",
+          "course",
+          "exercise",
+          "experience"
+        ],
+        "title": "Kind",
+        "default": "article"
+      },
+      "skill_ids": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 10,
+        "title": "Skill Ids"
+      },
+      "declared_type": {
+        "type": "string",
+        "enum": [
+          "official",
+          "personal",
+          "advertising",
+          "unknown"
+        ],
+        "title": "Declared Type",
+        "default": "unknown"
+      },
+      "author": {
+        "type": "string",
+        "maxLength": 100,
+        "title": "Author",
+        "default": ""
+      },
+      "published_on": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Published On"
+      },
+      "authorization_scope": {
+        "type": "string",
+        "enum": [
+          "reference_only",
+          "local_excerpt"
+        ],
+        "title": "Authorization Scope"
+      },
+      "claims": {
+        "items": {
+          "$ref": "#/components/schemas/careerpilot__source_api__ClaimInput"
+        },
+        "type": "array",
+        "maxItems": 8,
+        "title": "Claims"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "rights_confirmed",
+      "title",
+      "authorization_scope"
+    ],
+    "title": "DocumentInput"
+  },
+  "DraftEdit": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "text": {
+        "type": "string",
+        "maxLength": 20000,
+        "minLength": 1,
+        "title": "Text"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "text"
+    ],
+    "title": "DraftEdit"
+  },
+  "Example": {
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9_-]{1,60}$",
+        "title": "Id"
+      },
+      "group": {
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9_-]{1,60}$",
+        "title": "Group"
+      },
+      "text": {
+        "type": "string",
+        "maxLength": 8000,
+        "minLength": 1,
+        "title": "Text"
+      },
+      "expected": {
+        "type": "boolean",
+        "title": "Expected"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "id",
+      "group",
+      "text",
+      "expected"
+    ],
+    "title": "Example"
+  },
+  "ExperienceInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "kind": {
+        "type": "string",
+        "enum": [
+          "education",
+          "internship",
+          "work",
+          "project"
+        ],
+        "title": "Kind"
+      },
+      "title": {
+        "type": "string",
+        "maxLength": 200,
+        "minLength": 1,
+        "title": "Title"
+      },
+      "organization": {
+        "type": "string",
+        "maxLength": 200,
+        "title": "Organization",
+        "default": ""
+      },
+      "role": {
+        "type": "string",
+        "maxLength": 200,
+        "title": "Role",
+        "default": ""
+      },
+      "start_date": {
+        "$ref": "#/components/schemas/PartialDate"
+      },
+      "end_date": {
+        "$ref": "#/components/schemas/PartialDate"
+      },
+      "situation": {
+        "type": "string",
+        "maxLength": 2000,
+        "title": "Situation",
+        "default": ""
+      },
+      "task": {
+        "type": "string",
+        "maxLength": 2000,
+        "title": "Task",
+        "default": ""
+      },
+      "action": {
+        "type": "string",
+        "maxLength": 2000,
+        "minLength": 1,
+        "title": "Action"
+      },
+      "result": {
+        "type": "string",
+        "maxLength": 2000,
+        "title": "Result",
+        "default": ""
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "kind",
+      "title",
+      "action"
+    ],
+    "title": "ExperienceInput"
+  },
+  "ExpertPreviewInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "cases": {
+        "items": {
+          "$ref": "#/components/schemas/Case"
+        },
+        "type": "array",
+        "maxItems": 100,
+        "minItems": 4,
+        "title": "Cases"
+      },
+      "report": {
+        "additionalProperties": true,
+        "type": "object",
+        "title": "Report"
+      },
+      "corrections": {
+        "items": {
+          "$ref": "#/components/schemas/careerpilot__expert_comparison__Correction"
+        },
+        "type": "array",
+        "maxItems": 100,
+        "title": "Corrections"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "cases",
+      "report"
+    ],
+    "title": "ExpertPreviewInput"
+  },
+  "ExternalApplicationInput": {
+    "properties": {
+      "job_id": {
+        "type": "string",
+        "maxLength": 100,
+        "minLength": 1,
+        "title": "Job Id"
+      },
+      "resume_description": {
+        "type": "string",
+        "maxLength": 200,
+        "title": "Resume Description",
+        "default": ""
+      },
+      "submitted_at": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Submitted At"
+      },
+      "note": {
+        "type": "string",
+        "maxLength": 2000,
+        "title": "Note",
+        "default": ""
+      },
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "job_id",
+      "confirmed"
+    ],
+    "title": "ExternalApplicationInput"
+  },
+  "FactInput": {
+    "properties": {
+      "kind": {
+        "type": "string",
+        "enum": [
+          "name",
+          "contact",
+          "summary",
+          "education",
+          "experience",
+          "project",
+          "skill"
+        ],
+        "title": "Kind"
+      },
+      "source_type": {
+        "type": "string",
+        "enum": [
+          "manual",
+          "memory",
+          "profile"
+        ],
+        "title": "Source Type"
+      },
+      "text": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 4000,
+            "minLength": 1
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Text"
+      },
+      "source_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Source Id"
+      },
+      "source_version": {
+        "anyOf": [
+          {
+            "type": "integer",
+            "minimum": 1.0
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Source Version"
+      },
+      "profile_field": {
+        "anyOf": [
+          {
+            "type": "string",
+            "enum": [
+              "major",
+              "education",
+              "graduation_date"
+            ]
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Profile Field"
+      },
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "kind",
+      "source_type",
+      "confirmed"
+    ],
+    "title": "FactInput"
+  },
+  "FeedbackInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "label": {
+        "type": "string",
+        "enum": [
+          "like",
+          "not_interested",
+          "misclassified",
+          "applied"
+        ],
+        "title": "Label"
+      },
+      "reason": {
+        "type": "string",
+        "maxLength": 1000,
+        "title": "Reason",
+        "default": ""
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "label"
+    ],
+    "title": "FeedbackInput"
+  },
+  "FilterInput": {
+    "properties": {
+      "q": {
+        "type": "string",
+        "maxLength": 200,
+        "title": "Q",
+        "default": ""
+      },
+      "location": {
+        "type": "string",
+        "maxLength": 100,
+        "title": "Location",
+        "default": ""
+      },
+      "company": {
+        "type": "string",
+        "maxLength": 100,
+        "title": "Company",
+        "default": ""
+      },
+      "education": {
+        "type": "string",
+        "maxLength": 100,
+        "title": "Education",
+        "default": ""
+      },
+      "graduation_cohort": {
+        "type": "string",
+        "maxLength": 20,
+        "title": "Graduation Cohort",
+        "default": ""
+      },
+      "employment_type": {
+        "type": "string",
+        "maxLength": 40,
+        "title": "Employment Type",
+        "default": ""
+      },
+      "duration": {
+        "type": "string",
+        "maxLength": 100,
+        "title": "Duration",
+        "default": ""
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "",
+          "unverified",
+          "verified",
+          "possibly_expired",
+          "closed"
+        ],
+        "title": "Status",
+        "default": ""
+      },
+      "salary_min": {
+        "anyOf": [
+          {
+            "type": "integer",
+            "maximum": 1000000.0,
+            "minimum": 0.0
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Salary Min"
+      },
+      "salary_unit": {
+        "type": "string",
+        "enum": [
+          "month",
+          "day"
+        ],
+        "title": "Salary Unit",
+        "default": "month"
+      },
+      "deadline_before": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Deadline Before"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "title": "FilterInput"
+  },
+  "GapInput": {
+    "properties": {
+      "job_ids": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 20,
+        "title": "Job Ids"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "title": "GapInput"
+  },
+  "GoalInput": {
+    "properties": {
+      "title": {
+        "type": "string",
+        "maxLength": 200,
+        "minLength": 1,
+        "title": "Title"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "title"
+    ],
+    "title": "GoalInput"
+  },
+  "GoalOutput": {
+    "properties": {
+      "title": {
+        "type": "string",
+        "maxLength": 200,
+        "minLength": 1,
+        "title": "Title"
+      },
+      "id": {
+        "type": "string",
+        "title": "Id"
+      },
+      "status": {
+        "type": "string",
+        "title": "Status"
+      },
+      "version": {
+        "type": "integer",
+        "title": "Version"
+      },
+      "created_at": {
+        "type": "string",
+        "title": "Created At"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "title",
+      "id",
+      "status",
+      "version",
+      "created_at"
+    ],
+    "title": "GoalOutput"
+  },
+  "GuidanceInput": {
+    "properties": {
+      "action": {
+        "type": "string",
+        "enum": [
+          "explore",
+          "learn",
+          "career",
+          "defer",
+          "resume",
+          "answered",
+          "reset"
+        ],
+        "title": "Action"
+      },
+      "run_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 36
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Run Id"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "action"
+    ],
+    "title": "GuidanceInput"
+  },
+  "HTTPValidationError": {
+    "properties": {
+      "detail": {
+        "items": {
+          "$ref": "#/components/schemas/ValidationError"
+        },
+        "type": "array",
+        "title": "Detail"
+      }
+    },
+    "type": "object",
+    "title": "HTTPValidationError"
+  },
+  "ImportClaim": {
+    "properties": {
+      "text": {
+        "type": "string",
+        "maxLength": 2000,
+        "minLength": 1,
+        "title": "Text"
+      },
+      "start": {
+        "type": "integer",
+        "minimum": 0.0,
+        "title": "Start"
+      },
+      "end": {
+        "type": "integer",
+        "minimum": 1.0,
+        "title": "End"
+      },
+      "category": {
+        "type": "string",
+        "enum": [
+          "self_report",
+          "document_fact"
+        ],
+        "title": "Category",
+        "default": "self_report"
+      },
+      "kind": {
+        "type": "string",
+        "enum": [
+          "name",
+          "contact",
+          "summary",
+          "education",
+          "experience",
+          "project",
+          "skill"
+        ],
+        "title": "Kind"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "text",
+      "start",
+      "end",
+      "kind"
+    ],
+    "title": "ImportClaim"
+  },
+  "ImportConfirmation": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "claims": {
+        "items": {
+          "$ref": "#/components/schemas/ImportClaim"
+        },
+        "type": "array",
+        "maxItems": 100,
+        "minItems": 1,
+        "title": "Claims"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "claims"
+    ],
+    "title": "ImportConfirmation"
+  },
+  "InviteInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "recipient_id": {
+        "type": "string",
+        "maxLength": 36,
+        "minLength": 36,
+        "title": "Recipient Id"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "recipient_id"
+    ],
+    "title": "InviteInput"
+  },
+  "JobEdit": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "content": {
+        "type": "string",
+        "maxLength": 100000,
+        "minLength": 1,
+        "title": "Content"
+      },
+      "source_url": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 2000
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Source Url"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "content"
+    ],
+    "title": "JobEdit"
+  },
+  "JobInput": {
+    "properties": {
+      "content": {
+        "type": "string",
+        "maxLength": 100000,
+        "minLength": 1,
+        "title": "Content"
+      },
+      "source_url": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 2000
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Source Url"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "content"
+    ],
+    "title": "JobInput"
+  },
+  "JobStatusInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "unverified",
+          "verified",
+          "possibly_expired",
+          "closed"
+        ],
+        "title": "Status"
+      },
+      "reason": {
+        "type": "string",
+        "maxLength": 200,
+        "minLength": 1,
+        "title": "Reason"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "status",
+      "reason"
+    ],
+    "title": "JobStatusInput"
+  },
+  "LocalResetInput": {
+    "properties": {
+      "confirmation": {
+        "type": "string",
+        "const": "CLEAR LOCAL DATA",
+        "title": "Confirmation"
+      }
+    },
+    "type": "object",
+    "required": [
+      "confirmation"
+    ],
+    "title": "LocalResetInput"
+  },
+  "LogInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "day": {
+        "type": "string",
+        "format": "date",
+        "title": "Day"
+      },
+      "minutes": {
+        "type": "integer",
+        "maximum": 1440.0,
+        "minimum": 1.0,
+        "title": "Minutes"
+      },
+      "note": {
+        "type": "string",
+        "maxLength": 2000,
+        "title": "Note",
+        "default": ""
+      },
+      "plan_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 36
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Plan Id"
+      },
+      "task_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 36
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Task Id"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "day",
+      "minutes"
+    ],
+    "title": "LogInput"
+  },
+  "ManualReviewInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "note": {
+        "type": "string",
+        "maxLength": 2000,
+        "minLength": 1,
+        "title": "Note"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "note"
+    ],
+    "title": "ManualReviewInput"
+  },
+  "MatchInput": {
+    "properties": {
+      "job_ids": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 100,
+        "title": "Job Ids"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "title": "MatchInput"
+  },
+  "MatchingConstraints": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "cities_hard": {
+        "type": "boolean",
+        "title": "Cities Hard",
+        "default": true
+      },
+      "available_months": {
+        "anyOf": [
+          {
+            "type": "integer",
+            "maximum": 36.0,
+            "minimum": 1.0
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Available Months"
+      },
+      "work_authorizations": {
+        "anyOf": [
+          {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 20
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Work Authorizations"
+      },
+      "qualifications": {
+        "anyOf": [
+          {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 20
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Qualifications"
+      },
+      "preferred_career_ids": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 20,
+        "title": "Preferred Career Ids"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed"
+    ],
+    "title": "MatchingConstraints"
+  },
+  "MaterialConfirmation": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "claims": {
+        "items": {
+          "$ref": "#/components/schemas/careerpilot__growth_api__ClaimInput"
+        },
+        "type": "array",
+        "maxItems": 100,
+        "minItems": 1,
+        "title": "Claims"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "claims"
+    ],
+    "title": "MaterialConfirmation"
+  },
+  "MaterialEdit": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "filename": {
+        "type": "string",
+        "maxLength": 180,
+        "minLength": 1,
+        "pattern": "^[^/\\\\\\x00]+$",
+        "title": "Filename"
+      },
+      "content": {
+        "type": "string",
+        "maxLength": 1000000,
+        "minLength": 1,
+        "title": "Content"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "filename",
+      "content"
+    ],
+    "title": "MaterialEdit"
+  },
+  "MediaInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "rights_confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Rights Confirmed"
+      },
+      "title": {
+        "type": "string",
+        "maxLength": 200,
+        "minLength": 1,
+        "title": "Title"
+      },
+      "kind": {
+        "type": "string",
+        "enum": [
+          "pdf",
+          "image",
+          "video"
+        ],
+        "title": "Kind"
+      },
+      "source_url": {
+        "type": "string",
+        "maxLength": 2000,
+        "title": "Source Url",
+        "default": ""
+      },
+      "license_basis": {
+        "type": "string",
+        "maxLength": 1000,
+        "minLength": 1,
+        "title": "License Basis"
+      },
+      "content_base64": {
+        "type": "string",
+        "maxLength": 11200000,
+        "minLength": 1,
+        "title": "Content Base64"
+      },
+      "retention_days": {
+        "type": "integer",
+        "maximum": 30.0,
+        "minimum": 1.0,
+        "title": "Retention Days",
+        "default": 7
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "rights_confirmed",
+      "title",
+      "kind",
+      "license_basis",
+      "content_base64"
+    ],
+    "title": "MediaInput"
+  },
+  "MemoryEdit": {
+    "properties": {
+      "text": {
+        "type": "string",
+        "maxLength": 2000,
+        "minLength": 1,
+        "title": "Text"
+      },
+      "category": {
+        "type": "string",
+        "enum": [
+          "self_report",
+          "document_fact",
+          "inference"
+        ],
+        "title": "Category"
+      },
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "text",
+      "category",
+      "confirmed"
+    ],
+    "title": "MemoryEdit"
+  },
+  "MemoryResolution": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "preferred_id": {
+        "type": "string",
+        "maxLength": 36,
+        "title": "Preferred Id"
+      },
+      "superseded_id": {
+        "type": "string",
+        "maxLength": 36,
+        "title": "Superseded Id"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "preferred_id",
+      "superseded_id"
+    ],
+    "title": "MemoryResolution"
+  },
+  "MergeInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "source_id": {
+        "type": "string",
+        "maxLength": 36,
+        "title": "Source Id"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "source_id"
+    ],
+    "title": "MergeInput"
+  },
+  "MetadataInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "url": {
+        "type": "string",
+        "maxLength": 2000,
+        "minLength": 1,
+        "title": "Url"
+      },
+      "skill_ids": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 10,
+        "title": "Skill Ids"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "url"
+    ],
+    "title": "MetadataInput"
+  },
+  "MilestoneState": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "completed": {
+        "type": "boolean",
+        "title": "Completed"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "completed"
+    ],
+    "title": "MilestoneState"
+  },
+  "ModeInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "mode": {
+        "type": "string",
+        "enum": [
+          "sprint",
+          "balanced",
+          "research_busy",
+          "light"
+        ],
+        "title": "Mode"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "mode"
+    ],
+    "title": "ModeInput"
+  },
+  "ModelPreviewInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "dataset": {
+        "$ref": "#/components/schemas/Dataset"
+      },
+      "report": {
+        "additionalProperties": true,
+        "type": "object",
+        "title": "Report"
+      },
+      "corrections": {
+        "items": {
+          "$ref": "#/components/schemas/careerpilot__model_comparison__Correction"
+        },
+        "type": "array",
+        "maxItems": 100,
+        "title": "Corrections"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "dataset",
+      "report"
+    ],
+    "title": "ModelPreviewInput"
+  },
+  "ModerationInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "reason": {
+        "type": "string",
+        "maxLength": 200,
+        "minLength": 1,
+        "title": "Reason"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "reason"
+    ],
+    "title": "ModerationInput"
+  },
+  "NarrativeInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "draft",
+          "confirmed",
+          "withdrawn"
+        ],
+        "title": "Status"
+      },
+      "situation": {
+        "type": "string",
+        "maxLength": 2000,
+        "title": "Situation",
+        "default": ""
+      },
+      "task": {
+        "type": "string",
+        "maxLength": 2000,
+        "title": "Task",
+        "default": ""
+      },
+      "action": {
+        "type": "string",
+        "maxLength": 2000,
+        "title": "Action",
+        "default": ""
+      },
+      "result": {
+        "type": "string",
+        "maxLength": 2000,
+        "title": "Result",
+        "default": ""
+      },
+      "asset_ids": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 10,
+        "title": "Asset Ids"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "status"
+    ],
+    "title": "NarrativeInput"
+  },
+  "NoteInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "text": {
+        "type": "string",
+        "maxLength": 2000,
+        "minLength": 1,
+        "title": "Text"
+      },
+      "category": {
+        "type": "string",
+        "const": "self_report",
+        "title": "Category",
+        "default": "self_report"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "text"
+    ],
+    "title": "NoteInput"
+  },
+  "NotificationInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "active",
+          "paused",
+          "cancelled"
+        ],
+        "title": "Status"
+      },
+      "timezone": {
+        "type": "string",
+        "title": "Timezone",
+        "default": "Asia/Shanghai"
+      },
+      "hour": {
+        "type": "integer",
+        "maximum": 23.0,
+        "minimum": 0.0,
+        "title": "Hour",
+        "default": 9
+      },
+      "weekday": {
+        "type": "integer",
+        "maximum": 6.0,
+        "minimum": 0.0,
+        "title": "Weekday",
+        "default": 0
+      },
+      "month_day": {
+        "type": "integer",
+        "maximum": 28.0,
+        "minimum": 1.0,
+        "title": "Month Day",
+        "default": 1
+      },
+      "quiet_start": {
+        "type": "integer",
+        "maximum": 23.0,
+        "minimum": 0.0,
+        "title": "Quiet Start",
+        "default": 22
+      },
+      "quiet_end": {
+        "type": "integer",
+        "maximum": 23.0,
+        "minimum": 0.0,
+        "title": "Quiet End",
+        "default": 8
+      },
+      "daily_limit": {
+        "type": "integer",
+        "maximum": 20.0,
+        "minimum": 1.0,
+        "title": "Daily Limit",
+        "default": 4
+      },
+      "daily_learning": {
+        "type": "boolean",
+        "title": "Daily Learning",
+        "default": false
+      },
+      "deadline_check": {
+        "type": "boolean",
+        "title": "Deadline Check",
+        "default": false
+      },
+      "weekly_report": {
+        "type": "boolean",
+        "title": "Weekly Report",
+        "default": false
+      },
+      "monthly_report": {
+        "type": "boolean",
+        "title": "Monthly Report",
+        "default": false
+      },
+      "spaced_review": {
+        "type": "boolean",
+        "title": "Spaced Review",
+        "default": false
+      },
+      "channel": {
+        "type": "string",
+        "const": "in_app",
+        "title": "Channel",
+        "default": "in_app"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "status"
+    ],
+    "title": "NotificationInput"
+  },
+  "NotificationState": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "read": {
+        "type": "boolean",
+        "title": "Read",
+        "default": true
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed"
+    ],
+    "title": "NotificationState"
+  },
+  "OfferDecisionInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "note": {
+        "type": "string",
+        "maxLength": 2000,
+        "minLength": 1,
+        "title": "Note"
+      },
+      "offer_index": {
+        "anyOf": [
+          {
+            "type": "integer",
+            "maximum": 9.0,
+            "minimum": 0.0
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Offer Index"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "note"
+    ],
+    "title": "OfferDecisionInput"
+  },
+  "OfferItem": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "name": {
+        "type": "string",
+        "maxLength": 100,
+        "minLength": 1,
+        "title": "Name"
+      },
+      "facts": {
+        "additionalProperties": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 2000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "propertyNames": {
+          "enum": [
+            "compensation",
+            "location",
+            "contract_terms"
+          ]
+        },
+        "type": "object",
+        "title": "Facts"
+      },
+      "source_basis": {
+        "type": "string",
+        "maxLength": 1000,
+        "minLength": 1,
+        "title": "Source Basis",
+        "default": "本人提供，未独立核实"
+      },
+      "ratings": {
+        "additionalProperties": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "propertyNames": {
+          "enum": [
+            "compensation",
+            "growth",
+            "location",
+            "stability",
+            "work_life"
+          ]
+        },
+        "type": "object",
+        "title": "Ratings"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "name",
+      "ratings"
+    ],
+    "title": "OfferItem"
+  },
+  "OffersInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "offers": {
+        "items": {
+          "$ref": "#/components/schemas/OfferItem"
+        },
+        "type": "array",
+        "maxItems": 10,
+        "minItems": 2,
+        "title": "Offers"
+      },
+      "weights": {
+        "additionalProperties": {
+          "type": "integer"
+        },
+        "propertyNames": {
+          "enum": [
+            "compensation",
+            "growth",
+            "location",
+            "stability",
+            "work_life"
+          ]
+        },
+        "type": "object",
+        "title": "Weights"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "offers",
+      "weights"
+    ],
+    "title": "OffersInput"
+  },
+  "OfflineTranscriptInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "transcription_consent": {
+        "type": "boolean",
+        "const": true,
+        "title": "Transcription Consent"
+      },
+      "locale": {
+        "type": "string",
+        "const": "en-US",
+        "title": "Locale"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "transcription_consent",
+      "locale"
+    ],
+    "title": "OfflineTranscriptInput"
+  },
+  "PartialDate": {
+    "properties": {
+      "value": {
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "^\\d{4}(-\\d{2})?(-\\d{2})?$"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Value"
+      },
+      "precision": {
+        "type": "string",
+        "enum": [
+          "unknown",
+          "year",
+          "month",
+          "day"
+        ],
+        "title": "Precision",
+        "default": "unknown"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "title": "PartialDate"
+  },
+  "PeerDecision": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "conclusion": {
+        "type": "string",
+        "enum": [
+          "context_explains_timing",
+          "needs_followup",
+          "inconclusive"
+        ],
+        "title": "Conclusion"
+      },
+      "note": {
+        "type": "string",
+        "maxLength": 2000,
+        "minLength": 1,
+        "title": "Note"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "conclusion",
+      "note"
+    ],
+    "title": "PeerDecision"
+  },
+  "PeerRequest": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "workspace_id": {
+        "type": "string",
+        "maxLength": 36,
+        "minLength": 36,
+        "title": "Workspace Id"
+      },
+      "reviewer_id": {
+        "type": "string",
+        "maxLength": 36,
+        "minLength": 36,
+        "title": "Reviewer Id"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "workspace_id",
+      "reviewer_id"
+    ],
+    "title": "PeerRequest"
+  },
+  "PipelineInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "start": {
+        "type": "string",
+        "format": "date",
+        "title": "Start"
+      },
+      "end": {
+        "type": "string",
+        "format": "date",
+        "title": "End"
+      },
+      "plan_id": {
+        "type": "string",
+        "maxLength": 36,
+        "minLength": 1,
+        "title": "Plan Id"
+      },
+      "query": {
+        "type": "string",
+        "maxLength": 200,
+        "title": "Query",
+        "default": ""
+      },
+      "reference_url": {
+        "type": "string",
+        "maxLength": 2000,
+        "title": "Reference Url",
+        "default": ""
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "start",
+      "end",
+      "plan_id"
+    ],
+    "title": "PipelineInput"
+  },
+  "PlanEdit": {
+    "properties": {
+      "title": {
+        "type": "string",
+        "maxLength": 200,
+        "minLength": 1,
+        "title": "Title"
+      },
+      "start_date": {
+        "type": "string",
+        "format": "date",
+        "title": "Start Date"
+      },
+      "deadline": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Deadline"
+      },
+      "tasks": {
+        "items": {
+          "$ref": "#/components/schemas/PlanTaskEdit"
+        },
+        "type": "array",
+        "maxItems": 200,
+        "title": "Tasks"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "title",
+      "start_date",
+      "tasks"
+    ],
+    "title": "PlanEdit"
+  },
+  "PlanInput": {
+    "properties": {
+      "job_ids": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 20,
+        "title": "Job Ids"
+      },
+      "start_date": {
+        "type": "string",
+        "format": "date",
+        "title": "Start Date"
+      },
+      "deadline": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Deadline"
+      },
+      "weekly_minutes": {
+        "anyOf": [
+          {
+            "type": "integer",
+            "maximum": 10080.0,
+            "minimum": 30.0
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Weekly Minutes"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "start_date"
+    ],
+    "title": "PlanInput"
+  },
+  "PlanTaskEdit": {
+    "properties": {
+      "id": {
+        "type": "string",
+        "maxLength": 36,
+        "minLength": 1,
+        "title": "Id"
+      },
+      "title": {
+        "type": "string",
+        "maxLength": 200,
+        "minLength": 1,
+        "title": "Title"
+      },
+      "skill_id": {
+        "type": "string",
+        "maxLength": 80,
+        "minLength": 1,
+        "title": "Skill Id"
+      },
+      "minutes": {
+        "type": "integer",
+        "maximum": 10080.0,
+        "minimum": 1.0,
+        "title": "Minutes"
+      },
+      "date": {
+        "type": "string",
+        "format": "date",
+        "title": "Date"
+      },
+      "requires": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 200,
+        "title": "Requires"
+      },
+      "resources": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 20,
+        "minItems": 1,
+        "title": "Resources"
+      },
+      "definition_of_done": {
+        "type": "string",
+        "maxLength": 2000,
+        "minLength": 1,
+        "title": "Definition Of Done"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "id",
+      "title",
+      "skill_id",
+      "minutes",
+      "date",
+      "resources",
+      "definition_of_done"
+    ],
+    "title": "PlanTaskEdit"
+  },
+  "PracticeAnswerInput": {
+    "properties": {
+      "choice": {
+        "type": "integer",
+        "maximum": 3.0,
+        "minimum": 0.0,
+        "title": "Choice"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "choice"
+    ],
+    "title": "PracticeAnswerInput"
+  },
+  "PracticeInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "kind": {
+        "type": "string",
+        "enum": [
+          "written",
+          "algorithm"
+        ],
+        "title": "Kind"
+      },
+      "title": {
+        "type": "string",
+        "maxLength": 200,
+        "minLength": 1,
+        "title": "Title"
+      },
+      "difficulty": {
+        "type": "string",
+        "enum": [
+          "easy",
+          "medium",
+          "hard"
+        ],
+        "title": "Difficulty"
+      },
+      "tags": {
+        "items": {
+          "type": "string",
+          "maxLength": 40,
+          "minLength": 1
+        },
+        "type": "array",
+        "maxItems": 10,
+        "title": "Tags"
+      },
+      "outcome": {
+        "type": "string",
+        "enum": [
+          "passed",
+          "failed",
+          "unjudged"
+        ],
+        "title": "Outcome"
+      },
+      "practiced_on": {
+        "type": "string",
+        "format": "date",
+        "title": "Practiced On"
+      },
+      "minutes": {
+        "type": "integer",
+        "maximum": 1440.0,
+        "minimum": 0.0,
+        "title": "Minutes"
+      },
+      "reflection": {
+        "type": "string",
+        "maxLength": 4000,
+        "title": "Reflection",
+        "default": ""
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "kind",
+      "title",
+      "difficulty",
+      "tags",
+      "outcome",
+      "practiced_on",
+      "minutes"
+    ],
+    "title": "PracticeInput"
+  },
+  "PreferencesInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "favorite_ids": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 500,
+        "title": "Favorite Ids"
+      },
+      "blocked_companies": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 100,
+        "title": "Blocked Companies"
+      },
+      "excluded_keywords": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 100,
+        "title": "Excluded Keywords"
+      },
+      "enabled_modes": {
+        "items": {
+          "type": "string",
+          "enum": [
+            "best",
+            "stretch",
+            "entry",
+            "explore"
+          ]
+        },
+        "type": "array",
+        "maxItems": 4,
+        "title": "Enabled Modes"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed"
+    ],
+    "title": "PreferencesInput"
+  },
+  "PreviewInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "plan_id": {
+        "type": "string",
+        "maxLength": 100,
+        "minLength": 1,
+        "title": "Plan Id"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "plan_id"
+    ],
+    "title": "PreviewInput"
+  },
+  "ProfileInput": {
+    "properties": {
+      "education": {
+        "type": "string",
+        "enum": [
+          "high_school",
+          "associate",
+          "bachelor",
+          "master",
+          "doctor",
+          "other"
+        ],
+        "title": "Education"
+      },
+      "major": {
+        "type": "string",
+        "maxLength": 100,
+        "minLength": 1,
+        "title": "Major"
+      },
+      "academic_year": {
+        "type": "string",
+        "maxLength": 40,
+        "minLength": 1,
+        "title": "Academic Year"
+      },
+      "graduation_date": {
+        "type": "string",
+        "format": "date",
+        "title": "Graduation Date"
+      },
+      "preferred_cities": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 20,
+        "minItems": 1,
+        "title": "Preferred Cities"
+      },
+      "expected_monthly_salary": {
+        "anyOf": [
+          {
+            "type": "integer",
+            "maximum": 1000000.0,
+            "minimum": 0.0
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Expected Monthly Salary"
+      },
+      "weekly_minutes": {
+        "type": "integer",
+        "maximum": 10080.0,
+        "minimum": 0.0,
+        "title": "Weekly Minutes"
+      },
+      "preferences": {
+        "type": "string",
+        "maxLength": 2000,
+        "title": "Preferences",
+        "default": ""
+      },
+      "timezone": {
+        "type": "string",
+        "title": "Timezone",
+        "default": "Asia/Shanghai"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "education",
+      "major",
+      "academic_year",
+      "graduation_date",
+      "preferred_cities",
+      "weekly_minutes"
+    ],
+    "title": "ProfileInput"
+  },
+  "ProjectDetails": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "title": {
+        "type": "string",
+        "maxLength": 200,
+        "minLength": 1,
+        "title": "Title"
+      },
+      "note": {
+        "type": "string",
+        "maxLength": 4000,
+        "title": "Note",
+        "default": ""
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "title"
+    ],
+    "title": "ProjectDetails"
+  },
+  "ProjectInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "job_id": {
+        "type": "string",
+        "maxLength": 100,
+        "minLength": 1,
+        "title": "Job Id"
+      },
+      "template_id": {
+        "type": "string",
+        "maxLength": 100,
+        "minLength": 1,
+        "title": "Template Id"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "job_id",
+      "template_id"
+    ],
+    "title": "ProjectInput"
+  },
+  "ProjectPlanInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "plan_id": {
+        "type": "string",
+        "maxLength": 100,
+        "minLength": 1,
+        "title": "Plan Id"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "plan_id"
+    ],
+    "title": "ProjectPlanInput"
+  },
+  "ProjectionInput": {
+    "properties": {
+      "kind": {
+        "type": "string",
+        "enum": [
+          "practice_project",
+          "plan",
+          "project_asset",
+          "project_narrative",
+          "brand_profile"
+        ],
+        "title": "Kind"
+      },
+      "source_id": {
+        "type": "string",
+        "maxLength": 36,
+        "minLength": 36,
+        "title": "Source Id"
+      },
+      "fields": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 10,
+        "minItems": 1,
+        "title": "Fields"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "kind",
+      "source_id",
+      "fields"
+    ],
+    "title": "ProjectionInput"
+  },
+  "ReasonInput": {
+    "properties": {
+      "reason": {
+        "type": "string",
+        "maxLength": 1000,
+        "minLength": 1,
+        "title": "Reason"
+      },
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "reason",
+      "confirmed"
+    ],
+    "title": "ReasonInput"
+  },
+  "ReceiptInput": {
+    "properties": {
+      "material_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Material Id"
+      },
+      "material_version": {
+        "anyOf": [
+          {
+            "type": "integer",
+            "minimum": 1.0
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Material Version"
+      },
+      "receipt_code": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 3
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Receipt Code"
+      },
+      "submitted_at": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Submitted At"
+      },
+      "note": {
+        "type": "string",
+        "maxLength": 2000,
+        "title": "Note",
+        "default": ""
+      },
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed"
+    ],
+    "title": "ReceiptInput"
+  },
+  "Reference": {
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9_-]{1,40}$",
+        "title": "Id"
+      },
+      "version": {
+        "type": "integer",
+        "maximum": 1000000.0,
+        "minimum": 1.0,
+        "title": "Version"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "id",
+      "version"
+    ],
+    "title": "Reference"
+  },
+  "ReflectionEdit": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "reflection": {
+        "type": "string",
+        "maxLength": 10000,
+        "minLength": 1,
+        "title": "Reflection"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "reflection"
+    ],
+    "title": "ReflectionEdit"
+  },
+  "ReminderInput": {
+    "properties": {
+      "kind": {
+        "type": "string",
+        "enum": [
+          "deadline",
+          "assessment",
+          "interview",
+          "follow_up"
+        ],
+        "title": "Kind"
+      },
+      "local_time": {
+        "type": "string",
+        "maxLength": 19,
+        "minLength": 16,
+        "title": "Local Time"
+      },
+      "timezone": {
+        "type": "string",
+        "maxLength": 100,
+        "title": "Timezone"
+      },
+      "quiet_start": {
+        "type": "integer",
+        "maximum": 23.0,
+        "minimum": 0.0,
+        "title": "Quiet Start",
+        "default": 22
+      },
+      "quiet_end": {
+        "type": "integer",
+        "maximum": 23.0,
+        "minimum": 0.0,
+        "title": "Quiet End",
+        "default": 8
+      },
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "kind",
+      "local_time",
+      "timezone",
+      "confirmed"
+    ],
+    "title": "ReminderInput"
+  },
+  "ReminderUpdate": {
+    "properties": {
+      "kind": {
+        "type": "string",
+        "enum": [
+          "deadline",
+          "assessment",
+          "interview",
+          "follow_up"
+        ],
+        "title": "Kind"
+      },
+      "local_time": {
+        "type": "string",
+        "maxLength": 19,
+        "minLength": 16,
+        "title": "Local Time"
+      },
+      "timezone": {
+        "type": "string",
+        "maxLength": 100,
+        "title": "Timezone"
+      },
+      "quiet_start": {
+        "type": "integer",
+        "maximum": 23.0,
+        "minimum": 0.0,
+        "title": "Quiet Start",
+        "default": 22
+      },
+      "quiet_end": {
+        "type": "integer",
+        "maximum": 23.0,
+        "minimum": 0.0,
+        "title": "Quiet End",
+        "default": 8
+      },
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "active",
+          "paused",
+          "cancelled"
+        ],
+        "title": "Status"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "kind",
+      "local_time",
+      "timezone",
+      "confirmed",
+      "status"
+    ],
+    "title": "ReminderUpdate"
+  },
+  "ResourceInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "favorite": {
+        "type": "boolean",
+        "title": "Favorite",
+        "default": false
+      },
+      "quality": {
+        "type": "string",
+        "enum": [
+          "unrated",
+          "helpful",
+          "poor"
+        ],
+        "title": "Quality",
+        "default": "unrated"
+      },
+      "broken": {
+        "type": "boolean",
+        "title": "Broken",
+        "default": false
+      },
+      "note": {
+        "type": "string",
+        "maxLength": 1000,
+        "title": "Note",
+        "default": ""
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed"
+    ],
+    "title": "ResourceInput"
+  },
+  "RestorePlanInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "target_version": {
+        "type": "integer",
+        "minimum": 1.0,
+        "title": "Target Version"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "target_version"
+    ],
+    "title": "RestorePlanInput"
+  },
+  "ResumeCreate": {
+    "properties": {
+      "fact_ids": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 100,
+        "minItems": 1,
+        "title": "Fact Ids"
+      },
+      "job_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Job Id"
+      },
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "title": {
+        "type": "string",
+        "maxLength": 100,
+        "minLength": 1,
+        "title": "Title"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "fact_ids",
+      "confirmed",
+      "title"
+    ],
+    "title": "ResumeCreate"
+  },
+  "ResumeDetails": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "title": {
+        "type": "string",
+        "maxLength": 100,
+        "minLength": 1,
+        "title": "Title"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "title"
+    ],
+    "title": "ResumeDetails"
+  },
+  "RevokeInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "reason": {
+        "type": "string",
+        "maxLength": 200,
+        "minLength": 1,
+        "title": "Reason"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "reason"
+    ],
+    "title": "RevokeInput"
+  },
+  "RunInput": {
+    "properties": {
+      "job_ids": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 20,
+        "title": "Job Ids"
+      },
+      "message": {
+        "type": "string",
+        "maxLength": 4000,
+        "minLength": 1,
+        "title": "Message"
+      },
+      "intent": {
+        "type": "string",
+        "enum": [
+          "auto",
+          "help",
+          "diagnose",
+          "plan",
+          "progress",
+          "resources",
+          "replan"
+        ],
+        "title": "Intent",
+        "default": "auto"
+      },
+      "plan_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 36
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Plan Id"
+      },
+      "conversation_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 36,
+            "minLength": 1
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Conversation Id"
+      },
+      "locale": {
+        "type": "string",
+        "enum": [
+          "zh-CN",
+          "en-US"
+        ],
+        "title": "Locale",
+        "default": "zh-CN"
+      },
+      "require_confirmation": {
+        "type": "boolean",
+        "title": "Require Confirmation",
+        "default": true
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "message"
+    ],
+    "title": "RunInput"
+  },
+  "SaveFilterInput": {
+    "properties": {
+      "q": {
+        "type": "string",
+        "maxLength": 200,
+        "title": "Q",
+        "default": ""
+      },
+      "location": {
+        "type": "string",
+        "maxLength": 100,
+        "title": "Location",
+        "default": ""
+      },
+      "company": {
+        "type": "string",
+        "maxLength": 100,
+        "title": "Company",
+        "default": ""
+      },
+      "education": {
+        "type": "string",
+        "maxLength": 100,
+        "title": "Education",
+        "default": ""
+      },
+      "graduation_cohort": {
+        "type": "string",
+        "maxLength": 20,
+        "title": "Graduation Cohort",
+        "default": ""
+      },
+      "employment_type": {
+        "type": "string",
+        "maxLength": 40,
+        "title": "Employment Type",
+        "default": ""
+      },
+      "duration": {
+        "type": "string",
+        "maxLength": 100,
+        "title": "Duration",
+        "default": ""
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "",
+          "unverified",
+          "verified",
+          "possibly_expired",
+          "closed"
+        ],
+        "title": "Status",
+        "default": ""
+      },
+      "salary_min": {
+        "anyOf": [
+          {
+            "type": "integer",
+            "maximum": 1000000.0,
+            "minimum": 0.0
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Salary Min"
+      },
+      "salary_unit": {
+        "type": "string",
+        "enum": [
+          "month",
+          "day"
+        ],
+        "title": "Salary Unit",
+        "default": "month"
+      },
+      "deadline_before": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Deadline Before"
+      },
+      "name": {
+        "type": "string",
+        "maxLength": 100,
+        "minLength": 1,
+        "title": "Name"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "name"
+    ],
+    "title": "SaveFilterInput"
+  },
+  "ScenarioInput": {
+    "properties": {
+      "career_ids": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 4,
+        "minItems": 1,
+        "title": "Career Ids"
+      },
+      "weekly_minutes": {
+        "type": "integer",
+        "maximum": 10080.0,
+        "minimum": 15.0,
+        "title": "Weekly Minutes"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "career_ids",
+      "weekly_minutes"
+    ],
+    "title": "ScenarioInput"
+  },
+  "ScheduleConfirmInput": {
+    "properties": {
+      "version": {
+        "type": "integer",
+        "minimum": 1.0,
+        "title": "Version"
+      },
+      "date": {
+        "type": "string",
+        "maxLength": 10,
+        "minLength": 10,
+        "title": "Date"
+      },
+      "time": {
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d$"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Time"
+      },
+      "timezone": {
+        "type": "string",
+        "maxLength": 100,
+        "minLength": 1,
+        "title": "Timezone"
+      },
+      "preparation_note": {
+        "type": "string",
+        "maxLength": 2000,
+        "title": "Preparation Note",
+        "default": ""
+      },
+      "preview_hash": {
+        "type": "string",
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Preview Hash"
+      },
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "version",
+      "date",
+      "timezone",
+      "preview_hash",
+      "confirmed"
+    ],
+    "title": "ScheduleConfirmInput"
+  },
+  "ScheduleInput": {
+    "properties": {
+      "version": {
+        "type": "integer",
+        "minimum": 1.0,
+        "title": "Version"
+      },
+      "date": {
+        "type": "string",
+        "maxLength": 10,
+        "minLength": 10,
+        "title": "Date"
+      },
+      "time": {
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d$"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Time"
+      },
+      "timezone": {
+        "type": "string",
+        "maxLength": 100,
+        "minLength": 1,
+        "title": "Timezone"
+      },
+      "preparation_note": {
+        "type": "string",
+        "maxLength": 2000,
+        "title": "Preparation Note",
+        "default": ""
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "version",
+      "date",
+      "timezone"
+    ],
+    "title": "ScheduleInput"
+  },
+  "SelfReviewDecision": {
+    "properties": {
+      "skill_id": {
+        "type": "string",
+        "maxLength": 80,
+        "minLength": 1,
+        "title": "Skill Id"
+      },
+      "minutes": {
+        "type": "integer",
+        "maximum": 180.0,
+        "minimum": 10.0,
+        "title": "Minutes"
+      },
+      "note": {
+        "type": "string",
+        "maxLength": 2000,
+        "title": "Note",
+        "default": ""
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "skill_id",
+      "minutes"
+    ],
+    "title": "SelfReviewDecision"
+  },
+  "SelfReviewInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "confirmed",
+          "withdrawn"
+        ],
+        "title": "Status"
+      },
+      "summary": {
+        "type": "string",
+        "maxLength": 4000,
+        "minLength": 1,
+        "title": "Summary"
+      },
+      "application_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 36,
+            "minLength": 1
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Application Id"
+      },
+      "decisions": {
+        "items": {
+          "$ref": "#/components/schemas/SelfReviewDecision"
+        },
+        "type": "array",
+        "maxItems": 12,
+        "title": "Decisions"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "status",
+      "summary"
+    ],
+    "title": "SelfReviewInput"
+  },
+  "SessionInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "resume_version_id": {
+        "type": "string",
+        "maxLength": 100,
+        "minLength": 1,
+        "title": "Resume Version Id"
+      },
+      "job_id": {
+        "type": "string",
+        "maxLength": 100,
+        "minLength": 1,
+        "title": "Job Id"
+      },
+      "fact_ids": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 3,
+        "title": "Fact Ids"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "resume_version_id",
+      "job_id"
+    ],
+    "title": "SessionInput"
+  },
+  "ShareInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "kind": {
+        "type": "string",
+        "enum": [
+          "practice_project",
+          "plan",
+          "project_asset",
+          "project_narrative",
+          "brand_profile"
+        ],
+        "title": "Kind"
+      },
+      "source_id": {
+        "type": "string",
+        "maxLength": 36,
+        "minLength": 36,
+        "title": "Source Id"
+      },
+      "fields": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 10,
+        "minItems": 1,
+        "title": "Fields"
+      },
+      "source_version": {
+        "type": "integer",
+        "minimum": 1.0,
+        "title": "Source Version"
+      },
+      "workspace_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 36,
+            "minLength": 36
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Workspace Id"
+      },
+      "public": {
+        "type": "boolean",
+        "title": "Public",
+        "default": false
+      },
+      "lifetime_hours": {
+        "type": "integer",
+        "maximum": 720.0,
+        "minimum": 1.0,
+        "title": "Lifetime Hours",
+        "default": 168
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "kind",
+      "source_id",
+      "fields",
+      "source_version"
+    ],
+    "title": "ShareInput"
+  },
+  "SkillGraphInput": {
+    "properties": {
+      "job_ids": {
+        "items": {
+          "type": "string",
+          "maxLength": 36,
+          "minLength": 1
+        },
+        "type": "array",
+        "maxItems": 20,
+        "minItems": 3,
+        "title": "Job Ids"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "job_ids"
+    ],
+    "title": "SkillGraphInput"
+  },
+  "SkillInput": {
+    "properties": {
+      "skill_id": {
+        "type": "string",
+        "maxLength": 80,
+        "minLength": 1,
+        "title": "Skill Id"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "skill_id"
+    ],
+    "title": "SkillInput"
+  },
+  "SnapshotInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "job_id": {
+        "type": "string",
+        "maxLength": 36,
+        "minLength": 36,
+        "title": "Job Id"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "job_id"
+    ],
+    "title": "SnapshotInput"
+  },
+  "Source": {
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9_-]{1,40}$",
+        "title": "Id"
+      },
+      "version": {
+        "type": "integer",
+        "maximum": 1000000.0,
+        "minimum": 1.0,
+        "title": "Version"
+      },
+      "text": {
+        "type": "string",
+        "maxLength": 3000,
+        "minLength": 1,
+        "title": "Text"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "id",
+      "version",
+      "text"
+    ],
+    "title": "Source"
+  },
+  "SpaceInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "name": {
+        "type": "string",
+        "maxLength": 100,
+        "minLength": 1,
+        "title": "Name"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "name"
+    ],
+    "title": "SpaceInput"
+  },
+  "StateInput": {
+    "properties": {
+      "kind": {
+        "type": "string",
+        "enum": [
+          "skill",
+          "learning_task",
+          "application",
+          "goal"
+        ],
+        "title": "Kind"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "kind"
+    ],
+    "title": "StateInput"
+  },
+  "SubmissionInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "application_id": {
+        "type": "string",
+        "maxLength": 36,
+        "minLength": 36,
+        "title": "Application Id"
+      },
+      "approval_id": {
+        "type": "string",
+        "maxLength": 36,
+        "minLength": 36,
+        "title": "Approval Id"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "application_id",
+      "approval_id"
+    ],
+    "title": "SubmissionInput"
+  },
+  "SubscriptionInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "name": {
+        "type": "string",
+        "maxLength": 100,
+        "minLength": 1,
+        "title": "Name"
+      },
+      "filters": {
+        "$ref": "#/components/schemas/FilterInput"
+      },
+      "favorites_only": {
+        "type": "boolean",
+        "title": "Favorites Only",
+        "default": false
+      },
+      "frequency": {
+        "type": "string",
+        "enum": [
+          "daily",
+          "weekly"
+        ],
+        "title": "Frequency",
+        "default": "weekly"
+      },
+      "hour": {
+        "type": "integer",
+        "maximum": 23.0,
+        "minimum": 0.0,
+        "title": "Hour",
+        "default": 9
+      },
+      "weekday": {
+        "type": "integer",
+        "maximum": 6.0,
+        "minimum": 0.0,
+        "title": "Weekday",
+        "default": 0
+      },
+      "timezone": {
+        "type": "string",
+        "maxLength": 100,
+        "title": "Timezone",
+        "default": "Asia/Shanghai"
+      },
+      "quiet_start": {
+        "type": "integer",
+        "maximum": 23.0,
+        "minimum": 0.0,
+        "title": "Quiet Start",
+        "default": 22
+      },
+      "quiet_end": {
+        "type": "integer",
+        "maximum": 23.0,
+        "minimum": 0.0,
+        "title": "Quiet End",
+        "default": 8
+      },
+      "source": {
+        "type": "string",
+        "const": "local_library",
+        "title": "Source",
+        "default": "local_library"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "name"
+    ],
+    "title": "SubscriptionInput"
+  },
+  "SubscriptionState": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "active",
+          "paused",
+          "cancelled"
+        ],
+        "title": "Status"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "status"
+    ],
+    "title": "SubscriptionState"
+  },
+  "TailorInput": {
+    "properties": {
+      "job_id": {
+        "type": "string",
+        "maxLength": 100,
+        "minLength": 1,
+        "title": "Job Id"
+      },
+      "job_version": {
+        "anyOf": [
+          {
+            "type": "integer",
+            "minimum": 1.0
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Job Version"
+      },
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "job_id",
+      "confirmed"
+    ],
+    "title": "TailorInput"
+  },
+  "TaskAction": {
+    "properties": {
+      "action": {
+        "type": "string",
+        "enum": [
+          "start",
+          "pause",
+          "complete",
+          "skip",
+          "lock",
+          "unlock",
+          "defer",
+          "split",
+          "attach"
+        ],
+        "title": "Action"
+      },
+      "date": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Date"
+      },
+      "minutes": {
+        "anyOf": [
+          {
+            "type": "integer",
+            "maximum": 10080.0,
+            "minimum": 1.0
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Minutes"
+      },
+      "outcome": {
+        "type": "string",
+        "maxLength": 4000,
+        "title": "Outcome",
+        "default": ""
+      },
+      "material_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 36
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Material Id"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "action"
+    ],
+    "title": "TaskAction"
+  },
+  "TaskInput": {
+    "properties": {
+      "kind": {
+        "type": "string",
+        "const": "baseline.validate",
+        "title": "Kind",
+        "default": "baseline.validate"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "title": "TaskInput"
+  },
+  "TeachingInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "skill_id": {
+        "type": "string",
+        "maxLength": 80,
+        "minLength": 1,
+        "title": "Skill Id"
+      },
+      "question_index": {
+        "type": "integer",
+        "maximum": 20.0,
+        "minimum": 0.0,
+        "title": "Question Index"
+      },
+      "level": {
+        "type": "integer",
+        "maximum": 3.0,
+        "minimum": 1.0,
+        "title": "Level"
+      },
+      "attempt": {
+        "type": "string",
+        "maxLength": 2000,
+        "title": "Attempt",
+        "default": ""
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "skill_id",
+      "question_index",
+      "level"
+    ],
+    "title": "TeachingInput"
+  },
+  "TranscriptInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "text": {
+        "type": "string",
+        "maxLength": 20000,
+        "minLength": 1,
+        "title": "Text"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "text"
+    ],
+    "title": "TranscriptInput"
+  },
+  "TranslationInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "resume_version_id": {
+        "type": "string",
+        "maxLength": 36,
+        "minLength": 36,
+        "title": "Resume Version Id"
+      },
+      "locale": {
+        "type": "string",
+        "enum": [
+          "zh-CN",
+          "en-US"
+        ],
+        "title": "Locale"
+      },
+      "mappings": {
+        "items": {
+          "$ref": "#/components/schemas/TranslationMapping"
+        },
+        "type": "array",
+        "maxItems": 100,
+        "minItems": 1,
+        "title": "Mappings"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "resume_version_id",
+      "locale",
+      "mappings"
+    ],
+    "title": "TranslationInput"
+  },
+  "TranslationMapping": {
+    "properties": {
+      "fact_id": {
+        "type": "string",
+        "maxLength": 36,
+        "minLength": 36,
+        "title": "Fact Id"
+      },
+      "text": {
+        "type": "string",
+        "maxLength": 4000,
+        "minLength": 1,
+        "title": "Text"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "fact_id",
+      "text"
+    ],
+    "title": "TranslationMapping"
+  },
+  "TrendInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "keyword": {
+        "type": "string",
+        "maxLength": 100,
+        "minLength": 1,
+        "title": "Keyword"
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "active",
+          "paused"
+        ],
+        "title": "Status",
+        "default": "active"
+      },
+      "interval_hours": {
+        "type": "integer",
+        "enum": [
+          6,
+          24,
+          168
+        ],
+        "title": "Interval Hours",
+        "default": 24
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "keyword"
+    ],
+    "title": "TrendInput"
+  },
+  "TutorStart": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "exam_id": {
+        "type": "string",
+        "maxLength": 36,
+        "minLength": 36,
+        "title": "Exam Id"
+      },
+      "answer_index": {
+        "type": "integer",
+        "maximum": 23.0,
+        "minimum": 0.0,
+        "title": "Answer Index"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "exam_id",
+      "answer_index"
+    ],
+    "title": "TutorStart"
+  },
+  "TutorTurn": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "action": {
+        "type": "string",
+        "enum": [
+          "reflect",
+          "hint"
+        ],
+        "title": "Action",
+        "default": "reflect"
+      },
+      "focus": {
+        "type": "string",
+        "enum": [
+          "concept",
+          "condition",
+          "counterexample"
+        ],
+        "title": "Focus",
+        "default": "concept"
+      },
+      "attempt": {
+        "type": "string",
+        "maxLength": 2000,
+        "minLength": 1,
+        "title": "Attempt"
+      },
+      "question": {
+        "type": "string",
+        "maxLength": 2000,
+        "title": "Question",
+        "default": ""
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "attempt"
+    ],
+    "title": "TutorTurn"
+  },
+  "UrlInput": {
+    "properties": {
+      "url": {
+        "type": "string",
+        "maxLength": 2000,
+        "minLength": 1,
+        "title": "Url"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "url"
+    ],
+    "title": "UrlInput"
+  },
+  "ValidationError": {
+    "properties": {
+      "loc": {
+        "items": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            }
+          ]
+        },
+        "type": "array",
+        "title": "Location"
+      },
+      "msg": {
+        "type": "string",
+        "title": "Message"
+      },
+      "type": {
+        "type": "string",
+        "title": "Error Type"
+      },
+      "input": {
+        "title": "Input"
+      },
+      "ctx": {
+        "type": "object",
+        "title": "Context"
+      }
+    },
+    "type": "object",
+    "required": [
+      "loc",
+      "msg",
+      "type"
+    ],
+    "title": "ValidationError"
+  },
+  "VoiceInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "recording_consent": {
+        "type": "boolean",
+        "const": true,
+        "title": "Recording Consent"
+      },
+      "interview_id": {
+        "type": "string",
+        "maxLength": 36,
+        "minLength": 36,
+        "title": "Interview Id"
+      },
+      "audio_base64": {
+        "type": "string",
+        "maxLength": 2800000,
+        "minLength": 1,
+        "title": "Audio Base64"
+      },
+      "retention_days": {
+        "type": "integer",
+        "maximum": 7.0,
+        "minimum": 1.0,
+        "title": "Retention Days",
+        "default": 1
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "recording_consent",
+      "interview_id",
+      "audio_base64"
+    ],
+    "title": "VoiceInput"
+  },
+  "careerpilot__collaboration_api__TicketInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "ticket": {
+        "type": "string",
+        "maxLength": 100,
+        "minLength": 32,
+        "title": "Ticket"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "ticket"
+    ],
+    "title": "TicketInput"
+  },
+  "careerpilot__expert_comparison__Correction": {
+    "properties": {
+      "repeat": {
+        "type": "integer",
+        "exclusiveMaximum": 10.0,
+        "minimum": 0.0,
+        "title": "Repeat"
+      },
+      "case": {
+        "type": "integer",
+        "exclusiveMaximum": 100.0,
+        "minimum": 0.0,
+        "title": "Case"
+      },
+      "arm": {
+        "type": "string",
+        "enum": [
+          "single",
+          "reviewed"
+        ],
+        "title": "Arm"
+      },
+      "decision": {
+        "$ref": "#/components/schemas/Decision"
+      },
+      "note": {
+        "type": "string",
+        "maxLength": 1000,
+        "minLength": 1,
+        "title": "Note"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "repeat",
+      "case",
+      "arm",
+      "decision",
+      "note"
+    ],
+    "title": "Correction"
+  },
+  "careerpilot__growth_api__ClaimInput": {
+    "properties": {
+      "text": {
+        "type": "string",
+        "maxLength": 2000,
+        "minLength": 1,
+        "title": "Text"
+      },
+      "start": {
+        "type": "integer",
+        "minimum": 0.0,
+        "title": "Start"
+      },
+      "end": {
+        "type": "integer",
+        "minimum": 1.0,
+        "title": "End"
+      },
+      "category": {
+        "type": "string",
+        "enum": [
+          "self_report",
+          "document_fact",
+          "inference"
+        ],
+        "title": "Category",
+        "default": "self_report"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "text",
+      "start",
+      "end"
+    ],
+    "title": "ClaimInput"
+  },
+  "careerpilot__growth_api__RestoreInput": {
+    "properties": {
+      "target_version": {
+        "type": "integer",
+        "minimum": 1.0,
+        "title": "Target Version"
+      },
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "target_version",
+      "confirmed"
+    ],
+    "title": "RestoreInput"
+  },
+  "careerpilot__hiring_api__ApplicationInput": {
+    "properties": {
+      "job_id": {
+        "type": "string",
+        "maxLength": 100,
+        "minLength": 1,
+        "title": "Job Id"
+      },
+      "resume_version_id": {
+        "type": "string",
+        "maxLength": 100,
+        "minLength": 1,
+        "title": "Resume Version Id"
+      },
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "job_id",
+      "resume_version_id",
+      "confirmed"
+    ],
+    "title": "ApplicationInput"
+  },
+  "careerpilot__hiring_api__DraftInput": {
+    "properties": {
+      "kind": {
+        "type": "string",
+        "enum": [
+          "cover_letter",
+          "email",
+          "introduction"
+        ],
+        "title": "Kind"
+      },
+      "tone": {
+        "type": "string",
+        "enum": [
+          "plain",
+          "formal"
+        ],
+        "title": "Tone"
+      },
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "kind",
+      "tone",
+      "confirmed"
+    ],
+    "title": "DraftInput"
+  },
+  "careerpilot__hiring_api__RestoreInput": {
+    "properties": {
+      "version_id": {
+        "type": "string",
+        "maxLength": 100,
+        "minLength": 1,
+        "title": "Version Id"
+      },
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "version_id",
+      "confirmed"
+    ],
+    "title": "RestoreInput"
+  },
+  "careerpilot__hiring_api__ResumeInput": {
+    "properties": {
+      "fact_ids": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 100,
+        "minItems": 1,
+        "title": "Fact Ids"
+      },
+      "job_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Job Id"
+      },
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "fact_ids",
+      "confirmed"
+    ],
+    "title": "ResumeInput"
+  },
+  "careerpilot__hiring_api__TransitionInput": {
+    "properties": {
+      "target": {
+        "type": "string",
+        "enum": [
+          "prepared",
+          "awaiting_user_submission",
+          "assessment",
+          "interviewing",
+          "offer",
+          "rejected",
+          "withdrawn",
+          "no_response"
+        ],
+        "title": "Target"
+      },
+      "note": {
+        "type": "string",
+        "maxLength": 2000,
+        "title": "Note",
+        "default": ""
+      },
+      "checklist": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/Checklist"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "target",
+      "confirmed"
+    ],
+    "title": "TransitionInput"
+  },
+  "careerpilot__interview_api__ReviewInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "confirmed",
+          "withdrawn"
+        ],
+        "title": "Status"
+      },
+      "summary": {
+        "type": "string",
+        "maxLength": 4000,
+        "minLength": 1,
+        "title": "Summary"
+      },
+      "decisions": {
+        "items": {
+          "$ref": "#/components/schemas/DecisionInput"
+        },
+        "type": "array",
+        "maxItems": 12,
+        "title": "Decisions"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "status",
+      "summary"
+    ],
+    "title": "ReviewInput"
+  },
+  "careerpilot__local_tools_api__ApplicationInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "application_id": {
+        "type": "string",
+        "maxLength": 36,
+        "minLength": 36,
+        "title": "Application Id"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "application_id"
+    ],
+    "title": "ApplicationInput"
+  },
+  "careerpilot__local_tools_api__ReviewInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "start": {
+        "type": "string",
+        "format": "date",
+        "title": "Start"
+      },
+      "end": {
+        "type": "string",
+        "format": "date",
+        "title": "End"
+      },
+      "reflection": {
+        "type": "string",
+        "maxLength": 4000,
+        "minLength": 1,
+        "title": "Reflection"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "start",
+      "end",
+      "reflection"
+    ],
+    "title": "ReviewInput"
+  },
+  "careerpilot__model_comparison__Correction": {
+    "properties": {
+      "repeat": {
+        "type": "integer",
+        "exclusiveMaximum": 10.0,
+        "minimum": 0.0,
+        "title": "Repeat"
+      },
+      "case": {
+        "type": "integer",
+        "exclusiveMaximum": 100.0,
+        "minimum": 0.0,
+        "title": "Case"
+      },
+      "arm": {
+        "type": "string",
+        "enum": [
+          "single",
+          "reviewed"
+        ],
+        "title": "Arm"
+      },
+      "prediction": {
+        "type": "boolean",
+        "title": "Prediction"
+      },
+      "note": {
+        "type": "string",
+        "maxLength": 1000,
+        "minLength": 1,
+        "title": "Note"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "repeat",
+      "case",
+      "arm",
+      "prediction",
+      "note"
+    ],
+    "title": "Correction"
+  },
+  "careerpilot__platform_api__TransitionInput": {
+    "properties": {
+      "target": {
+        "type": "string",
+        "maxLength": 40,
+        "minLength": 1,
+        "title": "Target"
+      },
+      "reason": {
+        "type": "string",
+        "maxLength": 200,
+        "minLength": 1,
+        "title": "Reason"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "target",
+      "reason"
+    ],
+    "title": "TransitionInput"
+  },
+  "careerpilot__progress_api__TicketInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "category": {
+        "type": "string",
+        "enum": [
+          "broken_link",
+          "content_correction",
+          "expired_job",
+          "complaint"
+        ],
+        "title": "Category"
+      },
+      "resource_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 80
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Resource Id"
+      },
+      "job_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 36
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Job Id"
+      },
+      "details": {
+        "type": "string",
+        "maxLength": 4000,
+        "minLength": 1,
+        "title": "Details"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "category",
+      "details"
+    ],
+    "title": "TicketInput"
+  },
+  "careerpilot__project_api__MilestoneInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "in_progress",
+          "completed"
+        ],
+        "title": "Status"
+      },
+      "note": {
+        "type": "string",
+        "maxLength": 4000,
+        "title": "Note",
+        "default": ""
+      },
+      "asset_ids": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 10,
+        "title": "Asset Ids"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "status"
+    ],
+    "title": "MilestoneInput"
+  },
+  "careerpilot__project_api__ReviewInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "decision": {
+        "type": "string",
+        "enum": [
+          "accept",
+          "request_changes"
+        ],
+        "title": "Decision"
+      },
+      "note": {
+        "type": "string",
+        "maxLength": 4000,
+        "minLength": 1,
+        "title": "Note"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "decision",
+      "note"
+    ],
+    "title": "ReviewInput"
+  },
+  "careerpilot__source_api__ClaimInput": {
+    "properties": {
+      "topic": {
+        "type": "string",
+        "maxLength": 80,
+        "minLength": 1,
+        "title": "Topic"
+      },
+      "value": {
+        "type": "string",
+        "maxLength": 300,
+        "minLength": 1,
+        "title": "Value"
+      },
+      "start": {
+        "type": "integer",
+        "minimum": 0.0,
+        "title": "Start"
+      },
+      "end": {
+        "type": "integer",
+        "minimum": 1.0,
+        "title": "End"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "topic",
+      "value",
+      "start",
+      "end"
+    ],
+    "title": "ClaimInput"
+  },
+  "careerpilot__source_api__CompareInput": {
+    "properties": {
+      "source_ids": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 4,
+        "minItems": 2,
+        "title": "Source Ids"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "source_ids"
+    ],
+    "title": "CompareInput"
+  },
+  "careerpilot__v1_api__MilestoneInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "title": {
+        "type": "string",
+        "maxLength": 200,
+        "minLength": 1,
+        "title": "Title"
+      },
+      "target_date": {
+        "type": "string",
+        "format": "date",
+        "title": "Target Date"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "title",
+      "target_date"
+    ],
+    "title": "MilestoneInput"
+  },
+  "careerpilot__v2_api__CompareInput": {
+    "properties": {
+      "job_ids": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "maxItems": 4,
+        "minItems": 2,
+        "title": "Job Ids"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "job_ids"
+    ],
+    "title": "CompareInput"
+  },
+  "careerpilot__v4_growth_api__RestoreInput": {
+    "properties": {
+      "confirmed": {
+        "type": "boolean",
+        "const": true,
+        "title": "Confirmed"
+      },
+      "target_version": {
+        "type": "integer",
+        "minimum": 1.0,
+        "title": "Target Version"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "confirmed",
+      "target_version"
+    ],
+    "title": "RestoreInput"
+  },
+  "careerpilot__workflow_api__DraftInput": {
+    "properties": {
+      "values": {
+        "additionalProperties": true,
+        "type": "object",
+        "title": "Values"
+      },
+      "base_record_version": {
+        "type": "integer",
+        "minimum": 0.0,
+        "title": "Base Record Version",
+        "default": 0
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "title": "DraftInput"
+  },
+  "careerpilot__workflow_api__ResumeInput": {
+    "properties": {
+      "approved": {
+        "type": "boolean",
+        "title": "Approved"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "approved"
+    ],
+    "title": "ResumeInput"
+  }
+}

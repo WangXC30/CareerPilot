@@ -15,6 +15,7 @@ import httpx
 import uvicorn
 from alembic import command
 from alembic.config import Config
+from browser_identity import connect_browser
 from playwright.sync_api import expect, sync_playwright
 from sqlalchemy.orm import Session
 
@@ -51,7 +52,11 @@ def run(output=None):
             port = sock.getsockname()[1]
         server = uvicorn.Server(
             uvicorn.Config(
-                create_app(url), host="127.0.0.1", port=port, log_level="error", access_log=False
+                create_app(url, local_only=False),
+                host="127.0.0.1",
+                port=port,
+                log_level="error",
+                access_log=False,
             )
         )
         thread = threading.Thread(target=server.run, daemon=True)
@@ -99,11 +104,8 @@ def run(output=None):
                     errors = []
                     page.on("pageerror", lambda error: errors.append(str(error)))
                     page.goto(base + "/app/#market")
-                    page.get_by_role("button", name="连接我的账号", exact=True).click()
-                    page.locator("#token").fill(token)
-                    page.locator("#account-form").get_by_role(
-                        "button", name="连接", exact=True
-                    ).click()
+                    connect_browser(page, token)
+                    pass
                     expect(page.locator("#job-preferences-form")).to_be_visible()
                     card = page.locator(f'#job-matches [data-match-job="{a_id}"]')
                     card.get_by_role("button", name="收藏岗位", exact=True).click()
@@ -186,6 +188,10 @@ def run(output=None):
                     page.get_by_role("button", name="恢复订阅", exact=True).click()
                     expect(page.locator(".subscription-card .tag")).to_have_text("启用")
                     page.get_by_role("button", name="编辑配置", exact=True).click()
+                    form.locator("[name=name]").fill("不应保存的临时改动")
+                    page.locator("#cancel-subscription-edit").click()
+                    expect(form.locator("[name=name]")).to_have_value("")
+                    page.get_by_role("button", name="编辑配置", exact=True).click()
                     form.locator("[name=name]").fill("每周上海后端（已编辑）")
                     form.get_by_role("button", name="确认保存订阅配置", exact=True).click()
                     expect(page.locator(".subscription-card h3")).to_have_text(
@@ -220,8 +226,10 @@ def run(output=None):
                             path=str(output / "subscriptions-desktop.png")
                         )
                     page.set_viewport_size({"width": 375, "height": 850})
+                    sidebar_width = page.locator("#sidebar").evaluate("n=>n.offsetWidth")
                     expect(page.locator("#sidebar")).to_have_css(
-                        "transform", "matrix(1, 0, 0, 1, -240, 0)"
+                        "transform",
+                        f"matrix(1, 0, 0, 1, -{sidebar_width}, 0)",
                     )
                     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
                     if output:

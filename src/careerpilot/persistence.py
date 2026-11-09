@@ -21,7 +21,7 @@ from sqlalchemy import (
 from sqlalchemy.engine import CursorResult
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-SCHEMA_REVISION = "0005"
+SCHEMA_REVISION = "0007"
 
 
 def utc_now() -> str:
@@ -69,6 +69,7 @@ def make_engine(url: str):
         @event.listens_for(engine, "connect")
         def enable_foreign_keys(connection, _):
             connection.execute("PRAGMA foreign_keys=ON")
+            connection.execute("PRAGMA busy_timeout=10000")
 
     return engine
 
@@ -83,6 +84,18 @@ class User(Base):
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
     tenant_id: Mapped[str] = mapped_column(String(36), nullable=False)
     display_name: Mapped[str] = mapped_column(String(100))
+    created_at: Mapped[str] = mapped_column(String(40), default=utc_now)
+
+
+class LocalWorkspace(Base):
+    __tablename__ = "local_workspace"
+    __table_args__ = (
+        ForeignKeyConstraint(["user_id", "tenant_id"], ["users.id", "users.tenant_id"]),
+        CheckConstraint("id = 'personal'"),
+    )
+    id: Mapped[str] = mapped_column(String(20), primary_key=True, default="personal")
+    user_id: Mapped[str] = mapped_column(String(36))
+    tenant_id: Mapped[str] = mapped_column(String(36))
     created_at: Mapped[str] = mapped_column(String(40), default=utc_now)
 
 

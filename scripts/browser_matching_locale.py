@@ -9,6 +9,7 @@ from pathlib import Path
 import uvicorn
 from alembic import command
 from alembic.config import Config
+from browser_identity import connect_browser
 from browser_v4_locale import MISMARKED
 from fastapi.testclient import TestClient
 from playwright.sync_api import expect, sync_playwright
@@ -32,7 +33,9 @@ def main():
             sock.bind(("127.0.0.1", 0))
             port = sock.getsockname()[1]
         server = uvicorn.Server(
-            uvicorn.Config(create_app(url), host="127.0.0.1", port=port, log_level="error")
+            uvicorn.Config(
+                create_app(url, local_only=False), host="127.0.0.1", port=port, log_level="error"
+            )
         )
         thread = threading.Thread(target=server.run, daemon=True)
         thread.start()
@@ -42,7 +45,10 @@ def main():
                     break
                 time.sleep(0.05)
             assert server.started
-            with TestClient(create_app(url)) as client, sync_playwright() as playwright:
+            with (
+                TestClient(create_app(url, local_only=False)) as client,
+                sync_playwright() as playwright,
+            ):
                 browser = playwright.chromium.launch()
                 try:
                     for width in (1440, 375):
@@ -117,9 +123,7 @@ def check_width(browser, port, token, width, records, engine):
     try:
         page.goto(f"http://127.0.0.1:{port}/app/#market")
         page.locator("#ui-locale").select_option("en-US")
-        page.locator("#connect").click()
-        page.locator("#token").fill(token)
-        page.locator("#account-form").get_by_role("button", name="Connect", exact=True).click()
+        connect_browser(page, token)
         expect(page.locator("#job-recommendations")).to_have_attribute("aria-busy", "false")
         first_id, failed_id, unknown_id = (record["id"] for record in records)
         first = page.locator(f'#job-matches [data-match-job="{first_id}"]')

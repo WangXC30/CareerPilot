@@ -140,7 +140,7 @@ def create(db, principal, args, key, trace):
 
     def make():
         version = resumes.owned_version(db, principal, args["resume_version_id"])
-        resumes.valid_facts(db, principal, [f["id"] for f in version["facts"]])
+        resumes.valid_version_facts(db, principal, version)
         job = resumes.job_context(db, principal, args["job_id"])
         if version["job"] and (
             version["job"]["id"] != job["id"]
@@ -209,7 +209,7 @@ def answer(db, principal, session_id, args, expected, trace):
         raise DomainError("VERSION_CONFLICT", "面试会话已更新，请刷新后继续", 412)
     if current["status"] != "running":
         raise DomainError("INTERVIEW_FINISHED", "此会话已结束", 409)
-    resumes.valid_facts(db, principal, [f["id"] for f in current["facts"]])
+    resumes.valid_version_facts(db, principal, current)
     q = current["questions"][len(current["answers"])]
     if q["id"] != args["question_id"]:
         raise DomainError("QUESTION_MISMATCH", "请回答当前问题", 409)
@@ -410,11 +410,51 @@ def save_review(db, principal, evaluation_id, args, expected, trace):
             "evaluation_id": evaluation_id,
             "session_id": session["id"],
             "basis": "user_confirmed_practice_review",
+            "user_archived": growth.data(row).get("user_archived", False) if row else False,
         },
         trace,
         row,
         expected,
         record_id=key,
+    )
+
+
+def save_self_review(db, principal, args, trace, review_id=None, expected=0, key=None):
+    """Save the person's account of an interview without inventing an evaluation."""
+    growth.lock_owner(db, principal)
+    row = growth.owned(db, principal, review_id, "interview_review") if review_id else None
+    if row and (
+        row.version != expected or growth.data(row).get("basis") != "user_reported_interview"
+    ):
+        raise DomainError("VERSION_CONFLICT", "复盘已改变或不是本人面试自述，请重新读取。", 412)
+    app_id = args.get("application_id")
+    app = growth.data(growth.owned(db, principal, app_id, "job_application")) if app_id else None
+    for item in args["decisions"]:
+        catalogue.require_skill(db, item["skill_id"])
+    scan_upload(growth.dump(args).encode(), "interview-self-review.json")
+    payload = {
+        "status": args["status"],
+        "summary": args["summary"],
+        "decisions": args["decisions"],
+        "application_id": app_id,
+        "job_id": app["job"]["id"] if app else None,
+        "resume_version_id": app["resume_version_id"] if app else None,
+        "evaluation_id": None,
+        "session_id": None,
+        "basis": "user_reported_interview",
+        "user_archived": growth.data(row).get("user_archived", False) if row else False,
+    }
+    if row:
+        return growth.save(db, principal, "interview_review", payload, trace, row, expected)
+    if not key:
+        raise DomainError("VALIDATION_ERROR", "创建复盘需要幂等键。", 422)
+    return remember(
+        db,
+        principal,
+        key,
+        {"action": "interview.self_review", "body": args},
+        "interview_review",
+        lambda: growth.save(db, principal, "interview_review", payload, trace),
     )
 
 
@@ -433,7 +473,7 @@ def plan_preview(db, principal, review_id, plan_id, expected, key, trace):
             raise DomainError("ACTIVE_PLAN_REQUIRED", "请选择当前已发布计划", 409)
         if any(t.get("interview_review_id") == review_id for t in current["tasks"]):
             raise DomainError("REVIEW_ALREADY_PLANNED", "此复盘已加入该计划，不重复添加", 409)
-        profile = learning.profile_context(db, principal)
+        profile = learning.profile_context(db, principal, current)
         profile["weekly_minutes"] = learning.plan_budget(current, profile["weekly_minutes"])
         graph = catalogue.skill_map(db)
         candidate = copy.deepcopy(body(current))
@@ -488,7 +528,10 @@ def plan_preview(db, principal, review_id, plan_id, expected, key, trace):
 
         for decision in review["decisions"]:
             add(
-                decision["skill_id"], decision["minutes"], decision["question_id"], decision["note"]
+                decision["skill_id"],
+                decision["minutes"],
+                decision.get("question_id"),
+                decision["note"],
             )
         today = datetime.now(ZoneInfo(profile["timezone"])).date().isoformat()
         candidate["tasks"] = learning.schedule(

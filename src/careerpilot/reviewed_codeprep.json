@@ -1,0 +1,182 @@
+[
+  {
+    "id": "codeprep-ts-mcq-union-type-meaning",
+    "topic": "TypeScript",
+    "question": "What does the type `string | number` mean for a variable?",
+    "choices": [
+      "Its value may be a `string` OR a `number` at any given time",
+      "Its value must be both a `string` and a `number` simultaneously",
+      "It is an array containing strings and numbers",
+      "It is a `string` that can be converted to a `number`"
+    ],
+    "correct": 0,
+    "explanation": "A union type `A | B` means the value is one of the constituent types at any moment. To use type-specific members you must first narrow it (e.g. with `typeof`). An intersection (`A & B`) would require both at once.",
+    "reference": "https://www.typescriptlang.org/docs/handbook/unions-and-intersections.html",
+    "origin": "https://github.com/codeprepdev/codeprep-questions/blob/1bc3a641cabdcef8bec6771bded34761911a60f5/data/questions.json",
+    "attribution": "Questions from CodePrep, CC BY 4.0; unmodified",
+    "author_url": "https://codeprep.dev",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+    "id": "codeprep-react-mcq-usestate-async-batching",
+    "topic": "React",
+    "question": "Immediately after calling `setCount(count + 1)`, what does reading `count` on the next line return (within the same event handler)?",
+    "choices": [
+      "The old value — the state variable does not change until the next render",
+      "The new value, because `setCount` updates `count` synchronously",
+      "`undefined`, because state is cleared during the update",
+      "It depends on whether the component is wrapped in `React.memo`"
+    ],
+    "correct": 0,
+    "explanation": "State setters schedule a re-render; they do not mutate the existing `count` binding. Within the same render/handler `count` keeps its current value, and the updated value is only visible in the next render. This is why updater functions are needed for sequential updates.",
+    "reference": "https://react.dev/learn/state-as-a-snapshot",
+    "origin": "https://github.com/codeprepdev/codeprep-questions/blob/1bc3a641cabdcef8bec6771bded34761911a60f5/data/questions.json",
+    "attribution": "Questions from CodePrep, CC BY 4.0; unmodified",
+    "author_url": "https://codeprep.dev",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+    "id": "codeprep-web-mcq-queryselector-first",
+    "topic": "Web API",
+    "question": "Given several `<button class=\"btn\">` elements, what does `document.querySelector(\".btn\")` return?",
+    "choices": [
+      "The first matching element, or `null` if none match",
+      "A live `HTMLCollection` of all matching elements",
+      "A static `NodeList` of all matching elements",
+      "An array of all matching elements"
+    ],
+    "correct": 0,
+    "explanation": "`querySelector` returns only the first element matching the CSS selector (in document order), or `null` if there are no matches. To get all matches use `querySelectorAll`, which returns a static `NodeList`.",
+    "reference": "https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector",
+    "origin": "https://github.com/codeprepdev/codeprep-questions/blob/1bc3a641cabdcef8bec6771bded34761911a60f5/data/questions.json",
+    "attribution": "Questions from CodePrep, CC BY 4.0; unmodified",
+    "author_url": "https://codeprep.dev",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+    "id": "codeprep-web-mcq-popover-invoker-attribute",
+    "topic": "Web API",
+    "question": "You have `<div id=\"menu\" popover>…</div>`. Using only HTML (no JavaScript), how do you make a `<button>` toggle it open and closed?",
+    "choices": [
+      "`<button popovertarget=\"menu\">Toggle</button>`",
+      "`<button popover=\"menu\">Toggle</button>`",
+      "`<button for=\"menu\">Toggle</button>`",
+      "`<button aria-controls=\"menu\">Toggle</button>`"
+    ],
+    "correct": 0,
+    "explanation": "A control button declares the popover it operates with `popovertarget=\"<id>\"`; by default the action is `toggle`, so the same button shows and hides it with no script. You can narrow the action with `popovertargetaction=\"show\"` or `\"hide\"`. `popover` is the attribute on the popover element itself (not the button), `for` is for `<label>`, and `aria-controls` only describes the relationship for assistive tech — it wires up no behavior.",
+    "reference": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/button#popovertarget",
+    "origin": "https://github.com/codeprepdev/codeprep-questions/blob/1bc3a641cabdcef8bec6771bded34761911a60f5/data/questions.json",
+    "attribution": "Questions from CodePrep, CC BY 4.0; unmodified",
+    "author_url": "https://codeprep.dev",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+    "id": "codeprep-node-mcq-process-env-type",
+    "topic": "Node.js",
+    "question": "What is the type of a value read from `process.env.PORT`?",
+    "choices": [
+      "`string` (or `undefined` if unset)",
+      "`number`",
+      "`string | number` depending on the value",
+      "Always `undefined` until you call `dotenv.config()`"
+    ],
+    "correct": 0,
+    "explanation": "Every value on `process.env` is a string (or `undefined` when the variable is not set). Numeric-looking values like `\"3000\"` are still strings, so you must convert with `Number(process.env.PORT)` before using them as numbers.",
+    "reference": "https://nodejs.org/api/process.html#processenv",
+    "origin": "https://github.com/codeprepdev/codeprep-questions/blob/1bc3a641cabdcef8bec6771bded34761911a60f5/data/questions.json",
+    "attribution": "Questions from CodePrep, CC BY 4.0; unmodified",
+    "author_url": "https://codeprep.dev",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+    "id": "codeprep-node-mcq-dirname-commonjs",
+    "topic": "Node.js",
+    "question": "In a CommonJS module (a `.js` file loaded with `require`), which of these is a real, module-scoped variable Node injects automatically?",
+    "choices": [
+      "`__dirname`",
+      "`import.meta.url`",
+      "`globalThis.module`",
+      "`window`"
+    ],
+    "correct": 0,
+    "explanation": "Node wraps every CommonJS module in a function that receives `exports`, `require`, `module`, `__filename`, and `__dirname` as parameters, so `__dirname` is available without importing anything. `import.meta` only exists in ES modules; `window` is a browser global.",
+    "reference": "https://nodejs.org/api/modules.html#the-module-wrapper",
+    "origin": "https://github.com/codeprepdev/codeprep-questions/blob/1bc3a641cabdcef8bec6771bded34761911a60f5/data/questions.json",
+    "attribution": "Questions from CodePrep, CC BY 4.0; unmodified",
+    "author_url": "https://codeprep.dev",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+    "id": "codeprep-sql-mcq-pgvector-knn",
+    "topic": "SQL",
+    "question": "Using the pgvector extension, which query returns the 5 rows whose `embedding` is most similar to `$1` by L2 (Euclidean) distance?",
+    "choices": [
+      "`SELECT * FROM items ORDER BY embedding <-> $1 LIMIT 5`",
+      "`SELECT * FROM items WHERE embedding = $1 LIMIT 5`",
+      "`SELECT * FROM items ORDER BY embedding DESC LIMIT 5`",
+      "`SELECT * FROM items GROUP BY embedding HAVING embedding <-> $1 LIMIT 5`"
+    ],
+    "correct": 0,
+    "explanation": "pgvector adds a `vector` column type and distance operators: `<->` is L2/Euclidean distance, `<=>` is cosine distance, and `<#>` is negative inner product. A k-nearest-neighbour search is expressed as `ORDER BY embedding <-> $query LIMIT k` — order by the chosen distance ascending and cap the result. With no index this is an exact sequential scan computing every distance; adding an approximate index (HNSW or IVFFlat) lets the same `ORDER BY ... LIMIT` query trade a little recall for a large speed-up. Equality (`=`), plain `DESC` ordering, and `GROUP BY` do not express nearest-neighbour search.",
+    "reference": "https://github.com/pgvector/pgvector#querying",
+    "origin": "https://github.com/codeprepdev/codeprep-questions/blob/1bc3a641cabdcef8bec6771bded34761911a60f5/data/questions.json",
+    "attribution": "Questions from CodePrep, CC BY 4.0; unmodified",
+    "author_url": "https://codeprep.dev",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+    "id": "codeprep-py-mcq-bool-is-int-subclass",
+    "topic": "Python",
+    "question": "What does `isinstance(True, int)` return, and why?",
+    "choices": [
+      "`True` — `bool` is a subclass of `int`, so `True` behaves as `1` and `False` as `0`",
+      "`False` — `bool` and `int` are unrelated types",
+      "`False` — `int` is a subclass of `bool`, not the other way around",
+      "It raises a `TypeError` because `True` is not a class instance"
+    ],
+    "correct": 0,
+    "explanation": "`bool` is defined as a subclass of `int` in Python, so `isinstance(True, int)` is `True` and booleans participate in arithmetic — `True + True` is `2`. This is why `isinstance(x, int)` accidentally accepts booleans, and why summing a list of bools counts the `True` values.",
+    "reference": "https://docs.python.org/3/library/stdtypes.html#boolean-type-bool",
+    "origin": "https://github.com/codeprepdev/codeprep-questions/blob/1bc3a641cabdcef8bec6771bded34761911a60f5/data/questions.json",
+    "attribution": "Questions from CodePrep, CC BY 4.0; unmodified",
+    "author_url": "https://codeprep.dev",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+    "id": "codeprep-py-mcq-classmethod-vs-staticmethod",
+    "topic": "Python",
+    "question": "What distinguishes a `@classmethod` from a `@staticmethod`?",
+    "choices": [
+      "A classmethod receives the class as an implicit first argument (`cls`); a staticmethod receives no implicit first argument at all",
+      "A staticmethod receives the instance (`self`); a classmethod receives nothing",
+      "A classmethod can be called on the class but a staticmethod can only be called on an instance",
+      "There is no difference; the two decorators are aliases"
+    ],
+    "correct": 0,
+    "explanation": "`@classmethod` binds the class to an implicit first parameter `cls`, which is why it can reference class attributes or act as an alternate constructor and respects subclassing. `@staticmethod` gets no implicit argument — it is just a plain function namespaced on the class. Both can be called via the class or an instance.",
+    "reference": "https://docs.python.org/3/library/functions.html#classmethod",
+    "origin": "https://github.com/codeprepdev/codeprep-questions/blob/1bc3a641cabdcef8bec6771bded34761911a60f5/data/questions.json",
+    "attribution": "Questions from CodePrep, CC BY 4.0; unmodified",
+    "author_url": "https://codeprep.dev",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+    "id": "codeprep-py-mcq-mro-c3",
+    "topic": "Python",
+    "question": "Given this diamond, what does `D().who()` return?\n\n```python\nclass A:\n    def who(self): return \"A\"\nclass B(A):\n    def who(self): return \"B\"\nclass C(A):\n    def who(self): return \"C\"\nclass D(B, C):\n    pass\n```",
+    "choices": [
+      "`\"B\"`",
+      "`\"C\"`",
+      "`\"A\"`",
+      "It raises a `TypeError` for ambiguous inheritance"
+    ],
+    "correct": 0,
+    "explanation": "Python resolves attributes along the C3-linearized method resolution order, which for `D(B, C)` is `D -> B -> C -> A -> object`. The first class on that chain defining `who` is `B`, so `D().who()` returns `\"B\"`. The MRO is what makes cooperative `super()` calls work without re-running shared bases.",
+    "reference": "https://docs.python.org/3/howto/mro.html",
+    "origin": "https://github.com/codeprepdev/codeprep-questions/blob/1bc3a641cabdcef8bec6771bded34761911a60f5/data/questions.json",
+    "attribution": "Questions from CodePrep, CC BY 4.0; unmodified",
+    "author_url": "https://codeprep.dev",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/"
+  }
+]

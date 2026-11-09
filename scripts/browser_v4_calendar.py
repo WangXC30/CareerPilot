@@ -9,6 +9,7 @@ from pathlib import Path
 import uvicorn
 from alembic import command
 from alembic.config import Config
+from browser_identity import connect_browser
 from fastapi.testclient import TestClient
 from playwright.sync_api import expect, sync_playwright
 
@@ -25,9 +26,7 @@ def ok(response, status=200):
 
 def connect(page, base, token):
     page.goto(base + "#local-tools")
-    page.locator("#connect").click()
-    page.locator("#token").fill(token)
-    page.locator("#account-form button[type=submit]").click()
+    connect_browser(page, token)
     expect(page.locator("#tool-calendar")).to_be_visible()
 
 
@@ -42,7 +41,7 @@ def main():
         _, token = provision(engine, "Synthetic calendar owner")
         _, other_token = provision(engine, "Synthetic calendar stranger")
         headers = {"Authorization": "Bearer " + token}
-        with TestClient(create_app(url)) as client:
+        with TestClient(create_app(url, local_only=False)) as client:
             goal = ok(
                 client.post(
                     "/api/v1/career-goals",
@@ -63,7 +62,9 @@ def main():
             sock.bind(("127.0.0.1", 0))
             port = sock.getsockname()[1]
         server = uvicorn.Server(
-            uvicorn.Config(create_app(url), host="127.0.0.1", port=port, log_level="error")
+            uvicorn.Config(
+                create_app(url, local_only=False), host="127.0.0.1", port=port, log_level="error"
+            )
         )
         thread = threading.Thread(target=server.run, daemon=True)
         thread.start()
@@ -114,7 +115,7 @@ def main():
                         assert exported.count("BEGIN:VEVENT") == 2
                         grant.locator(f'[data-calendar-item-remove="{job["id"]}"]').click()
                         expect(page.locator("#tool-result")).to_contain_text("已从此导出移除")
-                        with TestClient(create_app(url)) as client:
+                        with TestClient(create_app(url, local_only=False)) as client:
                             content = client.get(
                                 f"/api/v1/calendar-syncs/{grant_id}/export", headers=headers
                             )
@@ -150,9 +151,7 @@ def main():
                         assert page.evaluate("async () => await api('/career-goals')") == before
                         page.reload()
                         page.evaluate("location.hash='local-tools'")
-                        page.locator("#connect").click()
-                        page.locator("#token").fill(token)
-                        page.locator("#account-form button[type=submit]").click()
+                        connect_browser(page, token)
                         expect(
                             page.locator("[data-quarter-review]").filter(has_text=reflection)
                         ).to_have_count(1)
