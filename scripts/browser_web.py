@@ -811,9 +811,11 @@ def assert_asset_loading(page, client, base):
 
     page.goto(base + "/app/career")
     expect(page.get_by_role("heading", name="求职", exact=True)).to_be_visible()
+    expect(page.get_by_role("tab", name="申请记录", exact=True)).to_be_visible()
     assert any("/assets/career-" in path for path in paths)
     page.goto(base + "/app/learn")
     expect(page.get_by_role("heading", name="学习", exact=True)).to_be_visible()
+    expect(page.get_by_role("tab", name="计划与任务", exact=True)).to_be_visible()
     assert any("/assets/learning-" in path for path in paths)
     print("Asset loading passed: deferred pages and one batched version request for three resumes")
 
@@ -1781,8 +1783,10 @@ def run(
                         "岗位：后端实习生\n公司：合成公司\n地点：上海\n要求：Python 和 SQL"
                     )
                     job_form.get_by_role("button", name="确认保存").click()
-                    expect(page.get_by_text("后端实习生", exact=True).first).to_be_visible()
-                    page.get_by_role("navigation").get_by_role(
+                    expect(
+                        page.get_by_role("tabpanel").get_by_text("后端实习生", exact=True).first
+                    ).to_be_visible()
+                    page.get_by_role("navigation", name="主导航").get_by_role(
                         "link", name="AI 助手", exact=True
                     ).click()
                     assistant = page.locator(".assistant form")
@@ -2066,7 +2070,7 @@ def run(
                     )
                     note.get_by_text("编辑文字资料", exact=True).click()
                     assert client.get("/api/v1/resume-facts").json() == []
-                    page.get_by_role("navigation").get_by_role(
+                    page.get_by_role("navigation", name="主导航").get_by_role(
                         "link", name="学习", exact=True
                     ).click()
                     page.get_by_text("生成学习计划", exact=True).click()
@@ -2155,7 +2159,7 @@ def run(
                         },
                     ).json()
                     assert fact.get("id"), fact
-                    page.get_by_role("navigation").get_by_role(
+                    page.get_by_role("navigation", name="主导航").get_by_role(
                         "link", name="AI 助手", exact=True
                     ).click()
                     assistant = page.locator(".assistant")

@@ -2592,3 +2592,24 @@ button.chat-suggestion:hover { background: #f1f7f3; border-color: #a9cabe; }
     grid-template-columns: minmax(150px, 1.4fr) auto minmax(140px, 1fr);
   }
 }
+.model-settings-form {
+  max-width: 620px;
+}
+.model-preset-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0 12px;
+}
+.model-preset-pills button {
+  padding: 5px 11px;
+  font-size: 12px;
+}
+.model-preset-pills button[aria-pressed="true"] {
+  background: #e4ede6;
+  border-color: #24735d;
+  color: #175443;
+}
+.api-key-input {
+  -webkit-text-security: disc;
+}

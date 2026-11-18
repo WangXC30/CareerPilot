@@ -33,6 +33,8 @@ function Run({ id, initial }: { id: string; initial?: Data }) {
   const t = useText();
   const label = useLabel();
   const [run, setRun] = useState<Data>(initial || {});
+  const [streamText, setStreamText] = useState("");
+  const [activeStep, setActiveStep] = useState("");
   const [connection, setConnection] = useState("");
   const [subscription, setSubscription] = useState(0);
   const [confirmationPending, setConfirmationPending] = useState(false);
@@ -87,11 +89,14 @@ function Run({ id, initial }: { id: string; initial?: Data }) {
         number(data.sequence) < cursor.current
       )
         return;
-      const finished = ["completed", "failed", "cancelled"].includes(
-        string(data.status),
-      );
+      const nextStatus = string(data.status);
+      const finished = ["completed", "failed", "cancelled"].includes(nextStatus);
       if (terminal && !finished) return;
       setRun(data);
+      if (finished || nextStatus === "waiting_confirmation") {
+        setStreamText("");
+        setActiveStep("");
+      }
       cursor.current = number(data.sequence);
       terminal = finished;
       if (terminal) {
@@ -177,8 +182,15 @@ function Run({ id, initial }: { id: string; initial?: Data }) {
               event === "update" &&
               data.run_id === id &&
               number(data.sequence) > cursor.current
-            )
+            ) {
               cursor.current = number(data.sequence);
+              if (data.type === "delta") {
+                const delta = string(object(data.payload).text);
+                if (delta) setStreamText(delta);
+              } else if (data.type === "tool") {
+                setActiveStep(string(object(data.payload).action));
+              }
+            }
           }
         }
       } catch (error) {
@@ -265,7 +277,11 @@ function Run({ id, initial }: { id: string; initial?: Data }) {
             <span className="reply-thinking-label">
               {status === "queued"
                 ? t("正在准备", "Getting ready")
-                : t("正在思考", "Thinking")}
+                : activeStep
+                  ? t(`正在处理：${label(activeStep)}`, `Working: ${label(activeStep)}`)
+                  : streamText
+                    ? t("正在生成回复", "Writing reply")
+                    : t("正在思考", "Thinking")}
             </span>
             <span className="reply-thinking-dots" aria-hidden="true">
               <i />
@@ -287,7 +303,13 @@ function Run({ id, initial }: { id: string; initial?: Data }) {
             {connection}
           </p>
         )}
-        <AssistantRender text={replyText} />
+        <AssistantRender
+          text={
+            ["queued", "running"].includes(status) && streamText
+              ? streamText
+              : replyText
+          }
+        />
         {confirmationMessage && (
           <p
             className="confirmation-feedback"

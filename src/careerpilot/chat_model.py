@@ -2,7 +2,7 @@
 
 import json
 
-from careerpilot.deepseek_provider import DeepSeekProvider, configured_key
+from careerpilot.deepseek_provider import DeepSeekProvider
 from careerpilot.domain import DomainError
 from careerpilot.gateway import INCOMPLETE_ANSWER_RETRY_HINT, Gateway
 
@@ -86,7 +86,7 @@ SUMMARY_SYSTEM = """你是对话历史压缩器。仅输出符合下列 schema �
 
 class ChatProvider(DeepSeekProvider):
     system_prompt = SYSTEM
-    max_timeout = 45
+    max_timeout = 60
     # System prompt + output_schema + tool schemas + chat-template allowance.
     input_token_overhead = len(SYSTEM.encode()) + 16384
 
@@ -146,16 +146,27 @@ class ChatProvider(DeepSeekProvider):
 
 
 def gateway(engine):
+    from careerpilot import model_settings
+
     try:
-        provider = ChatProvider(configured_key(), timeout=40)
+        config = model_settings.resolve_runtime_config(engine)
+        provider = ChatProvider(
+            config["api_key"],
+            timeout=config["timeout"],
+            model=config["model"],
+            host=config["host"],
+            path=config["path"],
+        )
     except ValueError:
         raise DomainError(
-            "CHAT_NOT_CONFIGURED", "请先在本机配置 DeepSeek 模型凭据。", 503
+            "CHAT_NOT_CONFIGURED",
+            "请先在设置中配置模型 API Key，或在本地 .env 配置 DEEPSEEK_API_KEY。",
+            503,
         ) from None
     return Gateway(
         engine,
         provider,
-        timeout=45,
+        timeout=config["timeout"] + 5,
         daily_tokens=None,
         task_tokens=None,
         micros_per_token=10,

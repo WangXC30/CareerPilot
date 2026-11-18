@@ -2,7 +2,11 @@
 
 import json
 import re
+from io import BytesIO
+from pathlib import Path
 from uuid import NAMESPACE_URL, uuid5
+from xml.etree import ElementTree as ET
+from zipfile import BadZipFile, ZipFile
 
 from careerpilot import growth
 from careerpilot.domain import DomainError
@@ -25,8 +29,72 @@ def has_skill(key, text):
     return bool(re.search(r"(?<![A-Za-z0-9_])" + pattern + r"(?![A-Za-z0-9_])", text, re.I))
 
 
+def extract_resume_document(filename: str, content: bytes) -> tuple[str | None, str]:
+    suffix = Path(filename).suffix.lower()
+    if suffix in {".txt", ".md"}:
+        return None, "lines-v1"
+    if len(content) > 1024 * 1024:
+        raise DomainError("UPLOAD_REJECTED", "文件超过 1MiB", 422)
+    if suffix == ".pdf":
+        if not content.startswith(b"%PDF-"):
+            raise DomainError("UPLOAD_REJECTED", "PDF 文件格式无效", 422)
+        try:
+            from pypdf import PdfReader
+
+            reader = PdfReader(BytesIO(content))
+            if reader.is_encrypted or len(reader.pages) > 30:
+                raise DomainError("UPLOAD_REJECTED", "不支持加密或超过 30 页的 PDF", 422)
+            pages = [page.extract_text() or "" for page in reader.pages]
+        except DomainError:
+            raise
+        except Exception:
+            raise DomainError("UPLOAD_REJECTED", "无法读取该 PDF 文件", 422) from None
+        text = "\n".join(p.strip() for p in pages if p.strip())
+        if not text.strip():
+            raise DomainError("EMPTY_MATERIAL", "未能从 PDF 提取文字，请确认不是纯图片扫描件", 422)
+        return text, "pdf-lines-v1"
+    if suffix == ".docx":
+        try:
+            with ZipFile(BytesIO(content)) as archive:
+                total = sum(info.file_size for info in archive.infolist())
+                if total > 5 * 1024 * 1024 or "word/document.xml" not in archive.namelist():
+                    raise DomainError("UPLOAD_REJECTED", "DOCX 文件无效或体积过大", 422)
+                xml_bytes = archive.read("word/document.xml")
+                if (
+                    len(xml_bytes) > 2 * 1024 * 1024
+                    or b"<!DOCTYPE" in xml_bytes
+                    or b"<!ENTITY" in xml_bytes
+                ):
+                    raise DomainError("UPLOAD_REJECTED", "DOCX 文档结构不受支持", 422)
+                root = ET.fromstring(xml_bytes)
+        except DomainError:
+            raise
+        except (BadZipFile, ET.ParseError, KeyError, OSError):
+            raise DomainError("UPLOAD_REJECTED", "无法读取该 DOCX 文件", 422) from None
+        w_ns = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
+        lines = []
+        for para in root.iter(f"{w_ns}p"):
+            text = "".join(node.text or "" for node in para.iter(f"{w_ns}t")).strip()
+            if text:
+                lines.append(text)
+        extracted = "\n".join(lines)
+        if not extracted.strip():
+            raise DomainError("EMPTY_MATERIAL", "DOCX 文档中没有可提取的文字", 422)
+        return extracted, "docx-lines-v1"
+    raise DomainError("UPLOAD_REJECTED", "仅支持 TXT、Markdown、PDF 或 DOCX 文件", 422)
+
+
 def import_preview(db, principal, filename, content, trace):
-    material = growth.import_material(db, principal, filename, content, trace)
+    extracted_text, parser_version = extract_resume_document(filename, content)
+    material = growth.import_material(
+        db,
+        principal,
+        filename,
+        content,
+        trace,
+        extracted_text=extracted_text,
+        parser_version=parser_version,
+    )
     candidates = []
     section = "experience"
     for candidate in material["candidates"]:

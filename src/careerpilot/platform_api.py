@@ -48,6 +48,16 @@ class TransitionInput(BaseModel):
     # This V0 endpoint cannot fabricate assessment or application proof.
 
 
+class ModelSettingsInput(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    model: str = Field(min_length=1, max_length=120)
+    host: str = Field(default="api.deepseek.com", min_length=1, max_length=255)
+    path: str = Field(default="/chat/completions", min_length=1, max_length=120)
+    timeout: int = Field(default=40, ge=5, le=60)
+    api_key: str | None = Field(default=None, max_length=512)
+    clear_api_key: bool = False
+
+
 def register_platform(app, engine, session_dependency, identity):
     Db = Depends(session_dependency)
     Identity = Depends(identity)
@@ -69,6 +79,37 @@ def register_platform(app, engine, session_dependency, identity):
             }
             for c in rows
         ]
+
+    @app.get("/api/v1/model-settings")
+    def get_model_settings(db=Db, principal=Identity):
+        from careerpilot import model_settings
+
+        return model_settings.get_public_settings(db, principal)
+
+    @app.put("/api/v1/model-settings")
+    def put_model_settings(
+        body: ModelSettingsInput,
+        request: Request,
+        if_match: Annotated[str, Header(pattern=r'^"[0-9]+"$')],
+        db=Db,
+        principal=Identity,
+    ):
+        from careerpilot import model_settings
+
+        result = model_settings.update_settings(
+            db,
+            principal,
+            model=body.model,
+            host=body.host,
+            path=body.path,
+            timeout=body.timeout,
+            api_key=body.api_key,
+            clear_api_key=body.clear_api_key,
+            expected_version=int(if_match.strip('"')),
+            trace=request.state.trace_id,
+        )
+        db.commit()
+        return result
 
     @app.put("/api/v1/consents/{purpose}")
     def set_consent(

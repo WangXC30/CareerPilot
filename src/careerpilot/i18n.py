@@ -105,6 +105,10 @@ ERROR_MESSAGES_EN: dict[str, str] = {
     ),
     "LOCAL_WORKSPACE_RESETTING": "Local data cleanup is in progress. Please try again shortly.",
     "LOCAL_WORKSPACE_CHANGED": "The local workspace was reset. Reload before continuing.",
+    "INVALID_API_KEY": "Enter a valid visible-ASCII API key (up to 512 characters).",
+    "INVALID_MODEL_HOST": "Model host must be a valid public HTTPS hostname.",
+    "INVALID_MODEL_NAME": "Enter a valid model identifier.",
+    "INVALID_MODEL_PATH": "Model path must start with / and contain no query or whitespace.",
     "MODEL_PREVIEW_INVALID": (
         "Invalid dataset or frozen observations. Check versions and complete steps."
     ),

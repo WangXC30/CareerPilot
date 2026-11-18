@@ -940,3 +940,59 @@ def test_resume_export_uses_candidate_name_and_contact_header():
     assert ("Normal", "完成 CareerPilot 后端接口开发") in named
     unnamed = resume_exports.paragraphs({"facts": [{"kind": "project", "text": "独立项目"}]})
     assert unnamed[0] == ("Title", "个人简历")
+
+
+def test_pdf_and_docx_resume_import_extracts_lines_and_rejects_corrupt_files(system):
+    from pypdf import PdfWriter
+    from pypdf.generic import DecodedStreamObject, DictionaryObject, NameObject
+
+    from careerpilot import resume_exports
+
+    client, _, alice, *_ = system
+
+    # Build a valid single-page PDF with text in memory
+    writer = PdfWriter()
+    page = writer.add_blank_page(width=400, height=400)
+    stream = DecodedStreamObject()
+    stream.set_data(b"BT /F1 12 Tf 20 360 Td (Python backend project) Tj ET")
+    page[NameObject("/Contents")] = writer._add_object(stream)
+    page[NameObject("/Resources")] = DictionaryObject(
+        {
+            NameObject("/Font"): DictionaryObject(
+                {
+                    NameObject("/F1"): DictionaryObject(
+                        {
+                            NameObject("/Type"): NameObject("/Font"),
+                            NameObject("/Subtype"): NameObject("/Type1"),
+                            NameObject("/BaseFont"): NameObject("/Helvetica"),
+                        }
+                    )
+                }
+            )
+        }
+    )
+    pdf_buf = BytesIO()
+    writer.write(pdf_buf)
+    pdf_preview = ok(
+        client.post(
+            "/api/v1/resume-imports?filename=cv.pdf", headers=alice, content=pdf_buf.getvalue()
+        ),
+        201,
+    )
+    assert any("Python backend project" in c["text"] for c in pdf_preview["candidates"])
+
+    # Build a valid DOCX via resume_exports.docx and import it back
+    docx_bytes = resume_exports.docx(
+        {"facts": [{"kind": "project", "text": "完成 CareerPilot PDF 与 DOCX 导入"}]}
+    )
+    docx_preview = ok(
+        client.post("/api/v1/resume-imports?filename=cv.docx", headers=alice, content=docx_bytes),
+        201,
+    )
+    assert any("完成 CareerPilot PDF 与 DOCX 导入" in c["text"] for c in docx_preview["candidates"])
+    assert (
+        client.post(
+            "/api/v1/resume-imports?filename=bad.docx", headers=alice, content=b"not-a-zip"
+        ).status_code
+        == 422
+    )

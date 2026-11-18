@@ -2320,6 +2320,60 @@
     ],
     "title": "ModelPreviewInput"
   },
+  "ModelSettingsInput": {
+    "properties": {
+      "model": {
+        "type": "string",
+        "maxLength": 120,
+        "minLength": 1,
+        "title": "Model"
+      },
+      "host": {
+        "type": "string",
+        "maxLength": 255,
+        "minLength": 1,
+        "title": "Host",
+        "default": "api.deepseek.com"
+      },
+      "path": {
+        "type": "string",
+        "maxLength": 120,
+        "minLength": 1,
+        "title": "Path",
+        "default": "/chat/completions"
+      },
+      "timeout": {
+        "type": "integer",
+        "maximum": 60.0,
+        "minimum": 5.0,
+        "title": "Timeout",
+        "default": 40
+      },
+      "api_key": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 512
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Api Key"
+      },
+      "clear_api_key": {
+        "type": "boolean",
+        "title": "Clear Api Key",
+        "default": false
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "model"
+    ],
+    "title": "ModelSettingsInput"
+  },
   "ModerationInput": {
     "properties": {
       "confirmed": {

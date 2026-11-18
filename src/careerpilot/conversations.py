@@ -881,7 +881,40 @@ class ChatState(TypedDict, total=False):
 def build_graph(engine, task_id, checkpointer, transaction):
     """Every I/O boundary releases SQL locks; each tool effect has a durable receipt."""
 
-    def invoke(principal, trace, data, output_schema, suffix, max_tokens=1800):
+    def invoke(principal, trace, data, output_schema, suffix, max_tokens=1800, rounds=0):
+        stream_state = {"text": "", "at": 0.0, "step": 0}
+
+        def on_delta(raw):
+            import time
+
+            from sqlalchemy.exc import SQLAlchemyError
+            from sqlalchemy.orm import Session
+
+            from careerpilot.deepseek_provider import extract_streaming_answer
+            from careerpilot.workflows import append_event
+
+            preview = extract_streaming_answer(raw)
+            if not preview or preview == stream_state["text"]:
+                return
+            now = time.monotonic()
+            if len(preview) - len(stream_state["text"]) < 36 and now - stream_state["at"] < 0.35:
+                return
+            stream_state["text"] = preview
+            stream_state["at"] = now
+            stream_state["step"] += 1
+            try:
+                with Session(engine) as db, db.begin():
+                    append_event(
+                        db,
+                        principal,
+                        task_id,
+                        f"chat.delta:{rounds}:{stream_state['step']}",
+                        "delta",
+                        {"text": preview},
+                    )
+            except SQLAlchemyError:
+                pass
+
         return asyncio.run(
             chat_model.gateway(engine).generate(
                 principal,
@@ -898,6 +931,7 @@ def build_graph(engine, task_id, checkpointer, transaction):
                     if output_schema is DECISION
                     else frozenset({"MODEL_EMPTY_RESPONSE"})
                 ),
+                on_delta=on_delta if output_schema is DECISION else None,
             )
         )
 
@@ -1063,7 +1097,9 @@ def build_graph(engine, task_id, checkpointer, transaction):
             raise DomainError("MODEL_LIMIT", "对话内容过长，请新建对话或缩小资料范围。", 422)
         if decision is None:
             try:
-                decision = invoke(principal, trace, data, DECISION, "decision")
+                decision = invoke(
+                    principal, trace, data, DECISION, "decision", rounds=state["rounds"]
+                )
             except DomainError as exc:
                 if exc.code not in {"QUOTA_EXCEEDED", "MODEL_LIMIT"} or not any(
                     tool["status"] == "success" and tool["name"] in WRITES

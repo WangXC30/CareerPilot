@@ -138,6 +138,7 @@ class Gateway:
         max_tokens: int = 1024,
         retries: int = 1,
         retry_on: frozenset[str] | None = None,
+        on_delta=None,
     ):
         if not (1 <= max_tokens <= 4096 and 0 <= retries <= 2 and len(data.encode()) <= 49152):
             raise DomainError("MODEL_LIMIT", "模型请求超出限制", 422)
@@ -199,9 +200,15 @@ class Gateway:
             parsed = None
             reply = None
             try:
-                reply = await asyncio.wait_for(
-                    self.provider.generate(envelope, max_tokens), timeout=self.timeout
-                )
+                if on_delta is not None and hasattr(self.provider, "generate_stream"):
+                    reply = await asyncio.wait_for(
+                        self.provider.generate_stream(envelope, max_tokens, on_delta=on_delta),
+                        timeout=self.timeout,
+                    )
+                else:
+                    reply = await asyncio.wait_for(
+                        self.provider.generate(envelope, max_tokens), timeout=self.timeout
+                    )
                 if (
                     type(reply.input_tokens) is not int
                     or type(reply.output_tokens) is not int

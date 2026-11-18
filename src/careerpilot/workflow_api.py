@@ -254,6 +254,7 @@ def register_workflows(app, engine, session_dependency, identity):
 
         def stream():
             sequence, deadline = start, time.monotonic() + 20
+            last_snapshot = None
             while True:
                 with Session(engine) as session:
                     # A reset must terminate old subscriptions before disclosing
@@ -301,14 +302,22 @@ def register_workflows(app, engine, session_dependency, identity):
                         sequence = row.sequence
                     # Snapshots repair missing/expired/future cursors; stream end
                     # never implies completion. The stored status is authoritative.
-                    yield f"event: snapshot\ndata: {growth.dump(current)}\n\n"
+                    marker = (current["sequence"], current["status"])
+                    if (
+                        last_snapshot is None
+                        or marker != last_snapshot
+                        or not follow
+                        or current["status"] in workflows.TERMINAL
+                    ):
+                        yield f"event: snapshot\ndata: {growth.dump(current)}\n\n"
+                        last_snapshot = marker
                 if (
                     not follow
                     or current["status"] in workflows.TERMINAL
                     or time.monotonic() >= deadline
                 ):
                     return
-                time.sleep(0.5)
+                time.sleep(0.15)
 
         return StreamingResponse(
             stream(),

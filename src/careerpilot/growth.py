@@ -169,9 +169,15 @@ def authorize_import(db, principal):
     reserve(db, principal, f"source:user_import:{now // 60}", 1, source.rate_per_minute)
 
 
-def import_material(db, principal, filename, content, trace):
+def import_material(
+    db, principal, filename, content, trace, *, extracted_text=None, parser_version="lines-v1"
+):
     authorize_import(db, principal)
-    text = scan_upload(content, filename)
+    text = (
+        scan_upload(extracted_text.encode("utf-8"), "resume.txt")
+        if extracted_text is not None
+        else scan_upload(content, filename)
+    )
     if not text.strip():
         raise DomainError("EMPTY_MATERIAL", "材料不能为空", 422)
     # Conservative line extraction; no claim becomes a fact before confirmation.
@@ -188,7 +194,7 @@ def import_material(db, principal, filename, content, trace):
             "filename": filename,
             "content": text,
             "sha256": hashlib.sha256(content).hexdigest(),
-            "parser_version": "lines-v1",
+            "parser_version": parser_version,
             "status": "pending_confirmation",
             "candidates": candidates,
         },

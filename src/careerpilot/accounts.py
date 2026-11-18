@@ -159,7 +159,9 @@ def export_data(db, principal):
         )
         if table.name == "growth_records":
             query = query.where(
-                ~table.c.kind.in_({"github_secret", "workspace_invitation", "object_share"})
+                ~table.c.kind.in_(
+                    {"github_secret", "model_secret", "workspace_invitation", "object_share"}
+                )
             )
         if table.name == "growth_revisions":
             from careerpilot.growth_models import GrowthRecord
@@ -168,7 +170,12 @@ def export_data(db, principal):
                 ~table.c.record_id.in_(
                     select(GrowthRecord.id).where(
                         GrowthRecord.kind.in_(
-                            {"github_secret", "workspace_invitation", "object_share"}
+                            {
+                                "github_secret",
+                                "model_secret",
+                                "workspace_invitation",
+                                "object_share",
+                            }
                         )
                     )
                 )

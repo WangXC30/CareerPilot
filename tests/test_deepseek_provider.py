@@ -175,3 +175,55 @@ def test_whitespace_reply_is_rejected_but_validated_usage_is_preserved(connectio
     assert (error.value.input_tokens, error.value.output_tokens) == (40, 5)
     assert "content" not in error.value.__dict__
     assert connection.instances[-1].closed
+
+
+def test_streaming_answer_extraction_and_sse_transport(monkeypatch):
+    assert ds.extract_streaming_answer('{"action":"answer","answer":"你好\\n世界') == "你好\n世界"
+    assert ds.extract_streaming_answer('{"action":"plan","answer":"预览') is None
+
+    def sse(payload):
+        return f"data: {json.dumps(payload, ensure_ascii=False)}\n".encode()
+
+    events = [
+        sse({"model": "deepseek-chat", "choices": [{"delta": {"content": '{"action":"answer",'}}]}),
+        sse({"model": "deepseek-chat", "choices": [{"delta": {"content": '"answer":"第一段'}}]}),
+        sse(
+            {
+                "model": "deepseek-chat",
+                "choices": [{"delta": {"content": '内容","arguments":{},"source_ids":[]}'}}],
+            }
+        ),
+        sse(
+            {
+                "model": "deepseek-chat",
+                "choices": [{"delta": {}, "finish_reason": "stop"}],
+                "usage": {"prompt_tokens": 20, "completion_tokens": 12, "total_tokens": 32},
+            }
+        ),
+        b"data: [DONE]\n",
+    ]
+
+    class StreamConnection(Connection):
+        def __init__(self, host, timeout):
+            super().__init__(host, timeout)
+            self._lines = iter(events)
+
+        def readline(self, maximum=-1):
+            return next(self._lines, b"")
+
+    monkeypatch.setattr(ds.http.client, "HTTPSConnection", StreamConnection)
+    monkeypatch.setattr(StreamConnection, "instances", [])
+    provider = ds.DeepSeekProvider("synthetic-key", model="deepseek-chat", timeout=8)
+    deltas = []
+    reply = asyncio.run(
+        provider.generate_stream(
+            structured_envelope("hello", {"type": "object"}), 256, on_delta=deltas.append
+        )
+    )
+    assert reply == ProviderReply(
+        '{"action":"answer","answer":"第一段内容","arguments":{},"source_ids":[]}', 20, 12
+    )
+    assert len(deltas) == 3
+    body = json.loads(StreamConnection.instances[0].requests[0][2])
+    assert body["stream"] is True and body["model"] == "deepseek-chat"
+    assert "thinking" not in body

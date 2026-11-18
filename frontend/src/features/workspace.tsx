@@ -1,5 +1,6 @@
 import {
   useContext,
+  useEffect,
   useRef,
   useState,
 } from "react";
@@ -674,10 +675,10 @@ function MaterialImport({ existing }: { existing?: string } = {}) {
     >
       {!existing && (
         <label>
-          {t("文本或 Markdown 材料", "Text or Markdown document")}
+          {t("文本、Markdown、PDF 或 DOCX 材料", "TXT, Markdown, PDF or DOCX document")}
           <input
             type="file"
-            accept=".txt,.md"
+            accept=".txt,.md,.pdf,.docx"
             onChange={(e) => {
               setFile(e.target.files?.[0]);
               setPreview(undefined);
@@ -697,8 +698,8 @@ function MaterialImport({ existing }: { existing?: string } = {}) {
             return;
           }
           if (!file) throw new Error(t("请选择文件。", "Choose a file."));
-          if (file.size > 2 * 1024 * 1024)
-            throw new Error(t("文件过大。", "File is too large."));
+          if (file.size > 1024 * 1024)
+            throw new Error(t("文件不能超过 1 MiB。", "File exceeds 1 MiB."));
           const response = await fetch(
             `/api/v1/resume-imports?filename=${encodeURIComponent(file.name)}`,
             { method: "POST", headers: headers(), body: file },
@@ -1016,6 +1017,180 @@ function Calendar() {
   );
 }
 
+function ModelSettingsEditor() {
+  const t = useText();
+  const { revision, changed } = useContext(Revision);
+  const resource = useResource("/model-settings", revision);
+  const current = object(resource.data);
+  const [model, setModel] = useState("deepseek-flash");
+  const [host, setHost] = useState("api.deepseek.com");
+  const [path, setPath] = useState("/chat/completions");
+  const [timeout, setTimeoutSeconds] = useState(40);
+  const [apiKey, setApiKey] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [feedback, setFeedback] = useState("");
+  useEffect(() => {
+    if (!resource.data) return;
+    setModel(string(current.model) || "deepseek-flash");
+    setHost(string(current.host) || "api.deepseek.com");
+    setPath(string(current.path) || "/chat/completions");
+    setTimeoutSeconds(number(current.timeout) || 40);
+    // Sync form defaults only when backend resource reloads.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resource.data]);
+  if (resource.loading && resource.data === null)
+    return <Loading error={resource.error} retry={resource.refresh} />;
+  const presets = array(current.presets).map(string).filter(Boolean);
+  const version = number(current.version);
+  async function save(clearKey = false) {
+    setBusy(true);
+    setFeedback("");
+    try {
+      await command(
+        "/model-settings",
+        {
+          model: model.trim(),
+          host: host.trim(),
+          path: path.trim(),
+          timeout: Number(timeout) || 40,
+          ...(apiKey.trim() && !clearKey ? { api_key: apiKey.trim() } : {}),
+          clear_api_key: clearKey,
+        },
+        "PUT",
+        version,
+      );
+      setApiKey("");
+      setFeedback(
+        clearKey
+          ? t("已清除工作区保存的密钥。", "Saved workspace key cleared.")
+          : t("模型配置已保存，将在下次对话生效。", "Model settings saved for future runs."),
+      );
+      changed();
+    } catch (error) {
+      setFeedback(
+        error instanceof Error
+          ? error.message
+          : t("保存失败，请检查配置。", "Could not save model settings."),
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <form
+      className="model-settings-form command-form"
+      onSubmit={(e) => {
+        e.preventDefault();
+        void save(false);
+      }}
+    >
+      <p className="muted">
+        {current.has_workspace_key
+          ? t(
+              `当前密钥：已保存工作区密钥（${string(current.key_hint)}）`,
+              `Active key: workspace key (${string(current.key_hint)})`,
+            )
+          : current.env_key_available
+            ? t(
+                "当前密钥：使用本机 .env 环境变量配置。",
+                "Active key: using local .env environment variable.",
+              )
+            : t(
+                "当前尚未保存工作区密钥；如 Worker 未配置 .env 密钥，对话将提示配置。",
+                "No workspace key saved. Chat requires either a saved key or Worker .env key.",
+              )}
+      </p>
+      {presets.length > 0 && (
+        <div className="model-preset-pills" role="group" aria-label={t("常用模型", "Preset models")}>
+          {presets.map((preset) => (
+            <button
+              key={preset}
+              type="button"
+              className="secondary"
+              aria-pressed={model === preset}
+              disabled={busy}
+              onClick={() => setModel(preset)}
+            >
+              {preset}
+            </button>
+          ))}
+        </div>
+      )}
+      <label>
+        {t("模型名称", "Model ID")}
+        <input
+          value={model}
+          maxLength={120}
+          required
+          disabled={busy}
+          onChange={(e) => setModel(e.target.value)}
+        />
+      </label>
+      <label>
+        {t("HTTPS 服务域名", "HTTPS host")}
+        <input
+          value={host}
+          maxLength={255}
+          required
+          disabled={busy}
+          onChange={(e) => setHost(e.target.value)}
+        />
+      </label>
+      <label>
+        {t("接口路径", "API path")}
+        <input
+          value={path}
+          maxLength={120}
+          required
+          disabled={busy}
+          onChange={(e) => setPath(e.target.value)}
+        />
+      </label>
+      <label>
+        {t("请求超时（秒）", "Timeout (seconds)")}
+        <input
+          type="number"
+          min={5}
+          max={60}
+          value={timeout}
+          required
+          disabled={busy}
+          onChange={(e) => setTimeoutSeconds(Number(e.target.value))}
+        />
+      </label>
+      <label>
+        {t("API Key（留空保持当前配置，不回传明文）", "API key (leave blank to keep existing)")}
+        <input
+          type="text"
+          className="api-key-input"
+          autoComplete="off"
+          maxLength={512}
+          value={apiKey}
+          disabled={busy}
+          placeholder={t("例如 sk-...", "e.g. sk-...")}
+          onChange={(e) => setApiKey(e.target.value)}
+        />
+      </label>
+      <div className="actions">
+        <button disabled={busy || !model.trim() || !host.trim()}>
+          {busy ? t("保存中…", "Saving…") : t("保存模型配置", "Save model settings")}
+        </button>
+        {current.has_workspace_key === true && (
+          <button
+            type="button"
+            className="secondary"
+            disabled={busy}
+            onClick={() => void save(true)}
+          >
+            {t("清除工作区密钥", "Clear workspace key")}
+          </button>
+        )}
+      </div>
+      {feedback && <p role="status">{feedback}</p>}
+    </form>
+  );
+}
+
 export function Settings() {
   const t = useText();
   const [confirmation, setConfirmation] = useState("");
@@ -1067,6 +1242,11 @@ export function Settings() {
           </Disclosure>
           <Disclosure label={t("按需导出日历", "Export calendar when needed")}>
             <Calendar />
+          </Disclosure>
+          <Disclosure
+            label={t("模型与接口切换", "Model and API configuration")}
+          >
+            <ModelSettingsEditor />
           </Disclosure>
           <Disclosure
             label={t("模型与外部处理用途", "Models and external processing")}

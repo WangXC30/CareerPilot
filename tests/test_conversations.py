@@ -2286,3 +2286,83 @@ def test_long_chinese_jd_fits_without_model_limit_and_tools_live_in_system_promp
     messages = chat_model.ChatProvider("fixture-key").messages(envelope)
     assert "Allowed tools:" in messages[0]["content"]
     assert '"import_job"' in messages[0]["content"]
+
+
+def test_streaming_delta_events_and_workspace_model_settings(system, install, monkeypatch):
+    client, engine, alice, *_ = system
+
+    class StreamModel:
+        external, model_id = True, "stream-fixture"
+
+        async def generate(self, envelope, max_tokens):
+            raise AssertionError("generate_stream should be used when on_delta is supplied")
+
+        async def generate_stream(self, envelope, max_tokens, on_delta=None):
+            if on_delta:
+                on_delta('{"action":"answer","answer":"正在流式')
+                on_delta('{"action":"answer","answer":"正在流式' + ("输出内容" * 15))
+            return ProviderReply(
+                json.dumps(
+                    {
+                        "action": "answer",
+                        "answer": "正在流式" + ("输出内容" * 15) + "完成。",
+                        "arguments": {},
+                        "source_ids": [],
+                    },
+                    ensure_ascii=False,
+                ),
+                30,
+                25,
+            )
+
+    monkeypatch.setattr(
+        chat_model,
+        "gateway",
+        lambda eng: Gateway(
+            eng,
+            StreamModel(),
+            daily_tokens=2_000_000,
+            task_tokens=300_000,
+            instruction=chat_model.INSTRUCTION,
+        ),
+    )
+    chat = conversation(client, alice)
+    run = send(client, alice, chat, "流式测试").json()
+    run_once(engine)
+    stream = client.get(f"/api/v1/workflows/runs/{run['id']}/events?follow=false", headers=alice)
+    assert stream.status_code == 200
+    assert '"type": "delta"' in stream.text and "正在流式" in stream.text
+
+    # Workspace model configuration & API key isolation
+    initial = client.get("/api/v1/model-settings", headers=alice).json()
+    assert initial["model"] == "deepseek-flash" and initial["version"] == 0
+    saved = client.put(
+        "/api/v1/model-settings",
+        headers={**alice, "If-Match": '"0"'},
+        json={
+            "model": "deepseek-chat",
+            "host": "api.deepseek.com",
+            "path": "/v1/chat/completions",
+            "timeout": 35,
+            "api_key": "synthetic-workspace-credential-1234",
+            "clear_api_key": False,
+        },
+    )
+    assert saved.status_code == 200, saved.text
+    payload = saved.json()
+    assert payload["model"] == "deepseek-chat" and payload["has_workspace_key"] is True
+    assert "synthetic-workspace-credential-1234" not in json.dumps(payload)
+    exported = client.get("/api/v1/account/export", headers=alice).json()
+    assert "synthetic-workspace-credential-1234" not in json.dumps(exported)
+    cleared = client.put(
+        "/api/v1/model-settings",
+        headers={**alice, "If-Match": f'"{payload["version"]}"'},
+        json={
+            "model": "deepseek-flash",
+            "host": "api.deepseek.com",
+            "path": "/chat/completions",
+            "timeout": 40,
+            "clear_api_key": True,
+        },
+    )
+    assert cleared.status_code == 200 and cleared.json()["has_workspace_key"] is False
