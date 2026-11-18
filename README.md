@@ -52,4 +52,5 @@ docker compose run --build --rm --no-deps checks
 
 ## 更多资料
 
-- [资料填写指南](docs/PROFILE-WRITING-GUIDE.md)- [技术资料检索说明](docs/TECHNICAL-RAG.md)
+- [资料填写指南](docs/PROFILE-WRITING-GUIDE.md)
+- [技术资料检索说明](docs/TECHNICAL-RAG.md)

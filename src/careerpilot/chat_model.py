@@ -87,7 +87,8 @@ SUMMARY_SYSTEM = """你是对话历史压缩器。仅输出符合下列 schema �
 class ChatProvider(DeepSeekProvider):
     system_prompt = SYSTEM
     max_timeout = 45
-    input_token_overhead = len(SYSTEM.encode()) + 1024
+    # System prompt + output_schema + tool schemas + chat-template allowance.
+    input_token_overhead = len(SYSTEM.encode()) + 16384
 
     def messages(self, envelope):
         wrapped = json.loads(envelope)
@@ -105,6 +106,12 @@ class ChatProvider(DeepSeekProvider):
             + "\nJSON output_schema:\n"
             + json.dumps(output_schema, ensure_ascii=False, separators=(",", ":"))
         )
+        if not summarizing:
+            from careerpilot.conversations import TOOLS
+
+            system_prompt += "\nAllowed tools:\n" + json.dumps(
+                TOOLS, ensure_ascii=False, separators=(",", ":")
+            )
         if not summarizing and wrapped.get("retry_hint") == INCOMPLETE_ANSWER_RETRY_HINT:
             system_prompt += "\n" + INCOMPLETE_ANSWER_RETRY_HINT
         formatted_history = [

@@ -497,7 +497,7 @@ export function AssistantChat({
                         "An unfinished information draft is available. Continue editing or skip for now.",
                       )}
                     </p>
-                    <a href="/app/profile">
+                    <a className="result-link" href="/app/profile">
                       {t(
                         "继续未完成的资料草稿",
                         "Continue your information draft",
@@ -513,7 +513,7 @@ export function AssistantChat({
                       )}
                     </p>
                     {object(guidance.data).profile_draft === true && (
-                      <a href="/app/profile">
+                      <a className="result-link" href="/app/profile">
                         {t(
                           "继续未完成的资料草稿",
                           "Continue your information draft",
@@ -529,6 +529,7 @@ export function AssistantChat({
                     ).map(([action, zh, en]) => (
                       <button
                         type="button"
+                        className="guidance-primary"
                         key={action}
                         disabled={guidanceBusy}
                         onClick={() => void updateGuidance(action)}
@@ -570,13 +571,14 @@ export function AssistantChat({
                     )}
                     <button
                       type="button"
+                      className="secondary"
                       disabled={guidanceBusy}
                       onClick={() => void updateGuidance("reset")}
                     >
                       {t("更换目的", "Change purpose")}
                     </button>
                     {object(guidance.data).profile_draft === true && (
-                      <a href="/app/profile">
+                      <a className="result-link" href="/app/profile">
                         {t(
                           "继续未完成的资料草稿",
                           "Continue your information draft",
@@ -595,6 +597,7 @@ export function AssistantChat({
                 {object(guidance.data).status !== "deferred" && (
                   <button
                     type="button"
+                    className="secondary"
                     disabled={guidanceBusy}
                     onClick={() => void updateGuidance("defer")}
                   >
@@ -604,6 +607,7 @@ export function AssistantChat({
                 {object(guidance.data).status === "deferred" && (
                   <button
                     type="button"
+                    className="guidance-primary"
                     disabled={guidanceBusy}
                     onClick={() => void updateGuidance("resume")}
                   >

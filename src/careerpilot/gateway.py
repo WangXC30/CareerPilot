@@ -139,7 +139,7 @@ class Gateway:
         retries: int = 1,
         retry_on: frozenset[str] | None = None,
     ):
-        if not (1 <= max_tokens <= 4096 and 0 <= retries <= 2 and len(data.encode()) <= 32768):
+        if not (1 <= max_tokens <= 4096 and 0 <= retries <= 2 and len(data.encode()) <= 49152):
             raise DomainError("MODEL_LIMIT", "模型请求超出限制", 422)
 
         # No remote refs can cause a network fetch during schema validation.

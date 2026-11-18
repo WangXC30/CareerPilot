@@ -920,3 +920,23 @@ def test_external_report_rejects_future_and_accepts_real_receipt(system):
         saved["verification"] == "user_confirmed_receipt"
         and saved["receipt"]["resume_version_id"] is None
     )
+
+
+def test_resume_export_uses_candidate_name_and_contact_header():
+    from careerpilot import resume_exports
+
+    named = resume_exports.paragraphs(
+        {
+            "facts": [
+                {"kind": "name", "text": "张同学"},
+                {"kind": "contact", "text": "student@example.com · 13800000000"},
+                {"kind": "project", "text": "完成 CareerPilot 后端接口开发"},
+            ]
+        }
+    )
+    assert named[0] == ("Title", "张同学")
+    assert named[1] == ("Contact", "student@example.com · 13800000000")
+    assert ("Heading1", "项目经历") in named
+    assert ("Normal", "完成 CareerPilot 后端接口开发") in named
+    unnamed = resume_exports.paragraphs({"facts": [{"kind": "project", "text": "独立项目"}]})
+    assert unnamed[0] == ("Title", "个人简历")

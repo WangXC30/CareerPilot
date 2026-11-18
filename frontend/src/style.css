@@ -14,7 +14,7 @@
 }
 body {
   margin: 0;
-  min-width: 1100px;
+  min-width: 900px;
 }
 button,
 input,
@@ -159,11 +159,6 @@ label.check {
   color: #173e2b;
   font-weight: 700;
 }
-.nav-number {
-  font-size: 11px;
-  letter-spacing: 1px;
-  color: #647b67;
-}
 .sidebar-footer {
   margin-top: auto;
   display: grid;
@@ -212,31 +207,19 @@ section {
   overflow-wrap: anywhere;
 }
 .guidance-card {
-  margin: 1rem auto;
-  padding: 1rem;
-  max-width: 42rem;
-  border: 1px solid #d5dce5;
-  border-radius: 0.75rem;
-  background: #fff;
+  margin: 0.75rem auto 1.25rem;
+  padding: 16px 20px;
+  max-width: 760px;
+  border: 1px solid #dce5e1;
+  border-radius: 12px;
+  background: #f8faf9;
+}
+.guidance-card p:first-child {
+  margin-top: 0;
 }
 .guidance-card button,
 .guidance-card a {
-  margin: 0.25rem 0.5rem 0.25rem 0;
-}
-.primary-tabs {
-  display: flex;
-  gap: 1.5rem;
-  margin-bottom: 1.25rem;
-  border-bottom: 1px solid #d5dce5;
-}
-.primary-tabs a {
-  padding: 0.65rem 0;
-  color: inherit;
-  text-decoration: none;
-}
-.primary-tabs a[aria-current="page"] {
-  border-bottom: 3px solid #315cc8;
-  font-weight: 700;
+  margin: 6px 8px 2px 0;
 }
 .subtabs {
   display: flex;
@@ -998,18 +981,6 @@ button.chat-suggestion:hover {
   color: var(--muted);
   font-size: 11px;
 }
-.today-support {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  align-items: start;
-  gap: 16px;
-  margin-top: 12px;
-  max-height: 35%;
-  overflow-y: auto;
-}
-.today-support > .panel {
-  margin: 0;
-}
 .notice-tools {
   display: flex;
   justify-content: flex-end;
@@ -1255,91 +1226,6 @@ button.chat-suggestion:hover {
 }
 
 /* Everyday work and result actions share a clear visual hierarchy. */
-.daily-overview {
-  margin: 0 0 30px;
-  padding: 22px;
-  border: 1px solid #d6e3d8;
-  border-radius: 14px;
-  background: #eef5ee;
-}
-.daily-overview-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  margin-bottom: 16px;
-}
-.daily-overview-heading h2 {
-  margin: 3px 0 0;
-  font-size: 20px;
-}
-.daily-overview-heading > a {
-  font-size: 13px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-.overview-eyebrow {
-  color: #617c69;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-}
-.overview-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-}
-.overview-card {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 18px;
-  border: 1px solid #dfe8df;
-  border-radius: 10px;
-  background: white;
-  min-width: 0;
-}
-.overview-card h3 {
-  font-size: 14px;
-  color: #557162;
-  margin: 0 0 8px;
-}
-.overview-card p {
-  margin: 0 0 8px;
-}
-.overview-card .overview-title {
-  font-weight: 700;
-}
-.overview-card > a {
-  margin-top: auto;
-  padding-top: 12px;
-  font-weight: 600;
-  font-size: 13px;
-}
-.overview-list {
-  list-style: none;
-  margin: 4px 0;
-  padding: 0;
-  width: 100%;
-}
-.overview-list li {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 7px 0;
-  border-top: 1px solid #edf1ec;
-}
-.overview-list li span {
-  overflow-wrap: anywhere;
-}
-.overview-list small {
-  color: var(--muted);
-  white-space: nowrap;
-}
-.primary-tabs a[aria-current="page"] {
-  border-bottom-color: var(--green);
-  color: var(--green);
-}
 .panel {
   box-shadow: 0 2px 10px #233c3508;
 }
@@ -1387,32 +1273,6 @@ button.chat-suggestion:hover {
   padding: 6px 12px;
 }
 
-.daily-overview {
-  padding: 14px 18px;
-  margin-bottom: 20px;
-}
-.daily-overview-heading {
-  margin-bottom: 8px;
-}
-.daily-overview-heading h2 {
-  font-size: 17px;
-}
-.daily-overview .overview-card {
-  padding: 12px 15px;
-}
-.daily-overview .overview-grid {
-  grid-template-columns: minmax(0, 1fr);
-}
-.overview-list li {
-  padding: 5px 0;
-}
-.overview-list li a {
-  text-decoration: none;
-}
-.overview-list li a:hover {
-  text-decoration: underline;
-}
-
 /* Quieter, task-first workspace pages. */
 .content-page {
   max-width: 1120px;
@@ -1420,9 +1280,6 @@ button.chat-suggestion:hover {
 }
 .content-page > h1 {
   margin-bottom: 20px;
-}
-.primary-tabs {
-  margin-bottom: 26px;
 }
 .subtabs {
   gap: 6px;
@@ -1981,11 +1838,16 @@ button.chat-suggestion:hover {
   background: #f3f3f2;
 }
 .composer-toolbar > button {
-  background: #252525;
-  border-color: #252525;
+  background: var(--green);
+  border-color: var(--green);
   border-radius: 20px;
   min-height: 36px;
   padding: 5px 14px;
+}
+.composer-toolbar > button:hover {
+  background: #105141;
+  border-color: #105141;
+  filter: none;
 }
 .composer-hint {
   color: #929292;
@@ -2278,12 +2140,31 @@ button.chat-suggestion:hover {
   background: #d6e5d9;
 }
 .assistant-transcript .guidance-card button {
-  background: #edeeec;
-  color: #444;
+  background: #fff;
+  color: #4b5d54;
+  border: 1px solid #d5e0da;
   margin-right: 6px;
 }
+.assistant-transcript .guidance-card button.guidance-primary {
+  background: #e4ede6;
+  border-color: #bfd5c6;
+  color: #175443;
+  font-weight: 600;
+}
 .assistant-transcript .guidance-card button:hover {
-  background: #e2e4e1;
+  background: #f1f5f2;
+}
+.assistant-transcript .guidance-card button.guidance-primary:hover {
+  background: #d6e6da;
+}
+.assistant-transcript .guidance-card .result-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin: 4px 8px 4px 0;
 }
 
 /* Conversation results share the same quiet surface as the chat composer. */
@@ -2383,7 +2264,7 @@ button.chat-suggestion:hover {
   .chat-confirmation
   > .action
   > button:not(.secondary) {
-  background: #303030;
+  background: var(--green);
   color: #fff;
 }
 .assistant-transcript
@@ -2391,7 +2272,7 @@ button.chat-suggestion:hover {
   .chat-confirmation
   > .action
   > button:not(.secondary):hover {
-  background: #484848;
+  background: #105141;
 }
 .assistant-transcript .assistant-result a:focus-visible,
 .assistant-transcript .chat-confirmation button:focus-visible {
@@ -2531,10 +2412,7 @@ body { background: #f5f7f6; }
 .practice-unattempted { color: #8b9992; }
 .practice-list-pagination { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-top: 14px; color: #647572; font-size: 13px; }
 .content-page .practice-back { margin: 4px 0 8px; }
-.interview-knowledge-list { display: grid; gap: 8px; }
-.interview-knowledge-list details { padding: 12px 15px; border: 1px solid #dce4e2; border-radius: 8px; background: #fff; }
-.interview-knowledge-list summary { cursor: pointer; font-weight: 600; }
-.interview-knowledge-list summary span { margin-right: 8px; color: #536b5e; font-size: 0.85em; }
+.knowledge-table th:first-child { width: 56px; }
 .interview-knowledge-pagination { display: flex; gap: 10px; margin-top: 12px; }
 .assessment-catalogue { max-width: 850px; padding: 18px; border: 1px solid #dce4e2; border-radius: 8px; background: #fff; }
 .assessment-topics { display: flex; flex-wrap: wrap; gap: 10px; }
@@ -2669,3 +2547,48 @@ button.chat-suggestion:hover { background: #f1f7f3; border-color: #a9cabe; }
 .content-page .command-form .actions { border-top: 1px solid #e5ece8; margin: 0; padding-top: 18px; }
 .content-page .command-form .array-item { align-items: end; }
 .content-page .command-form .array-item > label { margin: 8px 0; }
+
+/* Quick cross-section links and narrow-desktop polish. */
+.page-context-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: -10px 0 22px;
+}
+.page-context-links a {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 11px;
+  border: 1px solid #dce5e1;
+  border-radius: 999px;
+  background: #fff;
+  color: #4f6659;
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
+}
+.page-context-links a:hover {
+  background: #f0f5f2;
+  color: #176653;
+  border-color: #bfd5c6;
+}
+.page-context-links a[aria-current="page"] {
+  background: #e4ede6;
+  border-color: #bfd5c6;
+  color: #175443;
+  font-weight: 600;
+}
+.action [role="status"]:not(:empty) {
+  color: var(--muted);
+}
+@media (max-width: 1180px) {
+  .workspace {
+    grid-template-columns: 224px minmax(0, 1fr);
+  }
+  .content-page {
+    padding: 32px 28px 64px;
+  }
+  .application-summary {
+    grid-template-columns: minmax(150px, 1.4fr) auto minmax(140px, 1fr);
+  }
+}

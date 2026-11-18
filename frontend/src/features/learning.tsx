@@ -882,17 +882,58 @@ function InterviewPractice() {
   const t = useText();
   const { revision } = useContext(Revision);
   const resource = useResource("/interview-practice", revision);
-  const [topic, setTopic] = useState("");
-  const [query, setQuery] = useState("");
-  const [wrongOnly, setWrongOnly] = useState(false);
-  const [reviewIds, setReviewIds] = useState<string[]>([]);
-  const [attempts, setAttempts] = useState<Record<string, { choice: number; feedback: Data }>>({});
-  const [view, setView] = useState<"list" | "question">("list");
-  const [listPage, setListPage] = useState(0);
-  const [position, setPosition] = useState(0);
+  const practiceDraftKey = learningDraftKey("practice");
+  const [savedPractice] = useState(() => readLearningDraft(practiceDraftKey));
+  const [topic, setTopic] = useState(() => string(savedPractice.topic));
+  const [query, setQuery] = useState(() => string(savedPractice.query));
+  const [wrongOnly, setWrongOnly] = useState(
+    () => savedPractice.wrongOnly === true,
+  );
+  const [reviewIds, setReviewIds] = useState<string[]>(() =>
+    array(savedPractice.reviewIds).map(string).filter(Boolean),
+  );
+  const [attempts, setAttempts] = useState<
+    Record<string, { choice: number; feedback: Data }>
+  >(() =>
+    object(savedPractice.attempts) as Record<
+      string,
+      { choice: number; feedback: Data }
+    >,
+  );
+  const [view, setView] = useState<"list" | "question">(() =>
+    savedPractice.view === "question" ? "question" : "list",
+  );
+  const [listPage, setListPage] = useState(() =>
+    number(savedPractice.listPage),
+  );
+  const [position, setPosition] = useState(() =>
+    number(savedPractice.position),
+  );
   const [selected, setSelected] = useState<number | null>(null);
   const [feedback, setFeedback] = useState<Data | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  useEffect(() => {
+    writeLearningDraft(practiceDraftKey, {
+      topic,
+      query,
+      wrongOnly,
+      reviewIds,
+      attempts,
+      view,
+      listPage,
+      position,
+    });
+  }, [
+    practiceDraftKey,
+    topic,
+    query,
+    wrongOnly,
+    reviewIds,
+    attempts,
+    view,
+    listPage,
+    position,
+  ]);
   const all = array(object(resource.data).items).map(object);
   const topics = Array.from(new Set(all.map((q) => string(q.topic))));
   const needle = query.trim().toLocaleLowerCase();
@@ -923,7 +964,7 @@ function InterviewPractice() {
       <option value="">{t("全部领域", "All topics")}</option>
       {topics.map((item) => <option key={item} value={item}>{item}</option>)}
     </select></label><label><span className="sr-only">{t("搜索题目", "Search questions")}</span><input type="search" value={query} disabled={submitting} onChange={(event) => { setQuery(event.target.value); move(0); setListPage(0); }} placeholder={t("搜索题目", "Search questions")} /></label>
-    <button type="button" className="secondary" aria-pressed={wrongOnly} disabled={submitting} onClick={() => { if (!wrongOnly) setReviewIds(Object.entries(attempts).filter(([, attempt]) => attempt.feedback.correct === false).map(([id]) => id)); setWrongOnly(!wrongOnly); move(0); setListPage(0); }}>{wrongOnly ? t("全部题目", "All questions") : t("本次错题", "Session mistakes")} · {wrongCount}</button><small>{t("作答状态仅本页保留", "Status is kept on this page only")}</small></div>
+    <button type="button" className="secondary" aria-pressed={wrongOnly} disabled={submitting} onClick={() => { if (!wrongOnly) setReviewIds(Object.entries(attempts).filter(([, attempt]) => attempt.feedback.correct === false).map(([id]) => id)); setWrongOnly(!wrongOnly); move(0); setListPage(0); }}>{wrongOnly ? t("全部题目", "All questions") : t("本次错题", "Session mistakes")} · {wrongCount}</button><small>{t("作答状态暂存在当前标签页", "Status is kept in this browser tab")}</small></div>
     {questions.length ? <><table className="practice-table"><thead><tr><th>{t("状态", "Status")}</th><th>{t("题目", "Problem")}</th><th>{t("领域", "Topic")}</th></tr></thead><tbody>
       {questions.slice(page * 20, page * 20 + 20).map((item, index) => {
         const attempt = attempts[string(item.id)];
@@ -976,6 +1017,7 @@ function InterviewKnowledge() {
   const [topic, setTopic] = useState("");
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(0);
+  const [view, setView] = useState<"card" | "list">("card");
   if (resource.loading || resource.error)
     return <Loading error={resource.error} retry={resource.refresh} />;
   const cards = array(object(resource.data).items).map(object);
@@ -988,14 +1030,54 @@ function InterviewKnowledge() {
   const currentPage = Math.min(page, Math.max(0, visible.length - 1));
   const card = visible[currentPage];
   return <section className="interview-knowledge">
-    <h2>{t("知识卡片", "Knowledge cards")}</h2>
+    <div className="practice-list-heading">
+      <h2>{t("知识卡片", "Knowledge cards")}</h2>
+      <button
+        type="button"
+        className="secondary"
+        onClick={() => setView(view === "card" ? "list" : "card")}
+      >
+        {view === "card" ? t("目录列表", "List view") : t("卡片阅读", "Card view")} · {visible.length}
+      </button>
+    </div>
     <div className="practice-filters"><label>{t("知识领域", "Topic")}{" "}<select value={topic} onChange={(event) => { setTopic(event.target.value); setPage(0); }}>
       <option value="">{t("全部领域", "All topics")}</option>
       {topics.map((item) => <option key={item} value={item}>{item}</option>)}
     </select></label>
     <label>{t("搜索题目或答案", "Search questions or answers")}{" "}<input type="search" value={query} onChange={(event) => { setQuery(event.target.value); setPage(0); }} /></label></div>
     {visible.length === 0 && <p>{t("没有匹配的题目。", "No matching questions.")}</p>}
-    {card && <><div className="knowledge-card" key={string(card.id)}>
+    {visible.length > 0 && view === "list" && (
+      <table className="practice-table knowledge-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>{t("题目", "Question")}</th>
+            <th>{t("知识领域", "Topic")}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {visible.map((item, index) => (
+            <tr key={string(item.id)}>
+              <td>{index + 1}</td>
+              <td>
+                <button
+                  type="button"
+                  className="practice-question-link"
+                  onClick={() => {
+                    setPage(index);
+                    setView("card");
+                  }}
+                >
+                  {string(item.question).split("\n")[0]}
+                </button>
+              </td>
+              <td>{string(item.topic)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+    {card && view === "card" && <><div className="knowledge-card" key={string(card.id)}>
       <div className="knowledge-card-meta" aria-live="polite"><span>{string(card.topic)}</span><span>{currentPage + 1} / {visible.length}</span></div>
       <h3>{string(card.question)}</h3>
       <details><summary>{t("查看答案", "Reveal answer")}</summary>

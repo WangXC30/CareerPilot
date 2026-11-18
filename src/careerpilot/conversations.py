@@ -1043,7 +1043,6 @@ def build_graph(engine, task_id, checkpointer, transaction):
             "history": state["history"],
             "context": state["context"],
             "sources": state["sources"],
-            "tools": TOOLS,
             "tools_allowed": state["rounds"] < MAX_TOOL_CALLS,
             "remaining_tool_calls": max(0, MAX_TOOL_CALLS - state["rounds"]),
             "tool_results": bounded(state["tools"][-4:], 6500),
@@ -1057,10 +1056,10 @@ def build_graph(engine, task_id, checkpointer, transaction):
                 for tool in state["tools"]
             ],
         }
-        while data["history"] and len(packed(data).encode()) > 31000:
+        while data["history"] and len(packed(data).encode()) > 44000:
             data["history"] = data["history"][2:]
             data["history_note"] = "部分历史未放入本轮窗口；需要细节时用 read_history 回查。"
-        if decision is None and len(packed(data).encode()) > 31000:
+        if decision is None and len(packed(data).encode()) > 44000:
             raise DomainError("MODEL_LIMIT", "对话内容过长，请新建对话或缩小资料范围。", 422)
         if decision is None:
             try:

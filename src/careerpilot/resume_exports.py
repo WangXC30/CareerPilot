@@ -9,14 +9,46 @@ from careerpilot.domain import DomainError
 from careerpilot.resumes import KINDS
 
 
+def _header_title(version):
+    name_facts = [
+        line.strip()
+        for f in version.get("facts", [])
+        if f.get("kind") == "name"
+        for line in f.get("text", "").splitlines()
+        if line.strip()
+    ]
+    if name_facts:
+        return name_facts[0]
+    title = str(version.get("title") or "").strip()
+    return title or "个人简历"
+
+
 def paragraphs(version):
-    result = [("Title", "个人简历")]
+    header = _header_title(version)
+    result = [("Title", header)]
+    used_header_as_name = False
     for kind, label in KINDS.items():
         facts = [f for f in version["facts"] if f["kind"] == kind]
         if not facts:
             continue
-        if kind not in {"name", "contact"}:
-            result.append(("Heading1", label))
+        if kind == "name":
+            for fact in facts:
+                for line in fact["text"].splitlines():
+                    clean = line.strip()
+                    if not clean:
+                        continue
+                    if not used_header_as_name and clean == header:
+                        used_header_as_name = True
+                        continue
+                    result.append(("Contact", clean))
+            continue
+        if kind == "contact":
+            for fact in facts:
+                result.extend(
+                    ("Contact", line.strip()) for line in fact["text"].splitlines() if line.strip()
+                )
+            continue
+        result.append(("Heading1", label))
         for fact in facts:
             result.extend(("Normal", line) for line in fact["text"].splitlines() if line.strip())
     return result
@@ -34,22 +66,28 @@ def docx(version):
     ns = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"'
     document = f"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:document {ns}><w:body>{"".join(parts)}<w:sectPr>
-<w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134"
-w:bottom="1134" w:left="1134" w:header="567" w:footer="567"/>
+<w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1020" w:right="1080"
+w:bottom="1020" w:left="1080" w:header="567" w:footer="567"/>
 </w:sectPr></w:body></w:document>"""
     styles = f"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:styles {ns}><w:docDefaults><w:rPrDefault><w:rPr>
 <w:rFonts w:ascii="Calibri" w:hAnsi="Calibri" w:eastAsia="Microsoft YaHei"/>
-<w:sz w:val="22"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr>
-<w:spacing w:after="120" w:line="300" w:lineRule="auto"/>
+<w:color w:val="202D32"/><w:sz w:val="21"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr>
+<w:spacing w:after="100" w:line="310" w:lineRule="auto"/>
 </w:pPr></w:pPrDefault></w:docDefaults>
 <w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style>
 <w:style w:type="paragraph" w:styleId="Title"><w:name w:val="Title"/>
-<w:basedOn w:val="Normal"/><w:pPr><w:keepNext/></w:pPr>
-<w:rPr><w:b/><w:sz w:val="36"/></w:rPr></w:style>
+<w:basedOn w:val="Normal"/><w:pPr><w:keepNext/><w:spacing w:after="60"/></w:pPr>
+<w:rPr><w:b/><w:color w:val="173C2F"/><w:sz w:val="38"/></w:rPr></w:style>
+<w:style w:type="paragraph" w:styleId="Contact"><w:name w:val="Subtitle"/>
+<w:basedOn w:val="Normal"/><w:pPr><w:spacing w:after="140"/>
+<w:pBdr><w:bottom w:val="single" w:sz="6" w:space="6" w:color="CBD5CF"/></w:pBdr></w:pPr>
+<w:rPr><w:color w:val="5C6D63"/><w:sz w:val="20"/></w:rPr></w:style>
 <w:style w:type="paragraph" w:styleId="Heading1"><w:name w:val="heading 1"/>
-<w:basedOn w:val="Normal"/><w:pPr><w:keepNext/><w:spacing w:before="240" w:after="120"/>
-<w:outlineLvl w:val="0"/></w:pPr><w:rPr><w:b/><w:sz w:val="26"/></w:rPr></w:style>
+<w:basedOn w:val="Normal"/><w:pPr><w:keepNext/><w:spacing w:before="220" w:after="100"/>
+<w:pBdr><w:bottom w:val="single" w:sz="6" w:space="4" w:color="DCE4E2"/></w:pBdr>
+<w:outlineLvl w:val="0"/></w:pPr>
+<w:rPr><w:b/><w:color w:val="176653"/><w:sz w:val="25"/></w:rPr></w:style>
 </w:styles>"""
     content_types = """<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
 <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
@@ -83,13 +121,30 @@ w:bottom="1134" w:left="1134" w:header="567" w:footer="567"/>
 def pdf(version):
     from playwright.sync_api import Error, sync_playwright
 
-    tags = {"Title": "h1", "Heading1": "h2", "Normal": "p"}
-    body = "".join(f"<{tags[s]}>{escape(t)}</{tags[s]}>" for s, t in paragraphs(version))
+    tags = {
+        "Title": ('<h1 class="resume-name">', "</h1>"),
+        "Contact": ('<p class="resume-contact">', "</p>"),
+        "Heading1": ('<h2 class="resume-section">', "</h2>"),
+        "Normal": ('<p class="resume-line">', "</p>"),
+    }
+    body = "".join(f"{tags[s][0]}{escape(t)}{tags[s][1]}" for s, t in paragraphs(version))
     html = (
         """<!doctype html><html lang="zh-CN"><meta charset="utf-8"><style>
-@page {size:A4;margin:20mm}body {font:11pt/1.5 "WenQuanYi Zen Hei",sans-serif;color:#111}
-h1 {font-size:18pt;margin:0 0 12pt}h2 {font-size:13pt;margin:14pt 0 6pt;break-after:avoid}
-p {margin:0 0 6pt;white-space:pre-wrap;overflow-wrap:anywhere;orphans:2;widows:2}
+@page {size:A4;margin:18mm 19mm}
+body {
+  font:10.5pt/1.55 "Noto Sans CJK SC","WenQuanYi Zen Hei","Microsoft YaHei",sans-serif;
+  color:#202d32;margin:0
+}
+.resume-name {font-size:19pt;font-weight:700;color:#173c2f;margin:0 0 4pt;letter-spacing:-0.02em}
+.resume-contact {font-size:9.5pt;color:#5c6d63;margin:0 0 4pt}
+.resume-contact + .resume-section,.resume-name + .resume-section {
+  margin-top:14pt;border-top:1pt solid #cbd5cf;padding-top:10pt
+}
+.resume-section {
+  font-size:12pt;font-weight:700;color:#176653;margin:14pt 0 6pt;
+  padding-bottom:3pt;border-bottom:0.75pt solid #dce4e2;break-after:avoid
+}
+.resume-line {margin:0 0 5pt;white-space:pre-wrap;overflow-wrap:anywhere;orphans:2;widows:2}
 </style><body>"""
         + body
         + "</body></html>"

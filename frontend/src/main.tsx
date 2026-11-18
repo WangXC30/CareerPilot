@@ -145,6 +145,50 @@ function Workspace() {
       window.removeEventListener("hashchange", navigate);
     };
   }, []);
+  useEffect(() => {
+    function interceptInternalLinks(event: MouseEvent) {
+      if (
+        event.defaultPrevented ||
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+      )
+        return;
+      const anchor = (event.target as Element | null)?.closest("a");
+      if (
+        !anchor ||
+        !anchor.getAttribute("href") ||
+        anchor.target === "_blank" ||
+        anchor.hasAttribute("download")
+      )
+        return;
+      const url = new URL(anchor.href, window.location.origin);
+      if (
+        url.origin !== window.location.origin ||
+        (url.pathname !== "/app" && !url.pathname.startsWith("/app/"))
+      )
+        return;
+      if (
+        url.pathname === window.location.pathname &&
+        url.search === window.location.search &&
+        url.hash
+      )
+        return;
+      event.preventDefault();
+      const target = `${url.pathname}${url.search}${url.hash}`;
+      const previous = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+      const hashChanged = url.hash !== window.location.hash;
+      if (target !== previous) history.pushState(null, "", target);
+      setRoute(locationRoute());
+      setNavigationNotice("");
+      window.dispatchEvent(new PopStateEvent("popstate"));
+      if (hashChanged) window.dispatchEvent(new HashChangeEvent("hashchange"));
+    }
+    document.addEventListener("click", interceptInternalLinks);
+    return () => document.removeEventListener("click", interceptInternalLinks);
+  }, []);
   const labels: Record<Route, [string, string]> = {
     today: ["AI 助手", "AI assistant"],
     goals: ["目标与岗位", "Goals and jobs"],
@@ -237,6 +281,32 @@ function Workspace() {
                   <h1 className={route === "today" ? "sr-only" : undefined}>
                     {language === "en-US" ? labels[route][1] : labels[route][0]}
                   </h1>
+                  {(["goals", "learn", "career", "profile"] as const).includes(
+                    route as "goals" | "learn" | "career" | "profile",
+                  ) && (
+                    <nav
+                      className="page-context-links"
+                      aria-label={
+                        language === "en-US"
+                          ? "Related sections"
+                          : "相关工作区"
+                      }
+                    >
+                      {(["goals", "learn", "career", "profile"] as const).map(
+                        (key) => (
+                          <a
+                            key={key}
+                            href={`/app/${key}`}
+                            aria-current={route === key ? "page" : undefined}
+                          >
+                            {language === "en-US"
+                              ? labels[key][1]
+                              : labels[key][0]}
+                          </a>
+                        ),
+                      )}
+                    </nav>
+                  )}
                   {navigationNotice && (
                     <p className="notice">
                       {navigationNotice === "historical"

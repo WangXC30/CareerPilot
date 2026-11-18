@@ -2256,3 +2256,33 @@ def test_profile_note_arguments_cannot_claim_verification_or_target_other_users(
     value = result(client, alice, run)
     assert value["status"] == "failed" and value["result"]["code"] == "TOOL_DENIED"
     assert client.get("/api/v1/memories", headers=alice).json() == []
+
+
+def test_long_chinese_jd_fits_without_model_limit_and_tools_live_in_system_prompt(system, install):
+    client, engine, alice, *_ = system
+    profile(client, alice)
+    long_jd = "岗位：后端工程师\n要求：Python、SQL。\n" + ("职责说明" * 950)
+    assert 3800 <= len(long_jd) <= 4000 and len(long_jd.encode()) > 11000
+    chat = conversation(client, alice)
+    install([decision(answer="背景说明：" + ("学习计划" * 350))])
+    first = send(client, alice, chat, "背景信息：" + ("工作经历" * 350)).json()
+    assert "id" in first, first
+    run_once(engine)
+    model = install([decision("import_job", content=long_jd), decision()])
+    run = send(client, alice, chat, long_jd).json()
+    assert "id" in run, run
+    run_once(engine)
+    waiting = result(client, alice, run)
+    assert waiting["status"] == "waiting_confirmation", waiting
+    assert "tools" not in model.requests[0]
+    assert len(model.requests[0]["history"]) == 2
+    assert len(json.dumps(model.requests[0], ensure_ascii=False).encode()) > 19000
+    envelope = json.dumps(
+        {
+            "untrusted_data": json.dumps({"message": "你好", "history": []}),
+            "output_schema": conversations.DECISION,
+        }
+    )
+    messages = chat_model.ChatProvider("fixture-key").messages(envelope)
+    assert "Allowed tools:" in messages[0]["content"]
+    assert '"import_job"' in messages[0]["content"]

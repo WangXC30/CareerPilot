@@ -6,6 +6,31 @@ import { InformationActions } from "./information-actions";
 import { InformationDetail as DetailContent, informationTitle } from "./information-detail";
 import { References, Revision } from "./references";
 
+const searchIgnoredKeys = new Set([
+  "id",
+  "user_id",
+  "tenant_id",
+  "version",
+  "base_version",
+  "content_hash",
+  "source_hash",
+  "hash",
+  "trace_id",
+  "payload_json",
+  "run_id",
+]);
+
+function searchableText(value: Json | undefined): string {
+  if (value === null || value === undefined || typeof value === "boolean")
+    return "";
+  if (typeof value !== "object") return String(value);
+  if (Array.isArray(value)) return value.map(searchableText).join(" ");
+  return Object.entries(value)
+    .filter(([key]) => !searchIgnoredKeys.has(key))
+    .map(([, entry]) => searchableText(entry))
+    .join(" ");
+}
+
 function careerNext(application: Data, t: (zh: string, en: string) => string) {
   return (
     (
@@ -198,7 +223,7 @@ export function Collection({
       (path !== "/memories" || !item.structured_experience) &&
       (path === "/jobs" ||
         !query ||
-        JSON.stringify(item)
+        searchableText(item)
           .toLocaleLowerCase()
           .includes(query.toLocaleLowerCase())),
   );
@@ -265,10 +290,12 @@ export function Collection({
         window.setTimeout(() => locate(true), 100);
     }
     window.addEventListener("hashchange", onHash);
+    window.addEventListener("popstate", onHash);
     document.addEventListener("click", onClick);
     return () => {
       window.clearTimeout(timer);
       window.removeEventListener("hashchange", onHash);
+      window.removeEventListener("popstate", onHash);
       document.removeEventListener("click", onClick);
     };
   }, [path, resource.data, targetJob.data]);
@@ -480,7 +507,11 @@ export function Subtabs({
       if (next >= 0) setActive(next);
     }
     window.addEventListener("hashchange", followHash);
-    return () => window.removeEventListener("hashchange", followHash);
+    window.addEventListener("popstate", followHash);
+    return () => {
+      window.removeEventListener("hashchange", followHash);
+      window.removeEventListener("popstate", followHash);
+    };
   }, [labels]);
   return (
     <>
