@@ -270,8 +270,8 @@ def test_unlimited_chat_quota_retains_usage_accounting(system):
     provider = FakeProvider(['{"answer":"ok"}', '{"answer":"ok"}'])
     provider.input_token_overhead = 9000
     gateway = Gateway(engine, provider, daily_tokens=None, task_tokens=None)
-    assert generate(gateway, principal_of(system)) == {'answer': 'ok'}
-    assert generate(gateway, principal_of(system)) == {'answer': 'ok'}
+    assert generate(gateway, principal_of(system)) == {"answer": "ok"}
+    assert generate(gateway, principal_of(system)) == {"answer": "ok"}
     with Session(engine) as db:
         usages = db.scalars(select(ModelUsage)).all()
         assert len(usages) == 2

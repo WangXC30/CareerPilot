@@ -198,11 +198,12 @@ class Gateway:
             error = ""
             retry_reason = ""
             parsed = None
-            reply = None
+            reply: ProviderReply | None = None
             try:
-                if on_delta is not None and hasattr(self.provider, "generate_stream"):
+                stream_fn = getattr(self.provider, "generate_stream", None)
+                if on_delta is not None and callable(stream_fn):
                     reply = await asyncio.wait_for(
-                        self.provider.generate_stream(envelope, max_tokens, on_delta=on_delta),
+                        stream_fn(envelope, max_tokens, on_delta=on_delta),
                         timeout=self.timeout,
                     )
                 else:
@@ -210,7 +211,8 @@ class Gateway:
                         self.provider.generate(envelope, max_tokens), timeout=self.timeout
                     )
                 if (
-                    type(reply.input_tokens) is not int
+                    reply is None
+                    or type(reply.input_tokens) is not int
                     or type(reply.output_tokens) is not int
                     or reply.input_tokens < 0
                     or reply.output_tokens < 0

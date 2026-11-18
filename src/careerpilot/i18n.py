@@ -283,6 +283,7 @@ ERROR_MESSAGES_EN: dict[str, str] = {
     "QUESTION_UNAVAILABLE": "This question is not in the current catalogue.",
     "QUIET_AFTER_DEADLINE": "Quiet hours push the reminder past the deadline. Choose earlier.",
     "QUOTA_EXCEEDED": "The usage quota has been reached.",
+    "RAG_UNAVAILABLE": "The local technical library is unavailable. Check models and index.",
     "RECEIPT_REQUIRED": "This application status requires a confirmed receipt.",
     "REGISTRATION_UNAVAILABLE": "This email cannot be registered. Try signing in.",
     "REMINDER_FINISHED": "This reminder has ended. Create a new one.",

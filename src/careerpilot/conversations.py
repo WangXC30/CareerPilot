@@ -525,30 +525,36 @@ def technical_search(query):
     from careerpilot.technical_rag import TECHNICAL_ALIASES
     from careerpilot.technical_rag import search as local_search
 
-    index = os.environ.get('CAREERPILOT_RAG_INDEX', 'data/rag_index/technical.sqlite3')
-    directory = os.environ.get('CAREERPILOT_RAG_MODEL', 'data/rag_models/multilingual-e5-small')
-    reranker_dir = os.environ.get('CAREERPILOT_RAG_RERANKER', 'data/rag_models/bge-reranker-v2-m3')
+    index = os.environ.get("CAREERPILOT_RAG_INDEX", "data/rag_index/technical.sqlite3")
+    directory = os.environ.get("CAREERPILOT_RAG_MODEL", "data/rag_models/multilingual-e5-small")
+    reranker_dir = os.environ.get("CAREERPILOT_RAG_RERANKER", "data/rag_models/bge-reranker-v2-m3")
     try:
         model, identity = _technical_model(directory)
         found = local_search(index, query, model, identity, limit=20)
         if found:
             reranker = _technical_reranker(reranker_dir)
             aliases = [value for key, value in TECHNICAL_ALIASES.items() if key in query]
-            rerank_query = query + (' ' + ' '.join(aliases) if aliases else '')
-            scores = reranker(rerank_query, [item['text'] for item in found])
+            rerank_query = query + (" " + " ".join(aliases) if aliases else "")
+            scores = reranker(rerank_query, [item["text"] for item in found])
             if len(scores) != len(found) or not all(math.isfinite(score) for score in scores):
-                raise ValueError('Reranker result count mismatch')
+                raise ValueError("Reranker result count mismatch")
             ordered = sorted(zip(scores, found), key=lambda pair: pair[0], reverse=True)
-            found, counts = [], Counter()
+            found = []
+            counts: Counter[str] = Counter()
             for score, item in ordered:
                 if score < -2:
                     continue
-                title = item['source']['title']
+                title = item["source"]["title"]
                 if counts[title] >= 2:
                     continue
-                if any(previous['source']['title'] == title and SequenceMatcher(
-                    None, previous['text'], item['text'], autojunk=False
-                ).ratio() >= 0.8 for previous in found):
+                if any(
+                    previous["source"]["title"] == title
+                    and SequenceMatcher(
+                        None, previous["text"], item["text"], autojunk=False
+                    ).ratio()
+                    >= 0.8
+                    for previous in found
+                ):
                     continue
                 found.append(item)
                 counts[title] += 1
@@ -556,19 +562,25 @@ def technical_search(query):
                     break
     except (OSError, ImportError, ValueError, RuntimeError, sqlite3.Error) as exc:
         raise DomainError(
-            'RAG_UNAVAILABLE', '本地技术资料库不可用，请检查模型和索引。', 503
+            "RAG_UNAVAILABLE", "本地技术资料库不可用，请检查模型和索引。", 503
         ) from exc
     items, sources = [], []
     for result in found:
-        origin = result['source']
-        page = f" · PDF 第 {origin['page']} 页" if origin.get('page') else ''
-        items.append({'source_id': result['id'], 'excerpt': result['text']})
-        href = origin['url'] + (f"#page={origin['page']}" if origin.get('page') else '')
-        label = origin['title'] + page + ' · ' + origin.get('license', '')
-        sources.append({'id': result['id'], 'label': label, 'href': href})
-    return {'items': items, 'sources': sources,
-            'notice': ('检索结果仅是候选依据；应核对内容，不能将不相关内容用于回答。'
-                       if items else '未找到足够相关的资料；不得编造来源。')}
+        origin = result["source"]
+        page = f" · PDF 第 {origin['page']} 页" if origin.get("page") else ""
+        items.append({"source_id": result["id"], "excerpt": result["text"]})
+        href = origin["url"] + (f"#page={origin['page']}" if origin.get("page") else "")
+        label = origin["title"] + page + " · " + origin.get("license", "")
+        sources.append({"id": result["id"], "label": label, "href": href})
+    return {
+        "items": items,
+        "sources": sources,
+        "notice": (
+            "检索结果仅是候选依据；应核对内容，不能将不相关内容用于回答。"
+            if items
+            else "未找到足够相关的资料；不得编造来源。"
+        ),
+    }
 
 
 def authorize(db, principal, action, args):
@@ -882,9 +894,12 @@ def build_graph(engine, task_id, checkpointer, transaction):
     """Every I/O boundary releases SQL locks; each tool effect has a durable receipt."""
 
     def invoke(principal, trace, data, output_schema, suffix, max_tokens=1800, rounds=0):
-        stream_state = {"text": "", "at": 0.0, "step": 0}
+        last_text = ""
+        last_at = 0.0
+        step = 0
 
         def on_delta(raw):
+            nonlocal last_text, last_at, step
             import time
 
             from sqlalchemy.exc import SQLAlchemyError
@@ -894,21 +909,21 @@ def build_graph(engine, task_id, checkpointer, transaction):
             from careerpilot.workflows import append_event
 
             preview = extract_streaming_answer(raw)
-            if not preview or preview == stream_state["text"]:
+            if not preview or preview == last_text:
                 return
             now = time.monotonic()
-            if len(preview) - len(stream_state["text"]) < 36 and now - stream_state["at"] < 0.35:
+            if len(preview) - len(last_text) < 36 and now - last_at < 0.35:
                 return
-            stream_state["text"] = preview
-            stream_state["at"] = now
-            stream_state["step"] += 1
+            last_text = preview
+            last_at = now
+            step += 1
             try:
                 with Session(engine) as db, db.begin():
                     append_event(
                         db,
                         principal,
                         task_id,
-                        f"chat.delta:{rounds}:{stream_state['step']}",
+                        f"chat.delta:{rounds}:{step}",
                         "delta",
                         {"text": preview},
                     )

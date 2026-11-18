@@ -6,6 +6,8 @@ import time
 
 import httpx
 
+from careerpilot.persistence import SCHEMA_REVISION
+
 
 def main():
     if os.environ.get("CAREERPILOT_ACCEPTANCE") != "1":
@@ -80,11 +82,11 @@ def main():
         assert status["status"] == "completed", status["status"]
         assert client.get("/api/v1/me", headers=headers).status_code == 409
         assert client.get("/api/v1/local-workspace").json()["user_id"] != workspace["user_id"]
-        assert client.get("/health/ready").json()["schema_revision"] == "0006"
+        assert client.get("/health/ready").json()["schema_revision"] == SCHEMA_REVISION
         print(
             json.dumps(
                 {
-                    "schema_revision": "0006",
+                    "schema_revision": SCHEMA_REVISION,
                     "separate_worker": True,
                     "assistant_status": "success",
                     "tool_results_match_persisted_plan": True,

@@ -22,20 +22,31 @@ def decision(tool="answer", answer="你好，我们继续讨论你的成长目�
 
 def test_technical_search_results_are_cited_in_chat(system, install, monkeypatch):
     client, engine, alice, *_ = system
-    monkeypatch.setattr(conversations, 'technical_search', lambda query: {
-        'items': [{'source_id': 'source-1', 'excerpt': 'Pages map virtual to physical memory.'}],
-        'sources': [{'id': 'source-1', 'label': 'OS textbook page 5',
-                     'href': 'https://example.org/book.pdf#page=5'}],
-    })
-    answer = decision(answer='页表将虚拟地址映射到物理地址。')
-    answer['source_ids'] = ['source-1']
-    install([decision('search_technical', query='页表'), answer])
-    run = send(client, alice, conversation(client, alice), '解释页表').json()
+    monkeypatch.setattr(
+        conversations,
+        "technical_search",
+        lambda query: {
+            "items": [
+                {"source_id": "source-1", "excerpt": "Pages map virtual to physical memory."}
+            ],
+            "sources": [
+                {
+                    "id": "source-1",
+                    "label": "OS textbook page 5",
+                    "href": "https://example.org/book.pdf#page=5",
+                }
+            ],
+        },
+    )
+    answer = decision(answer="页表将虚拟地址映射到物理地址。")
+    answer["source_ids"] = ["source-1"]
+    install([decision("search_technical", query="页表"), answer])
+    run = send(client, alice, conversation(client, alice), "解释页表").json()
     run_once(engine)
     output = result(client, alice, run)
-    assert output['status'] == 'completed'
-    assert output['result']['tools'][0]['name'] == 'search_technical'
-    assert output['result']['citations'][0]['id'] == 'source-1'
+    assert output["status"] == "completed"
+    assert output["result"]["tools"][0]["name"] == "search_technical"
+    assert output["result"]["citations"][0]["id"] == "source-1"
 
 
 @pytest.mark.parametrize("approved", [True, False])
